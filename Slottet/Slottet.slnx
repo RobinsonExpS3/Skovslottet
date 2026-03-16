@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Slottet.Client/Slottet.Client.csproj" />
+  <Project Path="Slottet/Slottet.csproj" />
+</Solution>
