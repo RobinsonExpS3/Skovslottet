@@ -6,21 +6,17 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/adminview/addResident">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Opret nyt beboerkort
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/adminview/EditResident">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Rediger beboerkort
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/adminview/EditSpecialResponsibility">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Rediger særligt ansvar
-            </NavLink>
-        </div>
+        <NavLink class="nav-button" href="/adminview/addResident">
+            Opret nyt beboerkort
+        </NavLink>
+
+        <NavLink class="nav-button" href="/adminview/EditResident">
+            Rediger beboerkort
+        </NavLink>
+
+        <NavLink class="nav-button" href="/adminview/EditSpecialResponsibility">
+            Rediger særligt ansvar
+        </NavLink>
        
     </nav>
 </div>
