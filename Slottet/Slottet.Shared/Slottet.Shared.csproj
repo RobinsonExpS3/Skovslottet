@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Slottet.Client\Slottet.Client.csproj" />
-    <ProjectReference Include="..\Slottet\Slottet.csproj" />
   </ItemGroup>
 
 </Project>

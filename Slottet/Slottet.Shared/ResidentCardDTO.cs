@@ -1,6 +1,6 @@
 ﻿namespace Slottet.Shared
 {
-    internal class ResidentCardDTO
+    public class ResidentCardDTO
     {
 
     }
