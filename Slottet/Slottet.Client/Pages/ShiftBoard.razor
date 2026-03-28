@@ -6,17 +6,19 @@
 }
 else
 {
-	<section>  @* Overskrift med afdelingens navn og vagttypen *@
+	<section class="shiftboard-header">  @* Overskrift med afdelingens navn og vagttypen *@
 		<h1>@Model.DepartmentName</h1>
-		<p><strong>Vagttype: </strong>@Model.ShiftType</p>
-		<p><strong>Start: </strong>@Model.StartDate.ToString("dd-MM-yyyy HH:mm")</p>
-		<p><strong>Slut: </strong>@Model.EndDate.ToString("dd-MM-yyyy HH:mm")</p>
+		<p>
+			<strong>Vagttype: </strong>@Model.ShiftType 
+			<strong>Start: </strong>@Model.StartDate.ToString("dd-MM-yyyy HH:mm")
+			<strong>Slut: </strong>@Model.EndDate.ToString("dd-MM-yyyy HH:mm")			
+		</p>
 	</section>
 
-	<section>
-		<div class="left-panel"> @* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
+	<section class="shiftboard-layout">
+		<aside class="left-panel"> @* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
 		<div class="info-box">
-			<h3>Telefonnumre ☎️</h3>
+			<h2>Telefonnumre ☎️</h2>
 			<p>
 			<ul>
 				@foreach (var phone in Model.PhoneNumbers)
@@ -28,7 +30,7 @@ else
 		</div>
 
 			<div class="info-box">
-				<h3>Afdelingens opgaver📝</h3>
+				<h2>Afdelingens opgaver📝</h2>
 				<ul>
 					@foreach (var task in Model.DepartmentTasks)
 					{
@@ -38,7 +40,7 @@ else
 			</div>
 
 			<div class="info-box">
-				<h3>Særligt ansvar 🔏</h3>
+				<h2>Særligt ansvar 🔏</h2>
 				<ul>
 					@foreach (var responsibility in Model.SpecialResponsibilities)
 					{
@@ -46,13 +48,12 @@ else
 					}
 				</ul>
 			</div>
-		</div>
-	</section>
+			</aside>
+	
+		<main class="right-panel">
+			<h2>Beboere</h2>
 
-	<section>
-		<div class="right-panel">
-		<div class="info-box">
-			<div> 
+		<div class="resident-card-grid">			
 				@foreach (var resident in Model.ResidentCards)
 				{
 					<article class="resident-card">
@@ -65,8 +66,7 @@ else
 					<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
 					</article>
 				}
-			</div>
 		</div>
-		</div>
+		</main>
 	</section>
 }

@@ -88,6 +88,168 @@ namespace Slottet.Client.Pages.MockData
 
                     GroceryDay = DateTime.Today.AddDays(1),
                     PaymentMethod = "Mobilepay"
+                },
+                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Gert Heller",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
+                },
+                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Ida Jacoby",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
+                },
+                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Karl Larsen",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
+                },
+                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Mette Nielsen",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
+                },
+                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Ole Pontoppidan",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
+                },
+                                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Quint Roberts",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
+                },
+                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Søren Thomasson",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
+                },
+                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Ulke Venja",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
+                },
+                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+
+                    ResidentName = "Whilmer Xander",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Kontanter"
                 }
             }
             };
