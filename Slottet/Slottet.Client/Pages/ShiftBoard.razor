@@ -16,6 +16,27 @@ else
 	</section>
 
 	<section class="shiftboard-layout">
+		<main class="right-panel">
+			<h2>Beboere</h2>
+
+			<div class="resident-card-grid">
+				@foreach (var resident in Model.ResidentCards)
+				{
+					<article class="resident-card">
+						<h3>@resident.ResidentName</h3>
+						<p><strong>⚠️Risikoniveau: </strong> @resident.RiskLevel</p>
+						<p><strong>📝Status: </strong> @resident.Status</p>
+						<p><strong>💊Medicintid: </strong> @resident.MedicinTime</p>
+						<p><strong>💉PN-tid: </strong> @resident.PnTime</p>
+						<p><strong>🗓️Indkøbsdag: </strong> @(resident.GroceryDay?.ToString("dd-MM-yyyy") ?? "-")</p>
+						<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
+					</article>
+				}
+			</div>
+		</main>
+
+
+
 		<aside class="left-panel"> @* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
 		<div class="info-box">
 			<h2>Telefonnumre ☎️</h2>
@@ -50,23 +71,6 @@ else
 			</div>
 			</aside>
 	
-		<main class="right-panel">
-			<h2>Beboere</h2>
-
-		<div class="resident-card-grid">			
-				@foreach (var resident in Model.ResidentCards)
-				{
-					<article class="resident-card">
-					<h3>@resident.ResidentName</h3>
-					<p><strong>⚠️Risikoniveau: </strong> @resident.RiskLevel</p>
-					<p><strong>📝Status: </strong> @resident.Status</p>
-					<p><strong>💊Medicintid: </strong> @resident.MedicinTime</p>
-					<p><strong>💉PN-tid: </strong> @resident.PnTime</p>
-					<p><strong>🗓️Indkøbsdag: </strong> @(resident.GroceryDay?.ToString("dd-MM-yyyy") ?? "-")</p>
-					<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
-					</article>
-				}
-		</div>
-		</main>
+		
 	</section>
 }
