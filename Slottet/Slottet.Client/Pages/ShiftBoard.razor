@@ -2,7 +2,7 @@
 
 @if (Model is null)
 {
-	<p> Indlæser </p>
+	<p> Der er sket en fejl i indlæsningen af data </p>
 }
 else
 {
@@ -16,42 +16,9 @@ else
 	</section>
 
 	<section class="shiftboard-layout">
-		<aside class="left-panel"> @* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
-		<div class="info-box">
-			<h2>Telefonnumre ☎️</h2>
-			<p>
-			<ul>
-				@foreach (var phone in Model.PhoneNumbers)
-				{
-						<li>@phone</li>
-					}
-			</ul>
-				</p>
-		</div>
-
-			<div class="info-box">
-				<h2>Afdelingens opgaver📝</h2>
-				<ul>
-					@foreach (var task in Model.DepartmentTasks)
-					{
-						<li>@task</li>
-					}
-				</ul>
-			</div>
-
-			<div class="info-box">
-				<h2>Særligt ansvar 🔏</h2>
-				<ul>
-					@foreach (var responsibility in Model.SpecialResponsibilities)
-					{
-						<li>@responsibility</li>
-					}
-				</ul>
-			</div>
-			</aside>
 	
-		<main class="right-panel">
-			<h2>Beboere</h2>
+		<main class="left-panel">
+			@* <h2>Beboere</h2> *@
 
 		<div class="resident-card-grid">			
 				@foreach (var resident in Model.ResidentCards)
@@ -68,5 +35,39 @@ else
 				}
 		</div>
 		</main>
+			<aside class="right-panel">
+				@* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
+				<div class="info-box">
+					<h3>Telefonnumre ☎️</h3>
+					<p>
+						<ul>
+							@foreach (var phone in Model.PhoneNumbers)
+							{
+								<li>@phone</li>
+							}
+						</ul>
+					</p>
+				</div>
+
+				<div class="info-box">
+					<h3>Afdelingens opgaver📝</h3>
+					<ul>
+						@foreach (var task in Model.DepartmentTasks)
+						{
+							<li>@task</li>
+						}
+					</ul>
+				</div>
+
+				<div class="info-box">
+					<h3>Særligt ansvar 🔏</h3>
+					<ul>
+						@foreach (var responsibility in Model.SpecialResponsibilities)
+						{
+							<li>@responsibility</li>
+						}
+					</ul>
+				</div>
+			</aside>
 	</section>
 }
