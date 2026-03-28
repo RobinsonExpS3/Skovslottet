@@ -2,7 +2,7 @@
 
 @if (Model is null)
 {
-	<p> Indlæser </p>
+	<p> Der er sket en fejl i indlæsningen af data </p>
 }
 else
 {
@@ -16,61 +16,77 @@ else
 	</section>
 
 	<section class="shiftboard-layout">
-		<main class="right-panel">
-			<h2>Beboere</h2>
+	
+		<main class="left-panel">
+			@* <h2>Beboere</h2> *@
 
-			<div class="resident-card-grid">
+		<div class="resident-card-grid">			
 				@foreach (var resident in Model.ResidentCards)
 				{
 					<article class="resident-card">
-						<h3>@resident.ResidentName</h3>
-						<p><strong>⚠️Risikoniveau: </strong> @resident.RiskLevel</p>
-						<p><strong>📝Status: </strong> @resident.Status</p>
-						<p><strong>💊Medicintid: </strong> @resident.MedicinTime</p>
-						<p><strong>💉PN-tid: </strong> @resident.PnTime</p>
-						<p><strong>🗓️Indkøbsdag: </strong> @(resident.GroceryDay?.ToString("dd-MM-yyyy") ?? "-")</p>
-						<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
+					<h3>@resident.ResidentName</h3>
+					<p><strong>⚠️Risikoniveau: </strong> @resident.RiskLevel</p>
+					<p><strong>📝Status: </strong> @resident.Status</p>
+					<p><strong>💊Medicintid: </strong> @resident.MedicinTime</p>
+					<p><strong>💉PN-tid: </strong> @resident.PnTime</p>
+					<p><strong>🗓️Indkøbsdag: </strong> @(resident.GroceryDay?.ToString("dd-MM-yyyy") ?? "-")</p>
+					<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
 					</article>
 				}
-			</div>
-		</main>
-
-
-
-		<aside class="left-panel"> @* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
-		<div class="info-box">
-			<h2>Telefonnumre ☎️</h2>
-			<p>
-			<ul>
-				@foreach (var phone in Model.PhoneNumbers)
-				{
-						<li>@phone</li>
-					}
-			</ul>
-				</p>
 		</div>
+		</main>
+			<aside class="right-panel">
+				@* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
+				<div class="info-box">
+					<h3>Telefonnumre ☎️</h3>
+					<p>
+						<ul>
+							@foreach (var phone in Model.PhoneNumbers)
+							{
+								<li>@phone</li>
+							}
+						</ul>
+					</p>
+				</div>
 
-			<div class="info-box">
-				<h2>Afdelingens opgaver📝</h2>
-				<ul>
-					@foreach (var task in Model.DepartmentTasks)
-					{
-						<li>@task</li>
-					}
-				</ul>
-			</div>
+				<div class="info-box">
+					<h3>Afdelingens opgaver📝</h3>
+					<ul>
+						@foreach (var task in Model.DepartmentTasks)
+						{
+							<li>@task</li>
+						}
+					</ul>
+				</div>
 
-			<div class="info-box">
-				<h2>Særligt ansvar 🔏</h2>
-				<ul>
-					@foreach (var responsibility in Model.SpecialResponsibilities)
-					{
-						<li>@responsibility</li>
-					}
-				</ul>
-			</div>
+				<div class="info-box">
+					<h3>Særligt ansvar 🔏</h3>
+					<ul>
+						@foreach (var responsibility in Model.SpecialResponsibilities)
+						{
+							<li>@responsibility</li>
+						}
+					</ul>
+				</div>
 			</aside>
 	
-		
+		<main class="right-panel">
+			<h2>Beboere</h2>
+
+		<div class="resident-card-grid">			
+				@foreach (var resident in Model.ResidentCards)
+				{
+					<article class="resident-card">
+					<h3>@resident.ResidentName</h3>
+					<p><strong>⚠️Risikoniveau: </strong> @resident.RiskLevel</p>
+					<p><strong>📝Status: </strong> @resident.Status</p>
+					<p><strong>💊Medicintid: </strong> @resident.MedicinTime</p>
+					<p><strong>💉PN-tid: </strong> @resident.PnTime</p>
+					<p><strong>🗓️Indkøbsdag: </strong> @(resident.GroceryDay?.ToString("dd-MM-yyyy") ?? "-")</p>
+					<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
+					</article>
+				}
+		</div>
+		</main>
 	</section>
 }

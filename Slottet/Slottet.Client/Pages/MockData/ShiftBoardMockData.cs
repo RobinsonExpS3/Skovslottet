@@ -16,21 +16,30 @@ namespace Slottet.Client.Pages.MockData
 
                 PhoneNumbers = new List<string>
             {
-                "12 34 56 78",
-                "87 65 43 21"
+                "41522",
+                "41523",
+                "41524",
+                "41525",
+                "41526",
+                "41527",
+                "41528",
+                "41529"
+
             },
 
                 DepartmentTasks = new List<string>
             {
-                "Sprit af",
-                "Lav Kaffe",
-                "Tøm skraldespande"
+                    "Tjek borger kalender",
+                    "Tjek FMK, Sundhedsplaner og delmål og en massse andre skørre aaarrh"
             },
 
                 SpecialResponsibilities = new List<string>
             {
                 "Medicinansvarlig",
-                "Hovedtelefon"
+                "Hovedtelefon",
+                "Sprit af",
+                "Lav Kaffe",
+                "Tøm skraldespande"
             },
 
                 ResidentCards = new List<ResidentCardViewDto>
@@ -251,6 +260,26 @@ namespace Slottet.Client.Pages.MockData
                     Date = DateTime.Today,
 
                     ResidentName = "Whilmer Xander",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Kontanter"
+                },
+
+                                new()
+                {
+                    ResidentCardId = Guid.NewGuid(),
+                    ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
+
+                    ResidentName = "Yvonne Zeniassen  Bjórnsdóttir",
                     IsActive = true,
 
                     RiskLevel = "Rød",
