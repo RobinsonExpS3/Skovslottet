@@ -39,14 +39,15 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Anna Bentsen",
                     IsActive = true,
 
                     RiskLevel = "Lav",
                     Status = "Stabil",
-                    
-                    
+
+
                     PnTime = "20:00",
                     MedicinTime = "10:00",
 
@@ -57,6 +58,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Carsten Didriksen",
                     IsActive = true,
@@ -75,6 +77,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Enaya Frederiksen",
                     IsActive = true,
@@ -93,6 +96,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Gert Heller",
                     IsActive = true,
@@ -111,6 +115,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Ida Jacoby",
                     IsActive = true,
@@ -129,6 +134,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Karl Larsen",
                     IsActive = true,
@@ -147,6 +153,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Mette Nielsen",
                     IsActive = true,
@@ -165,6 +172,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Ole Pontoppidan",
                     IsActive = true,
@@ -183,6 +191,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Quint Roberts",
                     IsActive = true,
@@ -201,6 +210,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Søren Thomasson",
                     IsActive = true,
@@ -219,6 +229,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Ulke Venja",
                     IsActive = true,
@@ -237,6 +248,7 @@ namespace Slottet.Client.Pages.MockData
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
+                    Date = DateTime.Today,
 
                     ResidentName = "Whilmer Xander",
                     IsActive = true,

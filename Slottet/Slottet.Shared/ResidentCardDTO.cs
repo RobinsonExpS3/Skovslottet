@@ -5,6 +5,7 @@
                                             //istedet for at have en klasse med et ansvar.
         public Guid ResidentCardId { get; set; }
         public Guid ResidentId { get; set; }
+        public DateTime Date { get; set; }
 
         public string ResidentName { get; set; } = string.Empty;
         public bool IsActive { get; set; }
