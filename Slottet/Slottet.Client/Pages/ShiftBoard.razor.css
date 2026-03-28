@@ -1,0 +1,27 @@
+﻿
+    .shiftboard-header {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #f5f5f5;
+        border-radius: 12px;
+    }
+
+    .shiftboard-layout {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 1.5rem;
+    }
+
+    .resident-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+    }
+
+    .resident-card {
+        background: #ffffff;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 1rem;
+    }
+

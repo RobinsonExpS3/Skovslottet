@@ -10,7 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Slottet.API\Slottet.API.csproj" />
     <ProjectReference Include="..\Slottet.Client\Slottet.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.5" />
   </ItemGroup>
 
 </Project>

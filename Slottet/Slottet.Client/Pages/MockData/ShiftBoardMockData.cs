@@ -1,4 +1,6 @@
-﻿namespace Slottet.Client.Pages.MockData
+﻿using Slottet.Shared;
+
+namespace Slottet.Client.Pages.MockData
 {
     public static class ShiftBoardMockData
     {
@@ -10,7 +12,7 @@
                 ShiftType = "Dagvagt",
                 StartDate = DateTime.Today.AddHours(7),
                 EndDate = DateTime.Today.AddHours(15),
-                DepartmentName = "Afdeling Solsikken",
+                DepartmentName = "Skoven",
 
                 PhoneNumbers = new List<string>
             {
@@ -20,15 +22,15 @@
 
                 DepartmentTasks = new List<string>
             {
-                "Morgenmedicin",
-                "Dokumentation",
-                "Kontakt til pårørende"
+                "Sprit af",
+                "Lav Kaffe",
+                "Tøm skraldespande"
             },
 
                 SpecialResponsibilities = new List<string>
             {
-                "Brandansvarlig",
-                "Nøgleansvarlig"
+                "Medicinansvarlig",
+                "Hovedtelefon"
             },
 
                 ResidentCards = new List<ResidentCardViewDto>
@@ -37,37 +39,55 @@
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
-                    ResidentName = "Anna Jensen",
+
+                    ResidentName = "Anna Bentsen",
                     IsActive = true,
-                    GroceryDay = DateTime.Today.AddDays(1),
-                    Status = "Stabil",
-                    Date = DateTime.Now,
+
                     RiskLevel = "Lav",
-                    PnTime = "20:00"
+                    Status = "Stabil",
+                    
+                    
+                    PnTime = "20:00",
+                    MedicinTime = "10:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Dankort"
                 },
                 new()
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
-                    ResidentName = "Bent Larsen",
+
+                    ResidentName = "Carsten Didriksen",
                     IsActive = true,
-                    GroceryDay = DateTime.Today.AddDays(2),
-                    Status = "Obs",
-                    Date = DateTime.Now,
-                    RiskLevel = "Mellem",
-                    PnTime = "21:00"
+
+                    RiskLevel = "Alt godt",
+                    Status = "Grøn",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "07:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "P-kort"
                 },
                 new()
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
-                    ResidentName = "Clara Nielsen",
-                    IsActive = false,
-                    GroceryDay = null,
-                    Status = "Passiv",
-                    Date = DateTime.Now,
-                    RiskLevel = "Høj",
-                    PnTime = "Efter behov"
+
+                    ResidentName = "Enaya Frederiksen",
+                    IsActive = true,
+
+                    RiskLevel = "Rød",
+                    Status = "Ked af det",
+
+
+                    PnTime = "20:00",
+                    MedicinTime = "22:00",
+
+                    GroceryDay = DateTime.Today.AddDays(1),
+                    PaymentMethod = "Mobilepay"
                 }
             }
             };

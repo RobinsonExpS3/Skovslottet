@@ -8,12 +8,14 @@
 
         public string ResidentName { get; set; } = string.Empty;
         public bool IsActive { get; set; }
-        public DateTime? GroceryDay { get; set; }
-
-        public string Status { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
 
         public string? RiskLevel { get; set; }
+        public string Status { get; set; } = string.Empty;
+                
         public string? PnTime { get; set; }
-    }
+        public string? MedicinTime { get; set; }
+
+        public DateTime? GroceryDay { get; set; }
+        public string? PaymentMethod { get; set; }
+}
 }

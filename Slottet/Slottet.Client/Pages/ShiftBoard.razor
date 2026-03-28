@@ -1,5 +1,72 @@
-﻿<h3>ShiftBoard</h3>
+﻿@page "/shiftboard_viewonly"
 
-<div class="content-container">
+@if (Model is null)
+{
+	<p> Indlæser </p>
+}
+else
+{
+	<section>  @* Overskrift med afdelingens navn og vagttypen *@
+		<h1>@Model.DepartmentName</h1>
+		<p><strong>Vagttype: </strong>@Model.ShiftType</p>
+		<p><strong>Start: </strong>@Model.StartDate.ToString("dd-MM-yyyy HH:mm")</p>
+		<p><strong>Slut: </strong>@Model.EndDate.ToString("dd-MM-yyyy HH:mm")</p>
+	</section>
 
-</div>
+	<section>
+		<div class="left-panel"> @* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
+		<div class="info-box">
+			<h3>Telefonnumre ☎️</h3>
+			<p>
+			<ul>
+				@foreach (var phone in Model.PhoneNumbers)
+				{
+						<li>@phone</li>
+					}
+			</ul>
+				</p>
+		</div>
+
+			<div class="info-box">
+				<h3>Afdelingens opgaver📝</h3>
+				<ul>
+					@foreach (var task in Model.DepartmentTasks)
+					{
+						<li>@task</li>
+					}
+				</ul>
+			</div>
+
+			<div class="info-box">
+				<h3>Særligt ansvar 🔏</h3>
+				<ul>
+					@foreach (var responsibility in Model.SpecialResponsibilities)
+					{
+						<li>@responsibility</li>
+					}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section>
+		<div class="right-panel">
+		<div class="info-box">
+			<div> 
+				@foreach (var resident in Model.ResidentCards)
+				{
+					<article class="resident-card">
+					<h3>@resident.ResidentName</h3>
+					<p><strong>⚠️Risikoniveau: </strong> @resident.RiskLevel</p>
+					<p><strong>📝Status: </strong> @resident.Status</p>
+					<p><strong>💊Medicintid: </strong> @resident.MedicinTime</p>
+					<p><strong>💉PN-tid: </strong> @resident.PnTime</p>
+					<p><strong>🗓️Indkøbsdag: </strong> @(resident.GroceryDay?.ToString("dd-MM-yyyy") ?? "-")</p>
+					<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
+					</article>
+				}
+			</div>
+		</div>
+		</div>
+	</section>
+}
