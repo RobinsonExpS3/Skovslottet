@@ -1,3 +1,5 @@
+USE Slottet
+
 CREATE TABLE dbo.SpecialResponsibility ( 
 	SpecialResponsibilityID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
 	Task NVARCHAR NOT NULL ); 
@@ -137,3 +139,9 @@ CREATE TABLE dbo.ResidentPaymentMethod(
 		FOREIGN KEY (PaymentMethodID) REFERENCES dbo.PaymentMethod(PaymentMethodID)
 ); 
 GO
+
+
+
+ALTER TABLE dbo.Resident 
+	ALTER COLUMN GroceryDay NVARCHAR NOT NULL;
+GO 
