@@ -196,7 +196,7 @@ namespace Slottet.Client.Pages.MockData
                     GroceryDay = DateTime.Today.AddDays(1),
                     PaymentMethod = "Mobilepay"
                 },
-                                new()
+                new()
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
@@ -273,7 +273,7 @@ namespace Slottet.Client.Pages.MockData
                     PaymentMethod = "Kontanter"
                 },
 
-                                new()
+                new()
                 {
                     ResidentCardId = Guid.NewGuid(),
                     ResidentId = Guid.NewGuid(),
