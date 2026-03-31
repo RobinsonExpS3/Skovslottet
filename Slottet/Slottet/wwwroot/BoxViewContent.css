@@ -1,4 +1,11 @@
-﻿.view-box {
+﻿.admin-content-box {
+    display: flex;
+    border: 1px solid #999;
+    width: 400px;
+    margin-left: 300px;
+}
+
+.view-box {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
