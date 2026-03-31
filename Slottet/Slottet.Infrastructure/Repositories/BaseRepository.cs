@@ -19,7 +19,7 @@ namespace Slottet.Infrastructure.Repositories
 
         public async Task InitializeAsync()
         {
-            var fresh = await QueryAllAsync();
+            var fresh = await GetAllAsync();
             _items.Clear();
             foreach (var e in fresh)
                 _items.Add(e);
@@ -52,6 +52,21 @@ namespace Slottet.Infrastructure.Repositories
         // Key helpers
         protected abstract Guid GetKey(T entity);
 
+
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            var list = new List<T>();
+
+            using var con = await DBContext.OpenConnection();
+            using var cmd = new SqlCommand(SqlSelectAll, con);
+            cmd.CommandType = CommandType.Text;
+            using var rd = await cmd.ExecuteReaderAsync();
+
+            while (await rd.ReadAsync()) list.Add(Map(rd));
+
+            return list;
+        }
+
         public async Task<T?> GetByIdAsync(Guid id)
         {
             using var con = await DBContext.OpenConnection();
@@ -61,8 +76,13 @@ namespace Slottet.Infrastructure.Repositories
             BindId(cmd, id);
 
             using var rd = await cmd.ExecuteReaderAsync();
-            return await rd.ReadAsync() ? Map(rd) : default(T);
+
+            return await rd.ReadAsync() ? Map(rd) : null;
         }
+
+        // ********
+        // Skal vi bruge denne???
+        // ********
         public virtual async Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids)
         {
             var list = new List<T>();
@@ -102,6 +122,10 @@ namespace Slottet.Infrastructure.Repositories
 
             await ReloadItemsAsync();
         }
+
+        // ********
+        // Skal vi bruge denne???
+        // ********
         public virtual async Task AddRangeAsync(IEnumerable<T> entities)
         {
             var entitiesList = entities.ToList();
@@ -145,6 +169,9 @@ namespace Slottet.Infrastructure.Repositories
             await ReloadItemsAsync();
         }
 
+        // ********
+        // Skal vi bruge denne???
+        // ********
         public async Task UpdateRangeAsync(IEnumerable<T> entities)
         {
             var entitiesList = entities.ToList();
@@ -196,24 +223,12 @@ namespace Slottet.Infrastructure.Repositories
 
         protected async Task ReloadItemsAsync()
         {
-            var fresh = await QueryAllAsync();
+            var fresh = await GetAllAsync();
             _items.Clear();
             foreach (var e in fresh)
                 _items.Add(e);
         }
 
-        private async Task<List<T>> QueryAllAsync()
-        {
-            var list = new List<T>();
 
-            using var con = await DBContext.OpenConnection();
-            using var cmd = new SqlCommand(SqlSelectAll, con);
-            cmd.CommandType = CommandType.Text;
-            using var rd = await cmd.ExecuteReaderAsync();
-
-            while (await rd.ReadAsync()) list.Add(Map(rd));
-
-            return list;
-        }
     }
 }
