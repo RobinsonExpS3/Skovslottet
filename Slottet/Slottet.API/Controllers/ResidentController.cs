@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Slottet.Domain.Entities;
 using Slottet.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc.Controllers;
+using Slottet.Domain.Entities;
 
 namespace Slottet.API.Controllers
 {
@@ -9,25 +8,29 @@ namespace Slottet.API.Controllers
     [Route("api/[controller]")]
     public class ResidentController : Controller
     {
-        private readonly IControllerRepository<Resident> _repository;
+        private readonly IBaseRepository<Resident> _repository;
 
-        public ResidentController(IControllerRepository<Resident> residentRepository) {
+        public ResidentController(IBaseRepository<Resident> residentRepository)
+        {
             _repository = residentRepository;
         }
 
         //Get: residents
         [HttpGet("api/Residents")]
-        public async Task<ActionResult<IEnumerable<Resident>>> GetAll() {
+        public async Task<ActionResult<IEnumerable<Resident>>> GetAll()
+        {
             var residents = await _repository.GetAllAsync();
             return Ok(residents);
         }
 
         //Get: resident by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Resident>> GetById(Guid id) {
+        public async Task<ActionResult<Resident>> GetById(Guid id)
+        {
             var resident = await _repository.GetByIdAsync(id);
 
-            if(resident == null) {
+            if (resident == null)
+            {
                 return NotFound();
             }
 
@@ -36,26 +39,31 @@ namespace Slottet.API.Controllers
 
         //Post: resident
         [HttpPost]
-        public async Task<ActionResult<Resident>> CreateResident([FromBody] Resident resident) {
-            if(resident == null) {
-                return BadRequest(); 
+        public async Task<ActionResult<Resident>> CreateResident([FromBody] Resident resident)
+        {
+            if (resident == null)
+            {
+                return BadRequest();
             }
 
-            var createdResident = await _repository.CreateAsync(resident);
+            await _repository.AddAsync(resident);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdResident.ResidentID}, createdResident);
+            return CreatedAtAction(nameof(GetById), new { id = resident.ResidentID }, resident);
         }
 
         //Put: resident by id
         [HttpPut("{id}")]
-        public async Task<ActionResult<Resident>> UpdateResident(Guid id, [FromBody] Resident resident) {
-            if(resident == null || id != resident.ResidentID) {
+        public async Task<ActionResult<Resident>> UpdateResident(Guid id, [FromBody] Resident resident)
+        {
+            if (resident == null || id != resident.ResidentID)
+            {
                 return BadRequest();
             }
 
             var existingResident = await _repository.GetByIdAsync(id);
 
-            if(existingResident == null) {
+            if (existingResident == null)
+            {
                 return NotFound();
             }
 
@@ -70,10 +78,12 @@ namespace Slottet.API.Controllers
 
         //Delete: resident by id
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteResident(Guid id) {
+        public async Task<ActionResult> DeleteResident(Guid id)
+        {
             var existingResident = await _repository.GetByIdAsync(id);
 
-            if (existingResident == null) {
+            if (existingResident == null)
+            {
                 return NotFound();
             }
 

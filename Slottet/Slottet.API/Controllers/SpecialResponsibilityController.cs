@@ -8,25 +8,29 @@ namespace Slottet.API.Controllers
     [Route("api/[controller]")]
     public class SpecialResponsibilityController : Controller
     {
-        private readonly IControllerRepository<SpecialResponsibility> _repository;
+        private readonly IBaseRepository<SpecialResponsibility> _repository;
 
-        public SpecialResponsibilityController(IControllerRepository<SpecialResponsibility> specialResponsibilityRepository) {
+        public SpecialResponsibilityController(IBaseRepository<SpecialResponsibility> specialResponsibilityRepository)
+        {
             _repository = specialResponsibilityRepository;
         }
 
         //Get: special responsibility
         [HttpGet("api/SpecialResponsibilities")]
-        public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAll() {
+        public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAll()
+        {
             var specialResponsibility = await _repository.GetAllAsync();
             return Ok(specialResponsibility);
         }
 
         //Get: special responsibility by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> GetById(Guid id) {
+        public async Task<ActionResult<SpecialResponsibility>> GetById(Guid id)
+        {
             var specialResponsibility = await _repository.GetByIdAsync(id);
 
-            if (specialResponsibility == null) {
+            if (specialResponsibility == null)
+            {
                 return NotFound();
             }
 
@@ -35,26 +39,31 @@ namespace Slottet.API.Controllers
 
         //Post: special responsibility
         [HttpPost]
-        public async Task<ActionResult<Resident>> CreateSpecialResponsibility([FromBody] SpecialResponsibility specialResponsibility) {
-            if (specialResponsibility == null) {
+        public async Task<ActionResult<SpecialResponsibility>> CreateSpecialResponsibility([FromBody] SpecialResponsibility specialResponsibility)
+        {
+            if (specialResponsibility == null)
+            {
                 return BadRequest();
             }
 
-            var createdSpecialResponsibility = await _repository.CreateAsync(specialResponsibility);
+            await _repository.AddAsync(specialResponsibility);
 
-            return CreatedAtAction(nameof(GetById), new { id = createdSpecialResponsibility.SpecialResponsibilityID }, createdSpecialResponsibility);
+            return CreatedAtAction(nameof(GetById), new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
         }
 
         //Put: special responsibility by id
         [HttpPut("{id}")]
-        public async Task<ActionResult<Resident>> UpdateSpecialResponsibility(Guid id, [FromBody] SpecialResponsibility specialResponsibility) {
-            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID) {
+        public async Task<ActionResult<SpecialResponsibility>> UpdateSpecialResponsibility(Guid id, [FromBody] SpecialResponsibility specialResponsibility)
+        {
+            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID)
+            {
                 return BadRequest();
             }
 
             var existingSpecialResponsibility = await _repository.GetByIdAsync(id);
 
-            if (existingSpecialResponsibility == null) {
+            if (existingSpecialResponsibility == null)
+            {
                 return NotFound();
             }
 
@@ -67,10 +76,12 @@ namespace Slottet.API.Controllers
 
         //Delete: special responsibility by id
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteSpecialResponsibility(Guid id) {
+        public async Task<ActionResult> DeleteSpecialResponsibility(Guid id)
+        {
             var existingSpecialResponsibility = await _repository.GetByIdAsync(id);
 
-            if (existingSpecialResponsibility == null) {
+            if (existingSpecialResponsibility == null)
+            {
                 return NotFound();
             }
 
