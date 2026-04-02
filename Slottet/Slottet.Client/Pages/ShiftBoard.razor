@@ -18,12 +18,73 @@ else
 	<section class="shiftboard-layout">
 	
 		<main class="left-panel">
-			@* <h2>Beboere</h2> *@
 
 		<div class="resident-card-grid">			
 				@foreach (var resident in Model.ResidentCards)
 				{
 					<article class="resident-card">
+						<section class="resident-header @resident.RiskCssClass">
+							<h3>@resident.ResidentName</h3>
+						</section>
+
+						<section class="resident-status">
+							<h4>Seneste status</h4>
+							<p>@resident.LatestStatusNote</p>
+						</section>
+
+						<section class="medicine-section">
+							<table class="medicine-table">
+								<thead>
+									<tr>
+										<th>Medicin</th>
+										@foreach (var medicine in resident.MedicineSchedule)
+										{
+											<th>@medicine.Label</th>
+										}
+									</tr>
+								</thead>
+
+								<tbody>
+									<tr>
+										<td>Givet</td>
+										@foreach (var medicine in resident.MedicineSchedule)
+										{
+											<td>
+												<div class="dose-box @(medicine.IsGiven ? "given" : "not-given")">
+													@(medicine.IsGiven ? "💊" : " ")
+												</div>
+
+											</td>
+										}
+									</tr>
+
+									<tr>
+										<td>PN</td>
+										@foreach (var pn in resident.PnSchedule)
+										{
+											<td>
+												<div class="dose-box @(pn.IsGiven ? "given" : "not-given")"">
+													@(pn.IsGiven ? "💉" : " ")
+												</div>
+											</td>
+										}
+									</tr>
+								</tbody>
+							</table>
+						</section>
+
+						<section class="assigned-staff">
+							<h4>Ansvarlig personale</h4>
+							<div class="staff-list">
+								@foreach (var staff in resident.AssignedStaff)
+								{
+									<span class="staff-pill">@staff</span>
+								}
+							</div>
+						</section>
+
+					</article>
+					@* <article class="resident-card">
 					<h3>@resident.ResidentName</h3>
 					<p><strong>⚠️Risikoniveau: </strong> @resident.RiskLevel</p>
 					<p><strong>📝Status: </strong> @resident.Status</p>
@@ -31,7 +92,7 @@ else
 					<p><strong>💉PN-tid: </strong> @resident.PnTime</p>
 					<p><strong>🗓️Indkøbsdag: </strong> @(resident.GroceryDay?.ToString("dd-MM-yyyy") ?? "-")</p>
 					<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
-					</article>
+					</article> *@
 				}
 		</div>
 		</main>
