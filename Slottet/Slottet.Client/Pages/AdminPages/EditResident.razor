@@ -1,9 +1,38 @@
 ﻿@page "/editResident"
 <div class="view-box">
-
 	<h2>Rediger beboer</h2>
 
-	<div class="form-input">
+	<div class="table-layout">
+		<table class="table-form">
+			@if(residents == null)
+			{
+				<tr>
+					<td>Loading...</td>
+				</tr>
+			}
+			else
+			{
+				@foreach(var resident in residents)
+				{
+					<tr @onclick="() => SelectedResident(resident)" class="@(selectedResident == resident ? "selected-row" : "")">
+						<td></td>
+					</tr>
+				}
+			}
+		</table>
+
+		<div class="button-column">
+			<input class="r-table-input" @bind="residentNameInput" placeholder="Indtæst navn..." />
+			<input class="r-table-input" @bind="residentGroceryInput" placeholder="Indtæst handledage..." />
+			<input class="r-table-input" @bind="residentMedicineTimeInput" placeholder="Indtæst medicintidspunkter..." />
+
+			<button class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(residentNameInput) || selectedResident != null)">Opret</button>
+			<button class="column-button" @onclick="Update" disabled="@(selectedResident == null)">Opdater</button>
+			<button class="column-button" @onclick="Delete" disabled="@(selectedResident == null)">Slet</button>
+		</div>
+	</div>
+
+@* 	<div class="form-input">
 
 		<input placeholder="Rediger beboer id" />
 		<input placeholder="Rediger beboer medicin" />
@@ -13,7 +42,5 @@
 
 	</div>
 
-	<button class ="submit-button" type="button">Bekræft</button>
+	<button class ="submit-button" type="button">Bekræft</button> *@
 </div>
-
-

@@ -16,7 +16,7 @@ namespace Slottet.API.Controllers
         }
 
         //Get: special responsibility
-        [HttpGet("api/SpecialResponsibilities")]
+        [HttpGet("SpecialResponsibilities")]
         public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAll()
         {
             var specialResponsibility = await _repository.GetAllAsync();

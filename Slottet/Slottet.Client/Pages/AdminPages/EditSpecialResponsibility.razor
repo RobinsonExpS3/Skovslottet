@@ -1,59 +1,32 @@
-﻿@page "/editSpecialResponsibility"
-<div class="view-box">
+﻿@* @inject HttpClient httpClient *@
+@page "/editSpecialResponsibility"
 
+<div class="view-box">
 	<h2>Rediger særligt ansvar</h2>
 
 	<div class="table-layout">
 		<table class="table-form">
-
-			<tr>
-				<td>Medicin</td>
-			</tr>
-			<tr>
-				<td>Rengøring</td>
-			</tr>
-			<tr>
-				<td>Medicin</td>
-			</tr>
-			<tr>
-				<td>Rengøring</td>
-			</tr>
-			<tr>
-				<td>Medicin</td>
-			</tr>
-			<tr>
-				<td>Rengøring</td>
-			</tr>
-			<tr>
-				<td>Medicin</td>
-			</tr>
-			<tr>
-				<td>Rengøring</td>
-			</tr>
-			<tr>
-				<td>Medicin</td>
-			</tr>
-			<tr>
-				<td>Rengøring</td>
-			</tr>
-			<tr>
-				<td>Medicin</td>
-			</tr>
-			<tr>
-				<td>Rengøring</td>
-			</tr>
-		
+			@if (specialResponsibilities == null) {
+				<tr>
+					<td>Loading...</td>
+				</tr>
+			} 
+			else
+			{
+				@foreach(var item in specialResponsibilities)
+				{
+					<tr @onclick="() => SelectItem(item)" class="@(selectedItem == item ? "selected-row" : "")">
+						<td>@item.TaskName</td>
+					</tr>
+				}
+			}
 		</table>
 		
 		<div class="button-column">
-			<button class="column-button" type="button">Særligt ansvar</button>
-			<button class="column-button" type="button">Opret</button>
-			<button class="column-button" type="button">Opdater</button>
-			<button class="column-button" type="button">Slet</button>
+			<input class="sp-table-input" @bind="taskNameInput" placeholder="Indtast særligt ansvar..." />
+			<button class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(taskNameInput) || selectedItem != null)">Opret</button>
+			<button class="column-button" @onclick="Update" disabled="@(selectedItem == null)">Opdater</button>
+			<button class="column-button" @onclick="Delete" disabled="@(selectedItem == null)">Slet</button>
 		</div>
 	</div>
-
-	
 </div>
-
-

@@ -6,7 +6,7 @@ namespace Slottet.Domain.Entities {
     public class Resident {
         public Guid ResidentID { get; set; }
         public string ResidentName { get; set; }
-        public DateOnly GroceryDay { get; set; }
+        public string GroceryDay { get; set; }
         public bool IsActive { get; set; }
         public Medicine MedicineID { get; set; }
     }
