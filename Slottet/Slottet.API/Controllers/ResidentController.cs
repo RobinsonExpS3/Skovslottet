@@ -16,7 +16,7 @@ namespace Slottet.API.Controllers
         }
 
         //Get: residents
-        [HttpGet("api/Residents")]
+        [HttpGet("Residents")]
         public async Task<ActionResult<IEnumerable<Resident>>> GetAll()
         {
             var residents = await _repository.GetAllAsync();

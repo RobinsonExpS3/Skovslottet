@@ -1,5 +1,3 @@
-USE Slottet
-
 CREATE TABLE dbo.SpecialResponsibility ( 
 	SpecialResponsibilityID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
 	Task NVARCHAR NOT NULL ); 
@@ -78,7 +76,7 @@ GO
 
 CREATE TABLE dbo.Resident ( 
 	ResidentID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
-	GroceryDay DATE NOT NULL, 
+	GroceryDay NVARCHAR NOT NULL, 
 	IsActive BIT NOT NULL, 
 	
 	MedicineID UNIQUEIDENTIFIER,
