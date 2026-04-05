@@ -55,7 +55,7 @@
 .resident-header,
 .resident-status,
 .assigned-staff {
-    background-color: white;
+    background-color: #fbfbfb;
     border: 2px solid #222;
     border-radius: 8px;
     padding: 1rem;
@@ -101,7 +101,7 @@
         border: 2px solid #222;
         text-align: center;
         vertical-align: middle;
-        padding: 0.75rem 0.5rem;
+        padding: 0.5rem 0.25rem;
         background-color: #fafafa;
         word-wrap: break-word;
     }
