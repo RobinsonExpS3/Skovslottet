@@ -1,6 +1,3 @@
-using Slottet.Domain.Entities;
-using Slottet.Application.Interfaces;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,10 +9,13 @@ builder.Services.AddOpenApi();
 //dependency injection - register repository
 //builder.Services.AddScoped<IControllerRepository, (Repositories)>();
 
+//builder.Services.AddScoped<IBaseRepository<SpecialResponsibility>, SpecialResponsibilityRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
+if (app.Environment.IsDevelopment())
+{
     app.MapOpenApi();
 }
 
