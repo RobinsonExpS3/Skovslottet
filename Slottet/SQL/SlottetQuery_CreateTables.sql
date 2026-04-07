@@ -1,8 +1,5 @@
-CREATE DATABASE Slottet_Eks
-GO
-
-USE Slottet_Eks
-GO
+-- USE Slottet_Eks
+-- GO
 
 CREATE TABLE dbo.SpecialResponsibility ( 
 	SpecialResponsibilityID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
