@@ -12,11 +12,17 @@ namespace Slottet.Client.Pages.AdminPages
         private List<SpecialResponsibility>? specialResponsibilities;
         private string? taskNameInput;
         private SpecialResponsibility? selectedItem;
+        private bool loadFailed = false;
 
         private async Task LoadData() {
-            specialResponsibilities = await httpClient.GetFromJsonAsync<List<SpecialResponsibility>>(
-                "api/SpecialResponsibility/SpecialResponsibilities"
-            );
+            try {
+                specialResponsibilities = await httpClient.GetFromJsonAsync<List<SpecialResponsibility>>(
+                    "api/SpecialResponsibility/SpecialResponsibilities"
+                );
+            } catch {
+                specialResponsibilities = new List<SpecialResponsibility>();
+                loadFailed = true;
+            }
         }
 
         protected override async Task OnInitializedAsync() {
