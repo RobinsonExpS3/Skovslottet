@@ -1,7 +1,8 @@
 CREATE TABLE dbo.SpecialResponsibility ( 
 	SpecialResponsibilityID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
-	Task NVARCHAR NOT NULL ); 
-GO 
+	TaskName NVARCHAR NOT NULL 
+);
+GO
 
 CREATE TABLE dbo.ShiftBoard ( 
 	ShiftBoardID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
@@ -18,7 +19,7 @@ GO
 
 CREATE TABLE dbo.DepartmentTask ( 
 	DepartmentTaskID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
-	DepartmentTask NVARCHAR NOT NULL 
+	DepartmentTaskName NVARCHAR NOT NULL 
 );
 GO
 
@@ -70,33 +71,55 @@ GO
 
 CREATE TABLE dbo.Medicine ( 
 	MedicineID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
-	MedicineTime DATETIME NOT NULL
-); 
-GO 
+	MedicineTime DATETIME NOT NULL,
+	MedicineGivenTime DATETIME NOT NULL,
+	MedicineRegisteredTime DATETIME NOT NULL
+);
+GO
+
+CREATE TABLE dbo.GroceryDay (
+	GroceryDayID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
+	GroceryDay NVARCHAR NOT NULL
+);
+GO
 
 CREATE TABLE dbo.Resident ( 
 	ResidentID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
-	GroceryDay NVARCHAR NOT NULL, 
+	ResidentName NVARCHAR NOT NULL,
 	IsActive BIT NOT NULL, 
 	
-	MedicineID UNIQUEIDENTIFIER,
+	GroceryDayID UNIQUEIDENTIFIER NOT NULL,
 
-	CONSTRAINT FK_Medicine_Resident
-		FOREIGN KEY (MedicineID) REFERENCES dbo.Medicine(MedicineID) 
-); 
-GO 
+	CONSTRAINT FK_GroceryDay_Resident
+		FOREIGN KEY (GroceryDayID) REFERENCES dbo.GroceryDay(GroceryDayID)
+);
+GO
+
+CREATE TABLE dbo.ResidentMedicine (
+	ResidentID UNIQUEIDENTIFIER NOT NULL,
+	MedicineID UNIQUEIDENTIFIER NOT NULL,
+
+	CONSTRAINT PK_ResidentMedicine
+		PRIMARY KEY (ResidentID, MedicineID),
+	CONSTRAINT FK_Resident_ResidentMedicine
+		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID),
+	CONSTRAINT FK_Medicine_ResidentMedicine
+		FOREIGN KEY (MedicineID) REFERENCES dbo.Medicine(MedicineID)
+);
+GO
 
 CREATE TABLE dbo.PN ( 
 	PNID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
-	PNTime NVARCHAR NOT NULL 
+	PNTime TIME NOT NULL,
+	PNStatus NVARCHAR NOT NULL
 ); 
 GO 
 
 CREATE TABLE dbo.RiskLevel( 
 	RiskLevelID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
-	RiskLevel NVARCHAR NOT NULL 
-); 
-GO 
+	RiskLevelName NVARCHAR NOT NULL 
+);
+GO
 
 CREATE TABLE dbo.PaymentMethod( 
 	PaymentMethodID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
@@ -107,7 +130,7 @@ GO
 CREATE TABLE dbo.ResidentCard ( 
 	ResidentCardID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
 	[Status] NVARCHAR NOT NULL, 
-	[Date] DATETIME NOT NULL, 
+	StatusEntryTime DATETIME NOT NULL, 
 
 	StaffID UNIQUEIDENTIFIER, 
 	ResidentID UNIQUEIDENTIFIER, 
@@ -126,20 +149,14 @@ CREATE TABLE dbo.ResidentCard (
 GO 
 
 CREATE TABLE dbo.ResidentPaymentMethod( 
-	ResidentCardID UNIQUEIDENTIFIER NOT NULL, 
+	ResidentID UNIQUEIDENTIFIER NOT NULL, 
 	PaymentMethodID UNIQUEIDENTIFIER NOT NULL,
 
 	CONSTRAINT PK_ResidentPaymentMethod
-		PRIMARY KEY (ResidentCardID, PaymentMethodID), 
-	CONSTRAINT FK_ResidentCard_ResidentPaymentMethod 
-		FOREIGN KEY (ResidentCardID) REFERENCES dbo.ResidentCard(ResidentCardID), 
+		PRIMARY KEY (ResidentID, PaymentMethodID), 
+	CONSTRAINT FK_Resident_ResidentPaymentMethod 
+		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID), 
 	CONSTRAINT FK_PaymentMethod_ResidentPaymentMethod 
 		FOREIGN KEY (PaymentMethodID) REFERENCES dbo.PaymentMethod(PaymentMethodID)
-); 
+);
 GO
-
-
-
-ALTER TABLE dbo.Resident 
-	ALTER COLUMN GroceryDay NVARCHAR NOT NULL;
-GO 
