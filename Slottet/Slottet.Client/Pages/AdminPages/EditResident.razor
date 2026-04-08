@@ -22,7 +22,9 @@
 				@foreach(var resident in residents)
 				{
 					<tr @onclick="() => SelectResident(resident)" class="@(selectedResident == resident ? "selected-row" : "")">
-						<td></td>
+						<td>@resident.ResidentName</td>
+						<td>@resident.GroceryDayName</td>
+						<td>@resident.ResidentName</td>
 					</tr>
 				}
 			}
@@ -30,24 +32,34 @@
 
 		<div class="button-column">
 			<input class="r-table-input" @bind="residentNameInput" placeholder="Indtæst navn..." />
+			<select @bind="selectedGroceryDayID">
+				<option value="">Vælg handledag</option>
+				@foreach(var day in groceryDays)
+				{
+					<option value="@day.GroceryDayID">@day.GroceryDayName</option>
+				}
+			</select>
+
+			<select multiple @onchange="OnPaymentMethodsChanged">
+				@foreach (var method in paymentMethods) {
+					<option value="@method.PaymentMethodID">
+						@method.PaymentMethodName
+					</option>
+				}
+			</select>
+
+			@foreach(var time in medicineTimes)
+			{
+				<input type="time" @bind="time.Time" />
+			}
+			<button @onclick="AddMedicineTime">+ Tilføj tid</button>
+
 @* 			<input class="r-table-input" @bind="residentGroceryInput" placeholder="Indtæst handledage..." />
 			<input class="r-table-input" @bind="residentMedicineTimeInput" placeholder="Indtæst medicintidspunkter..." /> *@
 
-			<button class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(residentNameInput) || selectedResident != null)">Opret</button>
-			<button class="column-button" @onclick="Update" disabled="@(selectedResident == null)">Opdater</button>
-			<button class="column-button" @onclick="Delete" disabled="@(selectedResident == null)">Slet</button>
+			<button class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(residentNameInput) || selectedResident is not null)">Opret</button>
+			<button class="column-button" @onclick="Update" disabled="@(selectedResident is null)">Opdater</button>
+			<button class="column-button" @onclick="Delete" disabled="@(selectedResident is null)">Slet</button>
 		</div>
 	</div>
-
-@*  	<div class="form-input">
-
-		<input placeholder="Rediger beboer id" />
-		<input placeholder="Rediger beboer medicin" />
-		<input placeholder="Rediger beboer pn" />
-		<input placeholder="Rediger beboer betalingsmetode" />
-		<input placeholder="Rediger beboer handledag" />
-
-	</div>
-
-	<button class ="submit-button" type="button">Bekræft</button> *@
 </div>

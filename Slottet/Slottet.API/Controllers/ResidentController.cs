@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
+using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
@@ -20,6 +21,14 @@ namespace Slottet.API.Controllers
         public async Task<ActionResult<IEnumerable<Resident>>> GetAll()
         {
             var residents = await _repository.GetAllAsync();
+
+            var result = residents.Select(r => new ResidentViewModel {
+                ResidentID = r.ResidentID,
+                ResidentName = r.ResidentName,
+                GroceryDayName = r.GroceryDay.GroceryDayName,
+                IsActive = r.IsActive
+            });
+
             return Ok(residents);
         }
 
@@ -39,12 +48,19 @@ namespace Slottet.API.Controllers
 
         //Post: resident
         [HttpPost]
-        public async Task<ActionResult<Resident>> CreateResident([FromBody] Resident resident)
+        public async Task<ActionResult<Resident>> CreateResident([FromBody] ResidentDTO dto)
         {
-            if (resident == null)
+            if (dto == null)
             {
                 return BadRequest();
             }
+
+            var resident = new Resident {
+                ResidentID = Guid.NewGuid(),
+                ResidentName = dto.ResidentName,
+                GroceryDayID = dto.GroceryDayID,
+                IsActive = dto.IsActive
+            };
 
             await _repository.AddAsync(resident);
 
