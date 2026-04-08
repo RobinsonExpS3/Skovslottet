@@ -6,13 +6,13 @@ using Slottet.Infrastructure.Data;
 
 namespace Slottet.Infrastructure.Repositories
 {
-    public abstract class BaseDBRepository<T> : IBaseRepository<T> where T : class
+    public abstract class BaseRepository<T> : IBaseRepository<T> where T : class
     {
         protected readonly ObservableCollection<T> _items;
 
         public ObservableCollection<T> Items => _items;
 
-        protected BaseDBRepository()
+        protected BaseRepository()
         {
             _items = new ObservableCollection<T>();
         }
