@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Slottet.Domain.Entities {
-    public class ResidentCard {
+﻿namespace Slottet.Domain.Entities
+{
+    public class ResidentCard
+    {
         public Guid ResidentCardID { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }
