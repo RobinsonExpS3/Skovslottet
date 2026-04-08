@@ -8,6 +8,7 @@ namespace Slottet.Domain.Entities {
         public string ResidentName { get; set; }
         public string GroceryDay { get; set; }
         public bool IsActive { get; set; }
+
         public Medicine MedicineID { get; set; }
     }
 }
