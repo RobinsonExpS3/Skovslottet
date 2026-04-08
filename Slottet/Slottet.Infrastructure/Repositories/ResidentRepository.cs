@@ -25,8 +25,8 @@ namespace Slottet.Infrastructure.Repositories
 
         protected override Resident Map(IDataRecord r) => new Resident
         {
-            throw new NotImplementedException();
-        }
+
+        };
 
         protected override void BindInsert(SqlCommand cmd, Resident e)
         {
@@ -36,7 +36,7 @@ namespace Slottet.Infrastructure.Repositories
         {
 
         }
-        protected override void BindDelete(SqlCommand cmd, Resident e)
+        public async Task DeleteAsync(Guid id)
         {
 
         }
