@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Slottet.Domain.Entities {
     public class ResidentPaymentMethod {
-        public Resident ResidentCardID { get; set; }
+        public Resident ResidentID { get; set; }
         public PaymentMethod PaymentMethodID { get; set; }
     }
 }
