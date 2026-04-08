@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Data;
 using Microsoft.Data.SqlClient;
 using Slottet.Domain.Entities;
 
@@ -18,10 +16,7 @@ namespace Slottet.Infrastructure.Repositories
 
         protected override string SqlDeleteById => "usp_Delete";
 
-        protected override Guid GetKey(Resident e)
-        {
-
-        }
+        protected override Guid GetKey(Resident e) => e.ResidentID;
 
         protected override Resident Map(IDataRecord r) => new Resident
         {
@@ -39,6 +34,5 @@ namespace Slottet.Infrastructure.Repositories
         public async Task DeleteAsync(Guid id)
         {
 
-        }
     }
 }
