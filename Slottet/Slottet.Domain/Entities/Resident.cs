@@ -9,6 +9,6 @@ namespace Slottet.Domain.Entities {
         public string GroceryDay { get; set; }
         public bool IsActive { get; set; }
 
-        public Medicine MedicineID { get; set; }
+        public GroceryDay GroceryDayID { get; set; }
     }
 }
