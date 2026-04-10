@@ -4,6 +4,7 @@ using System.Data;
 using System.Text;
 using Microsoft.Data.SqlClient;
 using Slottet.Domain.Entities;
+using Slottet.Infrastructure.Data;
 
 namespace Slottet.Infrastructure.Repositories
 {
@@ -46,7 +47,17 @@ namespace Slottet.Infrastructure.Repositories
 
         public async Task DeleteAsync (Guid id)
         {
+            using var con = await DBContext.OpenConnection();
+            using var cmd = new SqlCommand(SqlDeleteById, con);
+            cmd.CommandType = CommandType.StoredProcedure;
 
+            BindId(cmd, id);
+
+            await cmd.ExecuteNonQueryAsync();
+
+            var existing = _items.FirstOrDefault(x => Equals(GetKey(x), id));
+            if (existing != null)
+                _items.Remove(existing);
         }
     }
 }
