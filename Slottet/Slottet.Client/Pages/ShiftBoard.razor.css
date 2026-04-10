@@ -48,7 +48,7 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     min-width: 0;
     display: grid;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 /* Sektioner inde i resident card */
@@ -56,12 +56,12 @@
 .resident-status,
 .pn-status,
 .assigned-staff,
-.footer-box {
+.grocery-day,
+.payment-method {
     background-color: #f8f8f8;
     border: 2px solid #222;
     border-radius: 8px;
-    padding: 0.5rem;
-    gap: 0.25rem;
+    padding: 0.5rem;    
 }
 
 .resident-header {
@@ -145,7 +145,7 @@
 .resident-bottom-grid {
     display: grid;
     grid-template-columns: 2fr 1.2fr;
-    gap: 0;
+    gap: 5px;
 }
 
 .assigned-staff h4,
@@ -155,16 +155,14 @@
     font-size: 1.2rem;
 }
 
-
 .pn-status {
     padding: 0.5rem 0.5rem;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
     text-align: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 130px;
+    align-items: center;
 }
 
 /* Ansvarlige personale */
@@ -185,27 +183,9 @@
 
 .resident-footer-grid {
     display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 0;
+    grid-template-columns: 2fr 1.2fr;
+    gap: 5px;
 }
-
-.footer-box {
-    padding: 0.65rem 1rem;
-    text-align: center;
-    font-size: 0.95rem;
-    font-weight: 500;
-    border-radius: 999px;
-}
-
-    .footer-box:first-child {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-    }
-
-    .footer-box:last-child {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
 
 .grocery-day h4,
 .payment-method h4 {
