@@ -12,16 +12,13 @@
 
         public string? RiskLevel { get; set; }
         public string? LatestStatusNote { get; set; }
-        // public string Status { get; set; } = string.Empty;
 
         public List<MedicineScheduleItemDto> MedicineSchedule { get; set; } = new();
-        public List<PnScheduleItemDto> PnSchedule { get; set; } = new();
+        public string? PNStatus { get; set; }
         public List<string> AssignedStaff { get; set; } = new();
 
-        // public string? PnTime { get; set; }
-        // public string? MedicinTime { get; set; }
 
-        public DateTime? GroceryDay { get; set; }
+        public string? GroceryDay { get; set; }
         public string? PaymentMethod { get; set; }
 
         public string RiskCssClass => RiskLevel switch

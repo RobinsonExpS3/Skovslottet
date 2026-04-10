@@ -53,19 +53,15 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Grøn",
                         LatestStatusNote = "Har sovet godt og taget morgenmedicin uden problemer.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Mette", "Jonas" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, true),
                             ("kl 9", 9, false),
-                            ("kl 10", 10, true),
-                            ("kl 11", 11, false),
-                            ("kl 12", 12, false),
                             ("kl 15", 15, false),
-                            ("kl 20", 20, false),
-                            ("kl 21", 21, false),
                             ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9)
+                        PNStatus = "",
+                        PaymentMethod = "Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -76,19 +72,17 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Grøn",
                         LatestStatusNote = "Rolig formiddag. Har spist og været ude at gå.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Søren", "Emma" },
                         MedicineSchedule = CreateMedicineSchedule(
-                            ("kl 8", 8, true),
                             ("kl 9", 9, true),
                             ("kl 10", 10, false),
                             ("kl 11", 11, false),
-                            ("kl 12", 12, false),
                             ("kl 15", 15, false),
-                            ("kl 20", 20, false),
                             ("kl 21", 21, false),
                             ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9)
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -99,19 +93,16 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Gul",
                         LatestStatusNote = "Virker nedtrykt og ønsker ro i dag.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Lene", "Michael" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, false),
                             ("kl 9", 9, false),
-                            ("kl 10", 10, false),
-                            ("kl 11", 11, false),
                             ("kl 12", 12, true),
                             ("kl 15", 15, false),
-                            ("kl 20", 20, false),
-                            ("kl 21", 21, false),
                             ("kl 22", 22, true)),
-                        PnSchedule = CreatePnSchedule(9, 3)
+                        PNStatus = "",
+                        PaymentMethod = "Kontanter",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -122,19 +113,13 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Gul",
                         LatestStatusNote = "Har brug for ekstra støtte og tydelig guidning.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Nadia", "Ole" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, true),
-                            ("kl 9", 9, false),
-                            ("kl 10", 10, false),
-                            ("kl 11", 11, false),
-                            ("kl 12", 12, false),
-                            ("kl 15", 15, true),
-                            ("kl 20", 20, false),
-                            ("kl 21", 21, false),
                             ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9)
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -145,19 +130,11 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Rød",
                         LatestStatusNote = "Har været urolig i løbet af natten.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Freja", "Andreas" },
-                        MedicineSchedule = CreateMedicineSchedule(
-                            ("kl 8", 8, true),
-                            ("kl 9", 9, true),
-                            ("kl 10", 10, true),
-                            ("kl 11", 11, false),
-                            ("kl 12", 12, false),
-                            ("kl 15", 15, false),
-                            ("kl 20", 20, false),
-                            ("kl 21", 21, false),
-                            ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9, 6)
+                        MedicineSchedule = CreateMedicineSchedule(),
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -168,19 +145,14 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Rød",
                         LatestStatusNote = "Vil gerne have faste rutiner og korte beskeder.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Kasper", "Liva" },
                         MedicineSchedule = CreateMedicineSchedule(
-                            ("kl 8", 8, false),
                             ("kl 9", 9, false),
                             ("kl 10", 10, true),
-                            ("kl 11", 11, false),
-                            ("kl 12", 12, true),
-                            ("kl 15", 15, false),
-                            ("kl 20", 20, false),
-                            ("kl 21", 21, true),
-                            ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9)
+                            ("kl 11", 11, false)),
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -191,19 +163,15 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Gul",
                         LatestStatusNote = "Følsom over for støj i fællesarealerne.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Mads", "Signe" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, true),
-                            ("kl 9", 9, false),
-                            ("kl 10", 10, false),
-                            ("kl 11", 11, false),
                             ("kl 12", 12, false),
-                            ("kl 15", 15, false),
-                            ("kl 20", 20, true),
                             ("kl 21", 21, false),
                             ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9, 1)
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -214,19 +182,13 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Gul",
                         LatestStatusNote = "Har brug for opmuntring før aktiviteter.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Jonas", "Mia" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, false),
-                            ("kl 9", 9, true),
-                            ("kl 10", 10, false),
-                            ("kl 11", 11, false),
-                            ("kl 12", 12, false),
-                            ("kl 15", 15, false),
-                            ("kl 20", 20, false),
-                            ("kl 21", 21, false),
                             ("kl 22", 22, true)),
-                        PnSchedule = CreatePnSchedule(9)
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -237,19 +199,14 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Gul",
                         LatestStatusNote = "Har været afventende i kontakt med personale.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Noah", "Lærke" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, true),
-                            ("kl 9", 9, false),
-                            ("kl 10", 10, true),
-                            ("kl 11", 11, false),
                             ("kl 12", 12, false),
-                            ("kl 15", 15, false),
-                            ("kl 20", 20, false),
-                            ("kl 21", 21, false),
                             ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9)
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -260,19 +217,13 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Rød",
                         LatestStatusNote = "Har haft behov for hyppige pauser.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Peter", "Camilla" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, false),
-                            ("kl 9", 9, false),
-                            ("kl 10", 10, false),
-                            ("kl 11", 11, true),
-                            ("kl 12", 12, false),
-                            ("kl 15", 15, false),
-                            ("kl 20", 20, true),
-                            ("kl 21", 21, false),
                             ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9, 4)
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -283,7 +234,6 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Rød",
                         LatestStatusNote = "Har været træt og ønsket at blive på værelset.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Rikke", "Thomas" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, true),
@@ -295,7 +245,9 @@ namespace Slottet.Client.Pages.MockData
                             ("kl 20", 20, false),
                             ("kl 21", 21, false),
                             ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9)
+                        PNStatus = "",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -306,19 +258,15 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Grøn",
                         LatestStatusNote = "Ønsker rolig kontakt og én medarbejder ad gangen.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Louise", "Emil" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, false),
                             ("kl 9", 9, true),
                             ("kl 10", 10, false),
-                            ("kl 11", 11, false),
-                            ("kl 12", 12, true),
-                            ("kl 15", 15, false),
-                            ("kl 20", 20, false),
-                            ("kl 21", 21, false),
                             ("kl 22", 22, false)),
-                        PnSchedule = CreatePnSchedule(9, 7)
+                        PNStatus = "Panodil kl. 7",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     },
                     new()
                     {
@@ -329,19 +277,15 @@ namespace Slottet.Client.Pages.MockData
                         IsActive = true,
                         RiskLevel = "Grøn",
                         LatestStatusNote = "Har haft en svær start på dagen, men samarbejder fint nu.",
-                        GroceryDay = DateTime.Today.AddDays(1),
                         AssignedStaff = new List<string> { "Helene", "Victor" },
                         MedicineSchedule = CreateMedicineSchedule(
                             ("kl 8", 8, true),
-                            ("kl 9", 9, false),
-                            ("kl 10", 10, false),
-                            ("kl 11", 11, false),
                             ("kl 12", 12, false),
                             ("kl 15", 15, false),
-                            ("kl 20", 20, true),
-                            ("kl 21", 21, false),
                             ("kl 22", 22, true)),
-                        PnSchedule = CreatePnSchedule(9)
+                        PNStatus = "Panodil kl. 20",
+                        PaymentMethod = "Mobilepay og Dankort",
+                        GroceryDay = "Mandag"
                     }
                 }
             };
@@ -359,19 +303,19 @@ namespace Slottet.Client.Pages.MockData
                     .ToList();
             }
 
-        private static List<PnScheduleItemDto> CreatePnSchedule(int count, params int[] givenIndexes)
-            {
-                var givenSet = givenIndexes.ToHashSet();
+        //private static List<PnScheduleItemDto> CreatePnSchedule(int count, params int[] givenIndexes)
+        //    {
+        //        var givenSet = givenIndexes.ToHashSet();
 
-                return Enumerable.Range(0, count)
-                    .Select(i => new PnScheduleItemDto
-                    {
-                        Label = "PN",
-                        TimeLabel = string.Empty,
-                        IsGiven = givenSet.Contains(i)
-                    })
-                    .ToList();
-            }
+        //        return Enumerable.Range(0, count)
+        //            .Select(i => new PnScheduleItemDto
+        //            {
+        //                Label = "PN",
+        //                TimeLabel = string.Empty,
+        //                IsGiven = givenSet.Contains(i)
+        //            })
+        //            .ToList();
+        //    }
     };
 }
   
