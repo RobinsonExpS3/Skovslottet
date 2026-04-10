@@ -9,6 +9,6 @@ namespace Slottet.API.Controllers
     [Route("api/[controller]")]
     public class ShiftboardController : Controller
     {
-        private readonly IBaseRepository<>
+        private readonly IBaseRepository<ShiftBoard> _repository;
     }
 }

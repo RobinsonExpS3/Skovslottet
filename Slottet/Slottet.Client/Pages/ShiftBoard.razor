@@ -57,20 +57,14 @@ else
 											</td>
 										}
 									</tr>
-
-									<tr>
-										<td>PN</td>
-										@foreach (var pn in resident.PnSchedule)
-										{
-											<td>
-												<div class="dose-box @(pn.IsGiven ? "given" : "not-given")"">
-													@(pn.IsGiven ? "💉" : " ")
-												</div>
-											</td>
-										}
-									</tr>
 								</tbody>
 							</table>
+						</section>
+
+						<section class="resident-bottom-grid">
+						<section class="pn-status">
+							<h4>PN</h4>
+							<p>@resident.PNStatus</p>
 						</section>
 
 						<section class="assigned-staff">
@@ -82,22 +76,25 @@ else
 								}
 							</div>
 						</section>
+						</section>
+
+						<section class="resident-footer-grid">
+						<div class="payment-method">
+							<h4>Betaling</h4>
+							<p>@resident.PaymentMethod</p>
+						</div>
+
+						<div class="grocery-day">
+							<h4>Handledag</h4>
+							<p>@resident.GroceryDay</p>
+						</div>
+						</section>
 
 					</article>
-					@* <article class="resident-card">
-					<h3>@resident.ResidentName</h3>
-					<p><strong>⚠️Risikoniveau: </strong> @resident.RiskLevel</p>
-					<p><strong>📝Status: </strong> @resident.Status</p>
-					<p><strong>💊Medicintid: </strong> @resident.MedicinTime</p>
-					<p><strong>💉PN-tid: </strong> @resident.PnTime</p>
-					<p><strong>🗓️Indkøbsdag: </strong> @(resident.GroceryDay?.ToString("dd-MM-yyyy") ?? "-")</p>
-					<p><strong>💳Betalingsmetode: </strong>@resident.PaymentMethod</p>
-					</article> *@
 				}
 		</div>
 		</main>
 			<aside class="right-panel">
-				@* Info boks i venstre side - højre side? Kommer vel an på Valdemars main design? *@
 				<div class="info-box">
 					<h3>Telefonnumre ☎️</h3>
 					<p>
