@@ -32,13 +32,21 @@
 
 		<div class="button-column">
 			<input class="r-table-input" @bind="residentNameInput" placeholder="Indtæst navn..." />
-			<select @bind="selectedGroceryDayID">
+ 			<select @bind="selectedGroceryDayID">
 				<option value="">Vælg handledag</option>
 				@foreach(var day in groceryDays)
 				{
 					<option value="@day.GroceryDayID">@day.GroceryDayName</option>
+
+					<label>
+						<input type="radio" 
+							   name="groceryDays" 
+							   value="@day.GroceryDayID" 
+							   @onchange="() => selectedGroceryDayID = day.GroceryDayID"/>
+					</label>
 				}
 			</select>
+
 
 			<select multiple @onchange="OnPaymentMethodsChanged">
 				@foreach (var method in paymentMethods) {
@@ -48,14 +56,40 @@
 				}
 			</select>
 
-			@foreach(var time in medicineTimes)
-			{
-				<input type="time" @bind="time.Time" />
-			}
-			<button @onclick="AddMedicineTime">+ Tilføj tid</button>
+			<div>
+				<label>Vælg medicintid</label>
 
-@* 			<input class="r-table-input" @bind="residentGroceryInput" placeholder="Indtæst handledage..." />
-			<input class="r-table-input" @bind="residentMedicineTimeInput" placeholder="Indtæst medicintidspunkter..." /> *@
+				<select @bind="selectedHour">
+					@for (int i = 0; i < 24; i++) {
+						<option value="@i">@i.ToString("D2")</option>
+					}
+				</select>
+
+				:
+
+				<select @bind="selectedMinute">
+					@for (int i = 0; i < 60; i += 5) {
+						<option value="@i">@i.ToString("D2")</option>
+					}
+				</select>
+
+				<button @onclick="AddMedicineTime">Tilføj</button>
+			</div>
+
+			<div>
+				<strong>Valgte tider:</strong>
+
+				@if(!medicineTimes.Any())
+				{
+					<p>Ingen tider valgt</p>
+				}
+
+				@foreach(var time in medicineTimes)
+				{
+					@time.Time.ToString("HH:mm")
+					<button @onclick="() => RemoveMedicineTime(time)">Fjern tid</button>
+				}
+			</div>
 
 			<button class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(residentNameInput) || selectedResident is not null)">Opret</button>
 			<button class="column-button" @onclick="Update" disabled="@(selectedResident is null)">Opdater</button>

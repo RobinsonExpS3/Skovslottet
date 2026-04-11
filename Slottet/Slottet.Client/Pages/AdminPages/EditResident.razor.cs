@@ -12,7 +12,7 @@ namespace Slottet.Client.Pages.AdminPages
         private List<ResidentViewModel>? residents;
         private ResidentViewModel? selectedResident;
         private bool loadFailed = false;
-        private Guid selectedGroceryDayID;
+        private Guid? selectedGroceryDayID;
         private List<string> selectedPaymentMethodIDs = new();
         private List<PaymentMethodDTO> paymentMethods = new ();
         private List<GroceryDayDTO> groceryDays = new();
@@ -52,7 +52,7 @@ namespace Slottet.Client.Pages.AdminPages
         private async Task Create() {
             var dto = new ResidentDTO {
                 ResidentName = residentNameInput,
-                GroceryDayID = selectedGroceryDayID,
+                GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
                 PaymentMethodIDs = selectedPaymentMethodIDs.Select(id => Guid.Parse(id)).ToList(),
                 MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
                 IsActive = true
@@ -72,7 +72,7 @@ namespace Slottet.Client.Pages.AdminPages
 
             var dto = new ResidentDTO {
                 ResidentName = residentNameInput,
-                GroceryDayID = selectedGroceryDayID,
+                GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
                 PaymentMethodIDs = selectedPaymentMethodIDs.Select(id => Guid.Parse(id)).ToList(),
                 MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
                 IsActive = selectedResident.IsActive
@@ -110,8 +110,19 @@ namespace Slottet.Client.Pages.AdminPages
             public TimeOnly Time { get; set; } = new(8, 0);
         }
 
+        private void RemoveMedicineTime(TimeInput time) {
+            medicineTimes.Remove(time);
+        }
+
+        private int selectedHour = 8;
+        private int selectedMinute = 0;
+
         private void AddMedicineTime() {
-            medicineTimes.Add(new TimeInput());
+            var time = new TimeOnly(selectedHour, selectedMinute);
+
+            if (!medicineTimes.Any(t => t.Time == time)) {
+                medicineTimes.Add(new TimeInput { Time = time });
+            }
         }
     }
 }
