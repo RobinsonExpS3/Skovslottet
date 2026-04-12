@@ -4,9 +4,9 @@ namespace Slottet.Client.Pages.MockData
 {
     public static class ShiftBoardMockData
     {
-        public static ShiftBoardViewDto Create()
+        public static ShiftBoardDTO Create()
         {
-            return new ShiftBoardViewDto
+            return new ShiftBoardDTO
             {
                 ShiftBoardId = Guid.NewGuid(),
                 ShiftType = "Dagvagt",
@@ -42,7 +42,7 @@ namespace Slottet.Client.Pages.MockData
                     "Tøm skraldespande"
                 },
 
-                ResidentCards = new List<ResidentCardViewDto>
+                ResidentCards = new List<ResidentCardDto>
                 {
                     new()
                     {

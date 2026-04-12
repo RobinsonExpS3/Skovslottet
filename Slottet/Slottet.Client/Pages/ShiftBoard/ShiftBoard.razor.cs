@@ -1,7 +1,7 @@
 using Slottet.Client.Pages.MockData;
 using Slottet.Shared;
 
-namespace Slottet.Client.Pages
+namespace Slottet.Client.Pages.ShiftBoard
 {
     /// <summary>
     /// Represents the main component for displaying and managing the shift board view in the application.
@@ -9,7 +9,7 @@ namespace Slottet.Client.Pages
     /// 
     public partial class ShiftBoard //Midlertidig codebehind. Skal lige prøve det af. :D
     {
-        protected ShiftBoardViewDto? Model { get; set; }
+        protected ShiftBoardDTO? Model { get; set; }
 
         protected override void OnInitialized()
         {
