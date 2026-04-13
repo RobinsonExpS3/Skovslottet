@@ -8,5 +8,6 @@ namespace Slottet.Domain.Entities {
         public string DepartmentTaskName { get; set; }
 
         public Guid DepartmentID { get; set; }
+        public Department Department { get; set; }
     }
 }
