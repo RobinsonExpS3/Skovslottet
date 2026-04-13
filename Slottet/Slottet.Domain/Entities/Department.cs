@@ -4,5 +4,9 @@
     {
         public Guid DepartmentID { get; set; }
         public string DepartmentName { get; set; }
+
+        public ICollection<DepartmentTask> DepartmentTasks { get; set; }
+        public ICollection<Phone> Phones { get; set; }
+        public ICollection<Staff> Staffs { get; set; }
     }
 }

@@ -9,5 +9,7 @@
 
         public Department DepartmentID { get; set; }
         public Department Department { get; set; }
+
+        public ICollection<StaffResidentStatus> StaffResidentStatuses { get; set; }
     }
 }

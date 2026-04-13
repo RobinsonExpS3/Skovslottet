@@ -10,5 +10,7 @@
         public Guid GroceryDayID { get; set; }
         public GroceryDay GroceryDay { get; set; } = null!;
 
+        public ICollection<Medicine> Medicines { get; set; }
+
     }
 }

@@ -4,5 +4,7 @@
     {
         public Guid GroceryDayID { get; set; }
         public string GroceryDayName { get; set; }
+
+        public ICollection<Resident> Residents { get; set; }
     }
 }
