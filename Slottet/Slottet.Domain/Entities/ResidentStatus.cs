@@ -4,12 +4,9 @@ using System.Text;
 
 namespace Slottet.Domain.Entities {
     public class ResidentStatus {
-        public Guid ResidentCardID { get; set; }
+        public Guid ResidentStatusID { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }
-
-        public Guid StaffID { get; set; }
-        public Staff Staff { get; set; }
 
         public Guid ResidentID { get; set; }
         public Resident Resident { get; set; }
