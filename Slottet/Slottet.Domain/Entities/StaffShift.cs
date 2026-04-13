@@ -2,10 +2,11 @@
 {
     public class StaffShift
     {
-        public ShiftBoard ShiftBoardID { get; set; }
-        public Staff StaffID { get; set; }
+        public Guid ShiftBoardID { get; set; }
+        public ShiftBoard ShiftBoard { get; set; }
 
-        public ICollection<Staff> Staff { get; set; }
-        public ICollection<ShiftBoard> ShiftBoards { get; set; }
+        public Guid StaffID { get; set; }
+        public Staff Staff { get; set; }
+
     }
 }

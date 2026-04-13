@@ -7,6 +7,7 @@
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
+        public ICollection<StaffShift> StaffShifts { get; set; }
         public ICollection<SpecialResponsibility> SpecialResponsibilities { get; set; }
     }
 }
