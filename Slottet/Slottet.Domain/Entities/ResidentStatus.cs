@@ -7,9 +7,17 @@ namespace Slottet.Domain.Entities {
         public Guid ResidentCardID { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }
-        public Staff StaffID { get; set; }
-        public Resident ResidentID { get; set; }
-        public RiskLevel RiskLevelID { get; set; }
-        public PN PNID { get; set; }
+
+        public Guid StaffID { get; set; }
+        public Staff Staff { get; set; }
+
+        public Guid ResidentID { get; set; }
+        public Resident Resident { get; set; }
+
+        public Guid RiskLevelID { get; set; }
+        public RiskLevel RiskLevel { get; set; }
+
+        public Guid PNID { get; set; }
+        public PN PN { get; set; }
     }
 }
