@@ -116,16 +116,16 @@ CREATE TABLE dbo.Medicine
 );
 GO
 
-CREATE TABLE dbo.StaffResident
+CREATE TABLE dbo.StaffResidentStatus
 ( 
 	StaffID UNIQUEIDENTIFIER NOT NULL, 
 	ResidentID UNIQUEIDENTIFIER NOT NULL,
 	
 	CONSTRAINT PK_StaffResident
 		PRIMARY KEY (StaffID, ResidentID), 
-	CONSTRAINT FK_Staff_StaffResident 
+	CONSTRAINT FK_Staff_StaffResidentStatus 
 		FOREIGN KEY (StaffID) REFERENCES dbo.Staff(StaffID), 
-	CONSTRAINT FK_Resident_StaffResident 
+	CONSTRAINT FK_Resident_StaffResidentStatus 
 		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID) 
 );
 GO
@@ -148,14 +148,11 @@ CREATE TABLE dbo.ResidentStatus
 	ResidentStatusID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
 	Status NVARCHAR NOT NULL, 
 	StatusEntryTime DATETIME NOT NULL, 
-
-	StaffID UNIQUEIDENTIFIER NOT NULL, 
+	 
 	ResidentID UNIQUEIDENTIFIER NOT NULL,
 	RiskLevelID UNIQUEIDENTIFIER NOT NULL,
 	PNID UNIQUEIDENTIFIER NOT NULL,
-
-	CONSTRAINT FK_Staff_ResidentStatus
-		FOREIGN KEY (StaffID) REFERENCES dbo.Staff(StaffID), 
+	 
 	CONSTRAINT FK_Resident_ResidentStatus 
 		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID), 
 	CONSTRAINT FK_RiskLevel_ResidentStatus 
