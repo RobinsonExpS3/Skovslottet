@@ -1,9 +1,125 @@
 -- USE Slottet_Eks
 -- GO
 
+CREATE TABLE dbo.Department
+( 
+	DepartmentID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
+	DepartmentName NVARCHAR NOT NULL 
+);
+GO
+
+CREATE TABLE dbo.DepartmentTask
+( 
+	DepartmentTaskID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
+	DepartmentTaskName NVARCHAR NOT NULL,
+	
+	DepartmentID UNIQUEIDENTIFIER NOT NULL,
+
+	constraint FK_Department_DepartmentTask
+		FOREIGN KEY (DepartmentID) REFERENCES dbo.Department(DepartmentID)
+);
+GO
+
+CREATE TABLE DBO.Phone
+( 
+	PhoneID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
+	PhoneNumber NVARCHAR NOT NULL,
+	
+	DepartmentID UNIQUEIDENTIFIER NOT NULL,
+	constraint FK_Department_Phone
+		FOREIGN KEY (DepartmentID) REFERENCES dbo.Department(DepartmentID)
+);
+GO
+
+CREATE TABLE dbo.Staff
+( 
+	StaffID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
+	StaffName NVARCHAR NOT NULL, 
+	Initials NVARCHAR NOT NULL, 
+	[Role] NVARCHAR NOT NULL, 
+	DepartmentID UNIQUEIDENTIFIER NOT NULL,
+	constraint FK_Department_Staff
+		FOREIGN KEY (DepartmentID) REFERENCES dbo.Department(DepartmentID)
+);
+GO
+
+CREATE TABLE dbo.ShiftBoard
+( 
+	ShiftBoardID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
+	ShiftType NVARCHAR NOT NULL, 
+	StartDate DATETIME NOT NULL, 
+	EndDate DATETIME NOT NULL
+);
+GO
+
+CREATE TABLE dbo.SpecialResponsibility
+( 
+	SpecialResponsibilityID UniqueIDENTIFIER PRIMARY KEY NOT NULL,
+	TaskName NVARCHAR NOT NULL,
+
+	ShiftBoardID UNIQUEIDENTIFIER NOT NULL,
+
+	Constraint FK_ShiftBoard_SpecialResponsibility
+		FOREIGN KEY (ShiftBoardID) REFERENCES dbo.ShiftBoard(ShiftBoardID)
+);
+GO
+
+CREATE TABLE dbo.StaffShift
+( 
+	ShiftBoardID UNIQUEIDENTIFIER NOT NULL, 
+	StaffID UNIQUEIDENTIFIER NOT NULL, 
+
+	CONSTRAINT PK_StaffShift
+		PRIMARY KEY (ShiftBoardID, StaffID), 
+
+	CONSTRAINT FK_ShiftBoard_StaffShift 
+		FOREIGN KEY (ShiftBoardID) REFERENCES dbo.ShiftBoard(ShiftBoardID), 
+
+	CONSTRAINT FK_Staff_StaffShift 
+		FOREIGN KEY (StaffID) REFERENCES dbo.Staff(StaffID) 
+);
+GO
+
+CREATE TABLE dbo.GroceryDay
+( 
+	GroceryDayID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL,
+	GroceryDayName NVARCHAR NOT NULL
+);
+GO	
+
+CREATE TABLE dbo.Resident
+( 
+	ResidentID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
+	ResidentName NVARCHAR NOT NULL,
+	IsActive BIT NOT NULL, 
+
+	GroceryDayID UNIQUEIDENTIFIER NOT NULL,
+
+	CONSTRAINT FK_GroceryDay_Resident
+		FOREIGN KEY (GroceryDayID) REFERENCES dbo.GroceryDay(GroceryDayID)
+);
+GO
+
+CREATE TABLE dbo.Medicine
+( 
+	MedicineID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
+	MedicineTime DATETIME NOT NULL,
+	MedicineGivenTime DATETIME NOT NULL,
+	MedicineRegisteredTime DATETIME NOT NULL,
+
+	ResidentID UNIQUEIDENTIFIER NOT NULL,
+
+	constraint FK_Resident_Medicine
+		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID)
+);
+
+/*
 CREATE TABLE dbo.SpecialResponsibility ( 
 	SpecialResponsibilityID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
-	TaskName NVARCHAR NOT NULL 
+	TaskName NVARCHAR NOT NULL,
+	
+	ShiftBoardID UNIQUEIDENTIFIER NOT NULL,
+
 );
 GO
 
@@ -11,12 +127,7 @@ CREATE TABLE dbo.ShiftBoard (
 	ShiftBoardID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
 	ShiftType NVARCHAR NOT NULL, 
 	StartDate DATETIME NOT NULL, 
-	EndDate DATETIME, 
-
-	SpecialResponsibilityID UNIQUEIDENTIFIER, 
-
-	CONSTRAINT FK_SpecialResponsibility_ShiftBoard 
-		FOREIGN KEY (SpecialResponsibilityID) REFERENCES dbo.SpecialResponsibility(SpecialResponsibilityID) 
+	EndDate DATETIME
 ); 
 GO 
 
