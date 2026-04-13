@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace Slottet.Shared
+﻿namespace Slottet.Shared
 {
     public sealed class ResidentCardDto //For at indlæse alt nødvendige data til vores residentcards i udviklingsfasen. :) 
     {                                       //Kan erstattes med modellerne, men så skal vi hente data fra flere modellag,  
