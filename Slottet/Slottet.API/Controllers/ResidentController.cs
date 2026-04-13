@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
+using Slottet.Infrastructure.Repositories;
 using Slottet.Shared;
 
 namespace Slottet.API.Controllers
@@ -9,49 +10,54 @@ namespace Slottet.API.Controllers
     [Route("api/[controller]")]
     public class ResidentController : Controller
     {
-        private readonly IBaseRepository<Resident> _repository;
+        private readonly IBaseRepository<Resident> _baseRepository; 
+        private readonly ResidentRepository _residentRepository;
 
-        public ResidentController(IBaseRepository<Resident> residentRepository)
-        {
-            _repository = residentRepository;
+        public ResidentController( IBaseRepository<Resident> baseRepository, ResidentRepository residentRepository) {
+            _baseRepository = baseRepository;
+            _residentRepository = residentRepository;
         }
 
         //Get: residents
         [HttpGet("Residents")]
-        public async Task<ActionResult<IEnumerable<Resident>>> GetAll()
-        {
-            var residents = await _repository.GetAllAsync();
-
+        public async Task<ActionResult<IEnumerable<ResidentViewModel>>> GetAll() {
+            var residents = await _baseRepository.GetAllAsync();
             var result = residents.Select(r => new ResidentViewModel {
                 ResidentID = r.ResidentID,
                 ResidentName = r.ResidentName,
-                GroceryDayName = r.GroceryDay.GroceryDayName,
+                GroceryDayID = r.GroceryDayID,
+                GroceryDayName = r.GroceryDayName ?? string.Empty,
                 IsActive = r.IsActive
             });
 
-            return Ok(residents);
+            return Ok(result);
         }
 
         //Get: resident by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Resident>> GetById(Guid id)
-        {
-            var resident = await _repository.GetByIdAsync(id);
-
-            if (resident == null)
-            {
+        public async Task<ActionResult<ResidentDTO>> GetById(Guid id) {
+            var resident = await _baseRepository.GetByIdAsync(id);
+            
+            if (resident == null) {
                 return NotFound();
             }
 
-            return Ok(resident);
+            var dto = new ResidentDTO {
+                ResidentID = resident.ResidentID,
+                ResidentName = resident.ResidentName,
+                GroceryDayID = resident.GroceryDayID,
+                IsActive = resident.IsActive,
+                PaymentMethodIDs = await _residentRepository.GetPaymentMethodIdsAsync(id),
+                MedicineTimes = await _residentRepository.GetMedicineTimesAsync(id)
+            };
+
+            return Ok(dto);
         }
 
         //Post: resident
         [HttpPost]
-        public async Task<ActionResult<Resident>> CreateResident([FromBody] ResidentDTO dto)
-        {
-            if (dto == null)
-            {
+        public async Task<ActionResult<Resident>> CreateResident([FromBody] ResidentDTO dto) {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty) {
                 return BadRequest();
             }
 
@@ -62,48 +68,45 @@ namespace Slottet.API.Controllers
                 IsActive = dto.IsActive
             };
 
-            await _repository.AddAsync(resident);
+            await _baseRepository.AddAsync(resident);
+            await _residentRepository.ReplacePaymentMethodsAsync(resident.ResidentID, dto.PaymentMethodIDs);
+            await _residentRepository.ReplaceMedicineTimesAsync(resident.ResidentID, dto.MedicineTimes);
 
             return CreatedAtAction(nameof(GetById), new { id = resident.ResidentID }, resident);
         }
 
         //Put: resident by id
         [HttpPut("{id}")]
-        public async Task<ActionResult<Resident>> UpdateResident(Guid id, [FromBody] Resident resident)
-        {
-            if (resident == null || id != resident.ResidentID)
-            {
+        public async Task<ActionResult> UpdateResident(Guid id, [FromBody] ResidentDTO dto) {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty) {
                 return BadRequest();
             }
 
-            var existingResident = await _repository.GetByIdAsync(id);
+            var existingResident = await _baseRepository.GetByIdAsync(id);
+            if (existingResident == null) return NotFound();
 
-            if (existingResident == null)
-            {
-                return NotFound();
-            }
+            existingResident.ResidentName = dto.ResidentName;
+            existingResident.GroceryDayID = dto.GroceryDayID;
+            existingResident.IsActive = dto.IsActive;
 
-            existingResident.ResidentName = resident.ResidentName;
-            existingResident.GroceryDay = resident.GroceryDay;
-            existingResident.IsActive = resident.IsActive;
-
-            await _repository.UpdateAsync(existingResident);
+            await _baseRepository.UpdateAsync(existingResident);
+            await _residentRepository.ReplacePaymentMethodsAsync(id, dto.PaymentMethodIDs);
+            await _residentRepository.ReplaceMedicineTimesAsync(id, dto.MedicineTimes);
 
             return NoContent();
         }
 
         //Delete: resident by id
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteResident(Guid id)
-        {
-            var existingResident = await _repository.GetByIdAsync(id);
+        public async Task<ActionResult> DeleteResident(Guid id) {
+            var existingResident = await _baseRepository.GetByIdAsync(id);
 
-            if (existingResident == null)
-            {
+            if (existingResident == null) {
                 return NotFound();
             }
 
-            await _repository.DeleteAsync(id);
+            await _residentRepository.DeleteRelationsAsync(id);
+            await _baseRepository.DeleteAsync(id);
 
             return NoContent();
         }

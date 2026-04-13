@@ -1,3 +1,7 @@
+using Slottet.Application.Interfaces;
+using Slottet.Domain.Entities;
+using Slottet.Infrastructure.Repositories;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,6 +14,11 @@ builder.Services.AddOpenApi();
 //builder.Services.AddScoped<IControllerRepository, (Repositories)>();
 
 //builder.Services.AddScoped<IBaseRepository<SpecialResponsibility>, SpecialResponsibilityRepository>();
+
+builder.Services.AddScoped<ResidentRepository>(); 
+builder.Services.AddScoped<IBaseRepository<Resident>, ResidentRepository>();
+builder.Services.AddScoped<IBaseRepository<GroceryDay>, GroceryDayRepository>();
+builder.Services.AddScoped<IBaseRepository<PaymentMethod>, PaymentMethodRepository>();
 
 var app = builder.Build();
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Slottet.Domain.Entities {
-    public class ResidentCard {
+    public class ResidentStatus {
         public Guid ResidentCardID { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }

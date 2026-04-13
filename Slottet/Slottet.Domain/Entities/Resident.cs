@@ -10,5 +10,7 @@ namespace Slottet.Domain.Entities {
 
         public Guid GroceryDayID { get; set; }
         public GroceryDay GroceryDay { get; set; }
+
+        public string? GroceryDayName { get; set; }
     }
 }

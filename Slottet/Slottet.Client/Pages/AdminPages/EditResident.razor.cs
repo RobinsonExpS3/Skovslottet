@@ -7,92 +7,118 @@ namespace Slottet.Client.Pages.AdminPages
 {
     public partial class EditResident {
         [Inject]
-        public HttpClient httpClient { get; set; }
+        public HttpClient? httpClient { get; set; } = default;
 
         private List<ResidentViewModel>? residents;
         private ResidentViewModel? selectedResident;
         private bool loadFailed = false;
         private Guid? selectedGroceryDayID;
-        private List<string> selectedPaymentMethodIDs = new();
-        private List<PaymentMethodDTO> paymentMethods = new ();
+        private List<Guid> selectedPaymentMethodIDs = new();
+        private List<PaymentMethodDTO> paymentMethods = new();
         private List<GroceryDayDTO> groceryDays = new();
         private List<TimeInput> medicineTimes = new();
         private string? residentNameInput;
 
-        private async Task LoadData() {
-            try {
-                residents = await httpClient.GetFromJsonAsync<List<ResidentViewModel>>(
-                    "api/Resident/Residents"
-                );
-
-                groceryDays = await httpClient.GetFromJsonAsync<List<GroceryDayDTO>>(
-                    "api/GroceryDay"
-                );
-
-                paymentMethods = await httpClient.GetFromJsonAsync<List<PaymentMethodDTO>>(
-                    "api/PaymentMethod"
-                );
-
-            } catch {
-                residents = new List<ResidentViewModel>();
-                groceryDays = new List<GroceryDayDTO>();
-                paymentMethods = new List<PaymentMethodDTO>();
-                loadFailed = true;
-            }
-        }
+        private int selectedHour = 8;
+        private int selectedMinute = 0;
 
         protected override async Task OnInitializedAsync() {
             await LoadData();
         }
 
-        private void SelectResident(ResidentViewModel resident) {
+        private async Task LoadData() {
+            loadFailed = false;
+
+            try {
+                residents = await httpClient!.GetFromJsonAsync<List<ResidentViewModel>>("api/Resident/Residents") ?? new();
+            } catch {
+                residents = new();
+                loadFailed = true;
+            }
+
+            try {
+                groceryDays = await httpClient!.GetFromJsonAsync<List<GroceryDayDTO>>("api/GroceryDay") ?? new();
+            } catch {
+                groceryDays = new();
+                loadFailed = true;
+            }
+
+            try {
+                paymentMethods = await httpClient!.GetFromJsonAsync<List<PaymentMethodDTO>>("api/PaymentMethod") ?? new();
+            } catch {
+                paymentMethods = new();
+                loadFailed = true;
+            }
+        }
+
+        private async Task SelectResident(ResidentViewModel resident) {
             selectedResident = resident;
+            residentNameInput = resident.ResidentName;
+            selectedGroceryDayID = resident.GroceryDayID;
+
+            var dto = await httpClient.GetFromJsonAsync<ResidentDTO>($"api/Resident/{resident.ResidentID}");
+            selectedPaymentMethodIDs = dto?.PaymentMethodIDs ?? new();
+            medicineTimes = dto?.MedicineTimes
+                .Select(t => new TimeInput { Time = TimeOnly.FromDateTime(t) })
+                .ToList() ?? new();
         }
 
         private async Task Create() {
             var dto = new ResidentDTO {
-                ResidentName = residentNameInput,
+                ResidentName = residentNameInput ?? string.Empty,
                 GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
-                PaymentMethodIDs = selectedPaymentMethodIDs.Select(id => Guid.Parse(id)).ToList(),
+                PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
                 MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
                 IsActive = true
             };
 
             var response = await httpClient.PostAsJsonAsync("api/Resident", dto);
 
-            if(response.IsSuccessStatusCode) {
-                await LoadData();
+            if (!response.IsSuccessStatusCode) {
+                return;
             }
+
+            ClearForm();
+            await LoadData();
         }
 
+
         private async Task Update() {
-            if(selectedResident == null) {
+            if (selectedResident == null) {
                 return;
             }
 
             var dto = new ResidentDTO {
-                ResidentName = residentNameInput,
+                ResidentID = selectedResident.ResidentID,
+                ResidentName = residentNameInput ?? string.Empty,
                 GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
-                PaymentMethodIDs = selectedPaymentMethodIDs.Select(id => Guid.Parse(id)).ToList(),
+                PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
                 MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
                 IsActive = selectedResident.IsActive
             };
 
-            await httpClient.PutAsJsonAsync(
-                $"api/Resident/{selectedResident.ResidentID}", dto
-            );
+            var response = await httpClient.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
 
+            if (!response.IsSuccessStatusCode) {
+                return;
+            }
+
+            ClearForm();
             await LoadData();
         }
 
         private async Task Delete() {
-            if(selectedResident == null) { 
-                return; 
+            if (selectedResident == null) {
+                return;
             }
 
-            await httpClient.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
+            var response = await httpClient.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
 
-            selectedResident = null;
+            if (!response.IsSuccessStatusCode) {
+                return;
+            }
+
+            ClearForm();
             await LoadData();
         }
 
@@ -100,9 +126,11 @@ namespace Slottet.Client.Pages.AdminPages
             selectedPaymentMethodIDs.Clear();
 
             if (e.Value is string[] valuesArray) {
-                selectedPaymentMethodIDs = valuesArray.ToList();
-            } else if (e.Value is string singleValue) {
-                selectedPaymentMethodIDs.Add(singleValue);
+                foreach (var v in valuesArray)
+                    if (Guid.TryParse(v, out var id))
+                        selectedPaymentMethodIDs.Add(id);
+            } else if (e.Value is string singleValue && Guid.TryParse(singleValue, out var id)) {
+                selectedPaymentMethodIDs.Add(id);
             }
         }
 
@@ -114,15 +142,20 @@ namespace Slottet.Client.Pages.AdminPages
             medicineTimes.Remove(time);
         }
 
-        private int selectedHour = 8;
-        private int selectedMinute = 0;
-
         private void AddMedicineTime() {
             var time = new TimeOnly(selectedHour, selectedMinute);
 
             if (!medicineTimes.Any(t => t.Time == time)) {
                 medicineTimes.Add(new TimeInput { Time = time });
             }
+        }
+
+        private void ClearForm() {
+            selectedResident = null;
+            residentNameInput = null;
+            selectedGroceryDayID = null;
+            selectedPaymentMethodIDs.Clear();
+            medicineTimes.Clear();
         }
     }
 }
