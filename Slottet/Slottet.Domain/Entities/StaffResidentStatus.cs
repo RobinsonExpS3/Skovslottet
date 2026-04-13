@@ -6,6 +6,6 @@
         public Guid ResidentStatusID { get; set; }
 
         public Staff Staff { get; set; }
-        public Resident ResidentStatus { get; set; }
+        public ResidentStatus ResidentStatus { get; set; }
     }
 }
