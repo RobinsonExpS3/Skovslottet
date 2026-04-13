@@ -1,11 +1,11 @@
 ﻿namespace Slottet.Domain.Entities
 {
-    public class ResidentPaymentMethod
+    public class StaffResident
     {
+        public Guid StaffID { get; set; }
         public Guid ResidentID { get; set; }
-        public Guid PaymentMethodID { get; set; }
 
+        public Staff Staff { get; set; }
         public Resident Resident { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
     }
 }
