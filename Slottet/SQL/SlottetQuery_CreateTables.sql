@@ -20,7 +20,7 @@ CREATE TABLE dbo.DepartmentTask
 );
 GO
 
-CREATE TABLE DBO.Phone
+CREATE TABLE dbo.Phone
 ( 
 	PhoneID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
 	PhoneNumber NVARCHAR NOT NULL,
@@ -112,6 +112,20 @@ CREATE TABLE dbo.Medicine
 	constraint FK_Resident_Medicine
 		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID)
 );
+GO
+
+CREATE TABLE dbo.StaffResident
+( 
+	StaffID UNIQUEIDENTIFIER NOT NULL, 
+	ResidentID UNIQUEIDENTIFIER NOT NULL, 
+	CONSTRAINT PK_StaffResident
+		PRIMARY KEY (StaffID, ResidentID), 
+	CONSTRAINT FK_Staff_StaffResident 
+		FOREIGN KEY (StaffID) REFERENCES dbo.Staff(StaffID), 
+	CONSTRAINT FK_Resident_StaffResident 
+		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID) 
+);
+GO
 
 /*
 CREATE TABLE dbo.SpecialResponsibility ( 
