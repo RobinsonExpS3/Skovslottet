@@ -29,36 +29,4 @@
             _ => "risk-default"
         };
     }
-
-    //Opdateret DTO - Vi skal nok have medicine i en DTO, der læses ind her ligesom i mock data
-    public sealed class ResidentCardDTO
-    {
-        // Resident Card 
-        public string Status { get; set; }
-        public DateTime StatusEntryTime { get; set; }
-
-        // Resident 
-        public string ResidentName { get; set; }
-        public bool IsActive { get; set; }
-
-        // Risk 
-        public string RiskLevelName { get; set; }
-
-        //PN
-        public string PNSatus { get; set; }
-
-        //Medicine
-        public List<MedicineSlotDTO> Medicines { get; set; }
-
-        //Grocery Day
-        public string GroceryDayName { get; set; }
-
-        //Payment Method
-        public List<string> PaymentMethods { get; set; }
-
-        //staff 
-        public List<string> ResponsibleStaff { get; set; } // (?)
-
-
-    }
 }
