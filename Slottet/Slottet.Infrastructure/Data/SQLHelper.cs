@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Slottet.Infrastructure.Data
 {
-    internal class DBContext
+    internal class SQLHelper
     {
         /// <summary>
         /// Config builder for connection string, gets the "appsettings.json", with optional to false; it must be provided.

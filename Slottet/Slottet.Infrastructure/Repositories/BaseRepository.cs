@@ -57,7 +57,7 @@ namespace Slottet.Infrastructure.Repositories
         {
             var list = new List<T>();
 
-            using var con = await DBContext.OpenConnection();
+            using var con = await SQLHelper.OpenConnection();
             using var cmd = new SqlCommand(SqlSelectAll, con);
             cmd.CommandType = CommandType.Text;
             using var rd = await cmd.ExecuteReaderAsync();
@@ -69,7 +69,7 @@ namespace Slottet.Infrastructure.Repositories
 
         public async Task<T?> GetByIdAsync(Guid id)
         {
-            using var con = await DBContext.OpenConnection();
+            using var con = await SQLHelper.OpenConnection();
             using var cmd = new SqlCommand(SqlSelectById, con);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -91,7 +91,7 @@ namespace Slottet.Infrastructure.Repositories
             if (idList.Count == 0)
                 return list;
 
-            using var con = await DBContext.OpenConnection();
+            using var con = await SQLHelper.OpenConnection();
 
             foreach (var id in idList)
             {
@@ -112,7 +112,7 @@ namespace Slottet.Infrastructure.Repositories
 
         public async Task AddAsync(T entity)
         {
-            using var con = await DBContext.OpenConnection();
+            using var con = await SQLHelper.OpenConnection();
             using var cmd = new SqlCommand(SqlInsert, con);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -131,7 +131,7 @@ namespace Slottet.Infrastructure.Repositories
             var entitiesList = entities.ToList();
             if (!entitiesList.Any()) return;
 
-            using var con = await DBContext.OpenConnection();
+            using var con = await SQLHelper.OpenConnection();
             using var transaction = (SqlTransaction)await con.BeginTransactionAsync();
 
             try
@@ -159,7 +159,7 @@ namespace Slottet.Infrastructure.Repositories
 
         public async Task UpdateAsync(T entity)
         {
-            using var con = await DBContext.OpenConnection();
+            using var con = await SQLHelper.OpenConnection();
             using var cmd = new SqlCommand(SqlUpdate, con);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -177,7 +177,7 @@ namespace Slottet.Infrastructure.Repositories
             var entitiesList = entities.ToList();
             if (!entitiesList.Any()) return;
 
-            using var con = await DBContext.OpenConnection();
+            using var con = await SQLHelper.OpenConnection();
             using var transaction = (SqlTransaction)await con.BeginTransactionAsync();
 
             try
@@ -206,7 +206,7 @@ namespace Slottet.Infrastructure.Repositories
 
         public async Task DeleteAsync(Guid id)
         {
-            using var con = await DBContext.OpenConnection();
+            using var con = await SQLHelper.OpenConnection();
             using var cmd = new SqlCommand(SqlDeleteById, con);
             cmd.CommandType = CommandType.StoredProcedure;
 
