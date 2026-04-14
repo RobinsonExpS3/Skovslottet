@@ -11,6 +11,7 @@ namespace Slottet.Infrastructure.Data.Configurations {
                 .WithMany(s => s.Staff)
                 .HasForeignKey(s => s.Staff)
                 .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasMany(sb => sb.ShiftBoards)
                 .WithMany(s => s.ShiftBoard)
                 .HasForeignKey(sb => sb.ShiftBoardID)

@@ -11,15 +11,15 @@ namespace Slottet.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<DepartmentTask> entity)
         {
-            entity.HasKey(r => new { r.DepartmentTaskID });
+            entity.HasKey(dt => new { dt.DepartmentTaskID });
 
-            entity.Property(r => r.DepartmentTaskName)
+            entity.Property(dt => dt.DepartmentTaskName)
                 .IsRequired()
                 .HasMaxLength(100);
 
-            entity.HasOne(r => r.Department)
-                .WithMany(g => g.DepartmentTasks)
-                .HasForeignKey(r => r.DepartmentID)
+            entity.HasOne(d => d.Department)
+                .WithMany(dt => dt.DepartmentTasks)
+                .HasForeignKey(d => d.DepartmentID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
