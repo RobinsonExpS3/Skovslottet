@@ -14,7 +14,7 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
-            entity.HasMany(rl => rl.ResidentStatus)
+            entity.HasMany(rl => rl.ResidentStatuses)
                 .WithOne(rs => rs.RiskLevel)
                 .HasForeignKey(rs => rs.RiskLevelID)
                 .OnDelete(DeleteBehavior.Restrict);
