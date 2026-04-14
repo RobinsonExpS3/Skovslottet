@@ -8,14 +8,14 @@ using Slottet.Domain.Entities;
 namespace Slottet.Infrastructure.Data.Configurations {
     public class PhoneConfiguration : IEntityTypeConfiguration<Phone> {
         public void Configure(EntityTypeBuilder<Phone> entity) {
-            entity.HasKey(r => new { r.PhoneID });
+            entity.HasKey(p => new { p.PhoneID });
 
-            entity.Property(r => r.PhoneNumber)
+            entity.Property(p => p.PhoneNumber)
                 .IsRequired();
 
-            entity.HasOne(r => r.Department)
-                .WithMany(g => g.Phones)
-                .HasForeignKey(r => r.DepartmentID)
+            entity.HasOne(d => d.Department)
+                .WithMany(p => p.Phones)
+                .HasForeignKey(d => d.DepartmentID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
