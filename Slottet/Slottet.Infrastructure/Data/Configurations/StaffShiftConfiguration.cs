@@ -10,14 +10,14 @@ namespace Slottet.Infrastructure.Data.Configurations
         {
             entity.HasKey(ss => new { ss.ShiftBoardID, ss.StaffID });
 
-            entity.HasOne(ss => ss.ShiftBoard)
-                .WithMany(sb => sb.StaffShifts)
-                .HasForeignKey(ss => ss.ShiftBoardID)
+            entity.HasOne(sb => sb.ShiftBoard)
+                .WithMany(ss => ss.StaffShifts)
+                .HasForeignKey(sb => sb.ShiftBoardID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasOne(ss => ss.Staff)
-                .WithMany(s => s.StaffShifts)
-                .HasForeignKey(ss => ss.StaffID)
+            entity.HasOne(s => s.Staff)
+                .WithMany(ss => ss.StaffShifts)
+                .HasForeignKey(s => s.StaffID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
