@@ -17,15 +17,15 @@ namespace Slottet.Infrastructure.Data.Configurations
             entity.Property(r => r.IsActive)
                 .IsRequired();
 
-            entity.HasOne(r => r.GroceryDay)
-                .WithMany(g => g.Residents)
-                .HasForeignKey(r => r.GroceryDayID)
-                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(g => g.GroceryDay)
+                .WithMany(r => r.Residents)
+                .HasForeignKey(g => g.GroceryDayID)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasMany(r => r.Medicines)
-                .WithOne(m => m.Resident)
-                .HasForeignKey(m => m.ResidentID)
-                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(m => m.Medicines)
+                .WithOne(r => r.Resident)
+                .HasForeignKey(r => r.ResidentID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
