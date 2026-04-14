@@ -17,7 +17,7 @@ namespace Slottet.Infrastructure.Data.Configurations
             entity.HasMany(g => g.Residents)
                 .WithOne(r => r.GroceryDay)
                 .HasForeignKey(r => r.GroceryDayID)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

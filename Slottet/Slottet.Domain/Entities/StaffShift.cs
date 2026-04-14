@@ -7,9 +7,5 @@
 
         public Guid StaffID { get; set; }
         public Staff Staff { get; set; }
-
-        public ICollection<Staff> Staffs { get; set; }
-        public ICollection<ShiftBoard> ShiftBoards { get; set; }
-
     }
 }
