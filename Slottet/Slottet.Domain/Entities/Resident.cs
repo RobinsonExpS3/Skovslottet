@@ -11,6 +11,7 @@
         public GroceryDay GroceryDay { get; set; } = null!;
 
         public ICollection<Medicine> Medicines { get; set; }
+        public ICollection<ResidentPaymentMethod> ResidentPaymentMethods { get; set; }
 
     }
 }
