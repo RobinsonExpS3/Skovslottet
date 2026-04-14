@@ -5,5 +5,7 @@
         public Guid PNID { get; set; }
         public DateTime PNTime { get; set; }
         public string PNStatus { get; set; }
+
+
     }
 }

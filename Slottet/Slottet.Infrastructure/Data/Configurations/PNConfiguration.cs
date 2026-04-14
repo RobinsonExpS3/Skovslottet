@@ -1,30 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Configurations
 {
-    public class PNConfiguration : IEntityTypeConfiguration<PN> 
+    public class PNConfiguration : IEntityTypeConfiguration<PN>
     {
         public void Configure(EntityTypeBuilder<PN> entity)
         {
-            entity.HasKey(pn => new { pn.PNID });
+            entity.HasKey(p => p.PNID);
 
-            entity.Property(pn => pn.PNStatus)
+            entity.Property(p => p.PNTime)
                 .IsRequired();
 
-            entity.Property(pn => pn.PNTime)
-                .IsRequired();
-
-            entity.HasOne(rs => rs.ResidentStatus)
-                .WithMany(pn => pn.PNs)
-                .HasForeignKey(rs => rs.PNID)
-                .OnDelete(DeleteBehavior.Restrict);
+            entity.Property(p => p.PNStatus)
+                .IsRequired()
+                .HasMaxLength(255);
 
         }
-        
+
     }
 }
