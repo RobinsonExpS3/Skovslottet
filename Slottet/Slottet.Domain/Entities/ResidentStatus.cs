@@ -5,6 +5,7 @@
         public Guid ResidentStatusID { get; set; }
         public string Status { get; set; }
         public DateTime Date { get; set; }
+        
         public Guid ResidentID { get; set; }
         public Resident Resident { get; set; }
         public Guid RiskLevelID { get; set; }
