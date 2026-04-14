@@ -119,21 +119,26 @@ GO
 CREATE TABLE dbo.StaffResidentStatus
 ( 
 	StaffID UNIQUEIDENTIFIER NOT NULL, 
-	ResidentID UNIQUEIDENTIFIER NOT NULL,
+	ResidentStatusID UNIQUEIDENTIFIER NOT NULL,
 	
-	CONSTRAINT PK_StaffResident
-		PRIMARY KEY (StaffID, ResidentID), 
+	CONSTRAINT PK_StaffResidentStatus
+		PRIMARY KEY (StaffID, ResidentStatusID), 
 	CONSTRAINT FK_Staff_StaffResidentStatus 
 		FOREIGN KEY (StaffID) REFERENCES dbo.Staff(StaffID), 
-	CONSTRAINT FK_Resident_StaffResidentStatus 
-		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID) 
+	CONSTRAINT FK_ResidentStatus_StaffResidentStatus 
+		FOREIGN KEY (ResidentStatusID) REFERENCES dbo.ResidentStatus(ResidentStatusID) 
 );
 GO
 
 CREATE TABLE dbo.PN ( 
     PNID UNIQUEIDENTIFIER PRIMARY KEY NOT NULL, 
     PNTime TIME NOT NULL,
-    PNStatus NVARCHAR NOT NULL
+    PNStatus NVARCHAR NOT NULL,
+
+	ResidentStatusID UNIQUEIDENTIFIER NOT NULL,
+
+	CONSTRAINT FK_ResidentStatus_PN
+		FOREIGN KEY (ResidentStatusID) REFERENCES dbo.ResidentStatus(ResidentStatusID)
 ); 
 GO 
 
@@ -151,14 +156,11 @@ CREATE TABLE dbo.ResidentStatus
 	 
 	ResidentID UNIQUEIDENTIFIER NOT NULL,
 	RiskLevelID UNIQUEIDENTIFIER NOT NULL,
-	PNID UNIQUEIDENTIFIER NOT NULL,
 	 
 	CONSTRAINT FK_Resident_ResidentStatus 
 		FOREIGN KEY (ResidentID) REFERENCES dbo.Resident(ResidentID), 
 	CONSTRAINT FK_RiskLevel_ResidentStatus 
-		FOREIGN KEY (RiskLevelID) REFERENCES dbo.RiskLevel(RiskLevelID),
-	Constraint FK_PN_ResidentStatus 
-		FOREIGN KEY (PNID) REFERENCES dbo.PN(PNID)
+		FOREIGN KEY (RiskLevelID) REFERENCES dbo.RiskLevel(RiskLevelID)
 );
 GO
 

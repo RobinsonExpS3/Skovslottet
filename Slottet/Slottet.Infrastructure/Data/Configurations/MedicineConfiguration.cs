@@ -18,7 +18,7 @@ namespace Slottet.Infrastructure.Data.Configurations {
 
             entity.HasOne(r => r.Resident)
                 .WithMany(m => m.Medicines)
-                .HasForeignKey(r => r.MedicineID)
+                .HasForeignKey(r => r.ResidentID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
