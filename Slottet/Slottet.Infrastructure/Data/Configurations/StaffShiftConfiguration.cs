@@ -8,12 +8,12 @@ namespace Slottet.Infrastructure.Data.Configurations {
             entity.HasKey(ss => new { ss.ShiftBoardID, ss.StaffID });
 
             entity.HasMany(s => s.Staffs)
-                .WithMany(s => s.Staff)
+                .WithOne(s => s.Staff)
                 .HasForeignKey(s => s.Staff)
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasMany(sb => sb.ShiftBoards)
-                .WithMany(s => s.ShiftBoard)
+                .WithOne(s => s.ShiftBoard)
                 .HasForeignKey(sb => sb.ShiftBoardID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
