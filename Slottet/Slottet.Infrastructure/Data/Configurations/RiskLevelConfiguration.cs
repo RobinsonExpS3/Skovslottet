@@ -8,7 +8,16 @@ namespace Slottet.Infrastructure.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<RiskLevel> entity)
         {
-            throw new NotImplementedException();
+            entity.HasKey(rl => rl.RiskLevelID);
+
+            entity.Property(rl => rl.RiskLevelName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.HasMany(rl => rl.ResidentStatus)
+                .WithOne(rs => rs.RiskLevel)
+                .HasForeignKey(rs => rs.RiskLevelID)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
