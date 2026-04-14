@@ -5,6 +5,6 @@
         public Guid RiskLevelID { get; set; }
         public string RiskLevelName { get; set; }
 
-        public ICollection<ResidentStatus> ResidentStatus { get; set; }
+        public ICollection<ResidentStatus> ResidentStatuses { get; set; }
     }
 }

@@ -6,6 +6,7 @@
         public DateTime PNTime { get; set; }
         public string PNStatus { get; set; }
 
-
+        public Guid ResidentStatusID { get; set; }
+        public ResidentStatus ResidentStatus { get; set; }
     }
 }

@@ -12,6 +12,7 @@
 
         public ICollection<Medicine> Medicines { get; set; }
         public ICollection<ResidentPaymentMethod> ResidentPaymentMethods { get; set; }
+        public ICollection<ResidentStatus> ResidentStatuses { get; set; }
 
     }
 }

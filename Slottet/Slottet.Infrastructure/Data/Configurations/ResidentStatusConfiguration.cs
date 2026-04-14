@@ -2,9 +2,12 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
-namespace Slottet.Infrastructure.Data.Configurations {
-    public class ResidentStatusConfiguration : IEntityTypeConfiguration<ResidentStatus> {
-        public void Configure(EntityTypeBuilder<ResidentStatus> entity) {
+namespace Slottet.Infrastructure.Data.Configurations
+{
+    public class ResidentStatusConfiguration : IEntityTypeConfiguration<ResidentStatus>
+    {
+        public void Configure(EntityTypeBuilder<ResidentStatus> entity)
+        {
             entity.HasKey(rs => new { rs.ResidentStatusID });
 
             entity.Property(rs => rs.Status)
@@ -18,14 +21,14 @@ namespace Slottet.Infrastructure.Data.Configurations {
                 .HasForeignKey(r => r.ResidentStatusID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasMany(rl => rl.RiskLevel)
-                .WithOne(rs => rs.ResidentStatuses)
+            entity.HasOne(rl => rl.RiskLevel)
+                .WithMany(rs => rs.ResidentStatuses)
                 .HasForeignKey(rl => rl.RiskLevelID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasMany(p => p.PN)
-                .WithOne(rs => rs.ResidentStatuses)
-                .HasForeignKey(p => p.PNID)
+            entity.HasMany(p => p.PNs)
+                .WithOne(rs => rs.ResidentStatus)
+                .HasForeignKey(rs => rs.ResidentStatusID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
