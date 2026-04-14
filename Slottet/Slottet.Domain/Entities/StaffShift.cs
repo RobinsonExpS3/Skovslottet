@@ -10,5 +10,6 @@
 
         public ICollection<Staff> Staffs { get; set; }
         public ICollection<ShiftBoard> ShiftBoards { get; set; }
+        public ShiftBoard ShiftBoard { get; set; }
     }
 }

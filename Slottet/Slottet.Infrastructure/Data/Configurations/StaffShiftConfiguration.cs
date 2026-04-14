@@ -2,9 +2,12 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
-namespace Slottet.Infrastructure.Data.Configurations {
-    public class StaffShiftConfiguration : IEntityTypeConfiguration<StaffShift> {
-        public void Configure(EntityTypeBuilder<StaffShift> entity) {
+namespace Slottet.Infrastructure.Data.Configurations
+{
+    public class StaffShiftConfiguration : IEntityTypeConfiguration<StaffShift>
+    {
+        public void Configure(EntityTypeBuilder<StaffShift> entity)
+        {
             entity.HasKey(ss => new { ss.ShiftBoardID, ss.StaffID });
 
             entity.HasMany(s => s.Staffs)
