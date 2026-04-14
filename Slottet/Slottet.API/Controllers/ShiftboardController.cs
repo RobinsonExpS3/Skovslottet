@@ -33,7 +33,7 @@ namespace Slottet.API.Controllers
         {
             var shiftboard = await _context.Set<ShiftBoard>()
                 .AsNoTracking()
-                .FirstOrDefaultAsync(sb = sbyte.ShiftBoardID == id);
+                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id);
 
             if (shiftboard is null)
                 return NotFound();
