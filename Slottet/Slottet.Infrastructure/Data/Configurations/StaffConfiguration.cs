@@ -22,19 +22,19 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
 
-            entity.HasOne(s => s.Department)
-                .WithMany(d => d.Staffs)
-                .HasForeignKey(s => s.DepartmentID)
+            entity.HasOne(d => d.Department)
+                .WithMany(s => s.Staffs)
+                .HasForeignKey(d => d.DepartmentID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasMany(s => s.StaffShifts)
-                .WithOne(ss => ss.Staff)
-                .HasForeignKey(ss => ss.StaffID)
+            entity.HasMany(ss => ss.StaffShifts)
+                .WithOne(s => s.Staff)
+                .HasForeignKey(s => s.StaffID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasMany(s => s.StaffResidentStatuses)
-                .WithOne(srs => srs.Staff)
-                .HasForeignKey(srs => srs.StaffID)
+            entity.HasMany(srs => srs.StaffResidentStatuses)
+                .WithOne(s => s.Staff)
+                .HasForeignKey(s => s.StaffID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
