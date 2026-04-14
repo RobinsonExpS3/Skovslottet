@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Slottet.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Configurations
 {
@@ -19,21 +16,26 @@ namespace Slottet.Infrastructure.Data.Configurations
 
             entity.Property(s => s.Initials)
                 .IsRequired()
-                .HasMaxLength(5);
+                .HasMaxLength(10);
 
             entity.Property(s => s.Role)
                 .IsRequired()
-                .HasMaxLength(25);
+                .HasMaxLength(50);
 
-            entity.HasOne(ss => ss.StaffShift)
-                .WithMany(s => s.Staffs)
-                .HasForeignKey(ss => ss.StaffID, ss.ShiftBoardID)
-                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(s => s.Department)
+                .WithMany(d => d.Staffs)
+                .HasForeignKey(s => s.DepartmentID)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(d => d.Department)
-                .WithMany(s => s.Staffs)
-                .HasForeignKey(d => d.DepartmentID)
-                .OnDelete(DeleteBehavior.Restrict);
+            entity.HasMany(s => s.StaffShifts)
+                .WithOne(ss => ss.Staff)
+                .HasForeignKey(ss => ss.StaffID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasMany(s => s.StaffResidentStatuses)
+                .WithOne(srs => srs.Staff)
+                .HasForeignKey(srs => srs.StaffID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
