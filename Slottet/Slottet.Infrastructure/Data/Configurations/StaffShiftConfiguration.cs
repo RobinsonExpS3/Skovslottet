@@ -19,7 +19,6 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .WithMany(s => s.StaffShifts)
                 .HasForeignKey(ss => ss.StaffID)
                 .OnDelete(DeleteBehavior.Restrict);
-
         }
     }
 }

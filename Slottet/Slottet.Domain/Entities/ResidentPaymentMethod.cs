@@ -7,5 +7,8 @@
 
         public Resident Resident { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
+
+        public ICollection<Resident> Residents { get; set; }
+        public ICollection<PaymentMethod> PaymentMethods { get; set; }
     }
 }
