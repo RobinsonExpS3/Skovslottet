@@ -4,5 +4,6 @@
     {
         public Guid PaymentMethodID { get; set; }
         public string PaymentMethodName { get; set; }
+        public ICollection<ResidentPaymentMethod> ResidentPaymentMethods { get; set; }
     }
 }
