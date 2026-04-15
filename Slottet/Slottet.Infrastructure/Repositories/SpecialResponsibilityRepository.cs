@@ -8,7 +8,7 @@ using Slottet.Infrastructure.Data;
 
 namespace Slottet.Infrastructure.Repositories
 {
-    class SpecialResponsibilityRepository : BaseRepository <SpecialResponsibility>
+    public class SpecialResponsibilityRepository : BaseRepository <SpecialResponsibility>
     {
         protected override string SqlSelectAll => "SELECT * FROM vm_SpecialResponsibility";
 

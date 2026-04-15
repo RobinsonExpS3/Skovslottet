@@ -26,7 +26,6 @@ namespace Slottet.API.Controllers
                 ResidentID = r.ResidentID,
                 ResidentName = r.ResidentName,
                 GroceryDayID = r.GroceryDayID,
-                GroceryDayName = r.GroceryDayName ?? string.Empty,
                 IsActive = r.IsActive
             });
 
