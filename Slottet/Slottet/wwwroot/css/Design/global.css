@@ -1,0 +1,26 @@
+/* ── Nav-knapper (global override — Blazor scoped CSS rammer ikke NavLink <a>-tags) ── */
+
+.nav-icon-btn,
+.nav-icon-btn:visited {
+    color: rgba(255, 255, 255, 0.7);
+    width: var(--nav-btn-size);
+    height: var(--nav-btn-size);
+    font-size: var(--nav-icon-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--nav-btn-radius);
+    background-color: transparent;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.nav-icon-btn:hover,
+.nav-icon-btn:focus {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.nav-icon-btn.active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+}
