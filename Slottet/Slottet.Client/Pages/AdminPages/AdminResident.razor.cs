@@ -5,7 +5,7 @@ using System.Net.Http.Json;
 
 namespace Slottet.Client.Pages.AdminPages
 {
-    public partial class EditResident {
+    public partial class AdminResident {
         [Inject]
         public HttpClient? httpClient { get; set; } = default;
 
