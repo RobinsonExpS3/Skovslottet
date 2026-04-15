@@ -13,10 +13,10 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(50);
 
-            entity.Property(sb => sb.StartDate)
+            entity.Property(sb => sb.StartDateTime)
                 .IsRequired();
 
-            entity.Property(sb => sb.EndDate)
+            entity.Property(sb => sb.EndDateTime)
                 .IsRequired();
 
             entity.HasMany(ss => ss.StaffShifts)

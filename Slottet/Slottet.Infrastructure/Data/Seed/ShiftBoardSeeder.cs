@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Slottet.Domain.Entities;
+﻿using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Seed
 {
@@ -16,8 +15,8 @@ namespace Slottet.Infrastructure.Data.Seed
             {
                 var nextDay = day.AddDays(1);
 
-                var dayHasShifts = await context.ShiftBoards
-                    .AnyAsync(s => s.StartDateTime >= day && s.StartDateTime < nextDay);
+                var dayHasShifts = context.ShiftBoards
+                    .Any(s => s.StartDateTime >= day && s.StartDateTime < nextDay);
 
                 if (dayHasShifts)
                     continue;

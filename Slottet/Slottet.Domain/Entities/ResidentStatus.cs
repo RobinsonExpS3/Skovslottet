@@ -10,8 +10,6 @@
         public Resident Resident { get; set; }
         public Guid RiskLevelID { get; set; }
         public RiskLevel RiskLevel { get; set; }
-        //public Guid PNID { get; set; }
-        //public PN PN { get; set; }
 
         public ICollection<StaffResidentStatus> StaffResidentStatuses { get; set; }
         public ICollection<PN> PNs { get; set; }

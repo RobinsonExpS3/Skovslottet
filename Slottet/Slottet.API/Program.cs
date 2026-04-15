@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Slottet.Infrastructure.Data;
-
 using Slottet.API.Controllers;
+using Slottet.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,10 +22,16 @@ builder.Services.AddDbContext<SlottetDBContext>(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment()) {
+if (app.Environment.IsDevelopment())
+{
     //app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<SlottetDBContext>();
+
+    await context.Database.MigrateAsync();
+    await DBSeeder.SeedAsync(context);
 }
 
 app.UseHttpsRedirection();

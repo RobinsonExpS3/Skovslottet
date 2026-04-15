@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
-using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
 using Slottet.Infrastructure.Data;
 
@@ -23,6 +21,7 @@ namespace Slottet.API.Controllers
         {
             var shiftboards = await _context.Set<ShiftBoard>()
                 .AsNoTracking()
+                .OrderBy(s => s.StartDateTime)
                 .ToListAsync();
 
             return Ok(shiftboards);
