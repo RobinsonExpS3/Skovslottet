@@ -1,5 +1,83 @@
 ﻿@page "/adminAudit"
+@rendermode InteractiveWebAssembly
 
-<h3>AdminAudit</h3>
+<div class="container">
+    <!-- Top Controls-->
+    <div class="top-bar">
+        <button>Date Picker</button>
+        <button>Shift Picker</button>
+    </div>
 
+@*     <div class="main-panel">
+        <!-- Collapesd Cards -->
+        <div class="cards collapsed">
+            <div>Name</div>
+            <div>Staff Initials</div>
+            <div>Staff Initials</div>
 
+            <div class="nav-item px-3">
+                <button class="nav-link btn btn-link w-100 text-start" @onclick="ToggleStatusCard">
+                    <span class="bi bi-list-nested-nav-menu"></span>
+                    @(isStatusOpen ? "▼" : "▶")
+                </button>
+            </div>
+        </div>
+    </div> *@
+
+    <div class="main-panel">
+        @if(!isStatusOpen)
+        {
+            <!-- COLLAPSED -->
+            <div class="card collapsed">
+
+                <div>Name</div>
+                <div>Staff Initials</div>
+                <div>Staff Initials</div>
+
+                <div class="arrow" @onclick="ToggleStatusCard">
+                    ▶
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <!-- Expanded -->
+            <div class="card expanded">
+
+                <!-- Header Row (same structure as collapsed) -->
+                <div class="row header">
+                    <div>Name</div>
+                    <div>Medicine</div>
+
+                    <div class="times">
+                        <div class="time">Time<br />Given</div>
+                        <div class="time">Time<br />Given</div>
+                        <div class="time">Time<br />Given</div>
+                    </div>
+
+                    <!-- Arrow stays HERE -->
+                    <div class="arrow" @onclick="ToggleStatusCard">
+                        ▼
+                    </div>
+                </div>
+
+                <!-- Rest of expanded content -->
+                <div class="content">
+                    <div class="left">
+                        <div class="staff">Staff Initials</div>
+                        <div class="staff">Staff Initials</div>
+                    </div>
+
+                    <div class="right">
+                        <div class="status-item">
+                            <span>Time Stamp</span>
+                            <span>Status</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
