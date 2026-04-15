@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Slottet.Domain.Entities {
-    public class DepartmentTask {
+namespace Slottet.Domain.Entities
+{
+    public class DepartmentTask 
+    {
         public Guid DepartmentTaskID { get; set; }
         public string DepartmentTaskName { get; set; }
 

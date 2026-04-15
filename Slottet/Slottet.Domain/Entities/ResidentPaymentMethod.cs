@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Slottet.Domain.Entities {
-    public class ResidentPaymentMethod {
+    public class ResidentPaymentMethod
+    {
         public Guid ResidentID { get; set; }
         public Guid PaymentMethodID { get; set; }
 

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Slottet.Domain.Entities {
-    public class Staff {
+    public class Staff
+    {   
         public Guid StaffID { get; set; }
         public string StaffName { get; set; }
         public string Initials { get; set; }
@@ -11,5 +12,8 @@ namespace Slottet.Domain.Entities {
 
         public Guid DepartmentID { get; set; }
         public Department Department { get; set; }
+
+        public ICollection<StaffShift> StaffShifts { get; set; }
+        public ICollection<StaffResidentStatus> StaffResidentStatuses { get; set; }
     }
 }
