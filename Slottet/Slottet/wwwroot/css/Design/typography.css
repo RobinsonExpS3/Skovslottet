@@ -1,0 +1,6 @@
+/* ── Global typografi ── */
+/* Kun regler der gælder på tværs af hele applikationen */
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
