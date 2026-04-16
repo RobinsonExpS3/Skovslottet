@@ -26,7 +26,7 @@ namespace Slottet.Infrastructure.Data
             await context.SaveChangesAsync();
 
             //await StaffShiftSeeder.SeedAsync(context); //Megan
-            //await PhoneSeeder.SeedAsync(context); 
+            await PhoneSeeder.SeedAsync(context);
             //await ResidentPaymentMethodSeeder.SeedAsync(context);
             //await StaffResidentStatusSeeder.SeedAsync(context);
             //await DepartmentTaskSeeder.SeedAsync(context);
