@@ -6,6 +6,10 @@ namespace Slottet.Infrastructure.Data.Seed
     public static class PaymentMethodSeeder
     {
         public static async Task<List<PaymentMethod>> SeedAsync(SlottetDBContext context) {
+            if(await context.PaymentMethods.AnyAsync()) {
+                return await context.PaymentMethods.ToListAsync();
+            }
+
             var paymentMethods = new[] {
                 "Kort",
                 "Kontant",
