@@ -1,6 +1,6 @@
 ﻿<nav class="sidebar-nav">
     <div class="nav-top">
-        <NavLink class="nav-icon-btn" href="/shiftboard" Match="NavLinkMatch.Prefix">
+        <NavLink class="nav-icon-btn" href="/" Match="NavLinkMatch.All">
             <i class="bi bi-house-door-fill"></i>
         </NavLink>
 
@@ -9,10 +9,9 @@
             <i class="bi bi-list-ul"></i>
         </button>
 
-        @* PLACEHOLDER *@
-        <button class="nav-icon-btn" disabled>
+        <NavLink class="nav-icon-btn" href="/shiftboard_viewonly" Match="NavLinkMatch.Prefix">
             <i class="bi bi-card-text"></i>
-        </button>
+        </NavLink>
     </div>
 
     <div class="nav-bottom">
