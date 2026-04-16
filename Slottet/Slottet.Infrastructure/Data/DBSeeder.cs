@@ -13,7 +13,7 @@ namespace Slottet.Infrastructure.Data
 
             await DepartmentSeeder.SeedAsync(context);
             //await MedicineSeeder.SeedAsync(context);
-            //await PaymentMethodSeeder.SeedAsync(context);
+            await PaymentMethodSeeder.SeedAsync(context);
             //await ResidentStatusSeeder.SeedAsync(context);
 
             await context.SaveChangesAsync();
