@@ -1,7 +1,12 @@
-using Slottet.Domain.Entities;
+namespace Slottet.Client.Pages.AdminPages
+{
+    public partial class AdminAudit
+    {
 
-namespace Slottet.Client.Pages.AdminPages {
-    public partial class AdminAudit {
+        public class ShiftBoard()
+        {
+        }
+
         List<ShiftBoard> shiftBoards = new();
 
         private bool isStatusOpen;
@@ -11,7 +16,8 @@ namespace Slottet.Client.Pages.AdminPages {
         //    isStatusOpen = !isStatusOpen;
         //}
 
-        private void ToggleStatusCard() {
+        private void ToggleStatusCard()
+        {
             Console.WriteLine("CLICKED");
             isStatusOpen = !isStatusOpen;
         }
