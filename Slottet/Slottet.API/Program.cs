@@ -19,15 +19,6 @@ builder.Services.AddDbContext<SlottetDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-//dependency injection - register repository
-//builder.Services.AddScoped<IControllerRepository, (Repositories)>();
-
-builder.Services.AddScoped<IBaseRepository<SpecialResponsibility>, SpecialResponsibilityRepository>();
-builder.Services.AddScoped<ResidentRepository>(); 
-builder.Services.AddScoped<IBaseRepository<Resident>, ResidentRepository>();
-builder.Services.AddScoped<IBaseRepository<GroceryDay>, GroceryDayRepository>();
-builder.Services.AddScoped<IBaseRepository<PaymentMethod>, PaymentMethodRepository>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
