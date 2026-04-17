@@ -1,93 +1,89 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Slottet.Application.Interfaces;
-using Slottet.Domain.Entities;
-
-namespace Slottet.API.Controllers
+﻿namespace Slottet.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class SpecialResponsibilityController : Controller
-    {
-        private readonly IBaseRepository<SpecialResponsibility> _repository;
+    //[ApiController]
+    //[Route("api/[controller]")]
+    //public class SpecialResponsibilityController : Controller
+    //{
+    //    private readonly IBaseRepository<SpecialResponsibility> _repository;
 
-        public SpecialResponsibilityController(IBaseRepository<SpecialResponsibility> specialResponsibilityRepository)
-        {
-            _repository = specialResponsibilityRepository;
-        }
+    //    public SpecialResponsibilityController(IBaseRepository<SpecialResponsibility> specialResponsibilityRepository)
+    //    {
+    //        _repository = specialResponsibilityRepository;
+    //    }
 
-        //Get: special responsibility
-        [HttpGet("SpecialResponsibilities")]
-        public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAll()
-        {
-            var specialResponsibility = await _repository.GetAllAsync();
-            return Ok(specialResponsibility);
-        }
+    //    //Get: special responsibility
+    //    [HttpGet("SpecialResponsibilities")]
+    //    public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAll()
+    //    {
+    //        var specialResponsibility = await _repository.GetAllAsync();
+    //        return Ok(specialResponsibility);
+    //    }
 
-        //Get: special responsibility by id
-        [HttpGet("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> GetById(Guid id)
-        {
-            var specialResponsibility = await _repository.GetByIdAsync(id);
+    //    //Get: special responsibility by id
+    //    [HttpGet("{id}")]
+    //    public async Task<ActionResult<SpecialResponsibility>> GetById(Guid id)
+    //    {
+    //        var specialResponsibility = await _repository.GetByIdAsync(id);
 
-            if (specialResponsibility == null)
-            {
-                return NotFound();
-            }
+    //        if (specialResponsibility == null)
+    //        {
+    //            return NotFound();
+    //        }
 
-            return Ok(specialResponsibility);
-        }
+    //        return Ok(specialResponsibility);
+    //    }
 
-        //Post: special responsibility
-        [HttpPost]
-        public async Task<ActionResult<SpecialResponsibility>> CreateSpecialResponsibility([FromBody] SpecialResponsibility specialResponsibility)
-        {
-            if (specialResponsibility == null)
-            {
-                return BadRequest();
-            }
+    //    //Post: special responsibility
+    //    [HttpPost]
+    //    public async Task<ActionResult<SpecialResponsibility>> CreateSpecialResponsibility([FromBody] SpecialResponsibility specialResponsibility)
+    //    {
+    //        if (specialResponsibility == null)
+    //        {
+    //            return BadRequest();
+    //        }
 
-            await _repository.AddAsync(specialResponsibility);
+    //        await _repository.AddAsync(specialResponsibility);
 
-            return CreatedAtAction(nameof(GetById), new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
-        }
+    //        return CreatedAtAction(nameof(GetById), new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
+    //    }
 
-        //Put: special responsibility by id
-        [HttpPut("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> UpdateSpecialResponsibility(Guid id, [FromBody] SpecialResponsibility specialResponsibility)
-        {
-            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID)
-            {
-                return BadRequest();
-            }
+    //    //Put: special responsibility by id
+    //    [HttpPut("{id}")]
+    //    public async Task<ActionResult<SpecialResponsibility>> UpdateSpecialResponsibility(Guid id, [FromBody] SpecialResponsibility specialResponsibility)
+    //    {
+    //        if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID)
+    //        {
+    //            return BadRequest();
+    //        }
 
-            var existingSpecialResponsibility = await _repository.GetByIdAsync(id);
+    //        var existingSpecialResponsibility = await _repository.GetByIdAsync(id);
 
-            if (existingSpecialResponsibility == null)
-            {
-                return NotFound();
-            }
+    //        if (existingSpecialResponsibility == null)
+    //        {
+    //            return NotFound();
+    //        }
 
-            existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
+    //        existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
 
-            await _repository.UpdateAsync(specialResponsibility);
+    //        await _repository.UpdateAsync(specialResponsibility);
 
-            return NoContent();
-        }
+    //        return NoContent();
+    //    }
 
-        //Delete: special responsibility by id
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteSpecialResponsibility(Guid id)
-        {
-            var existingSpecialResponsibility = await _repository.GetByIdAsync(id);
+    //    //Delete: special responsibility by id
+    //    [HttpDelete("{id}")]
+    //    public async Task<ActionResult> DeleteSpecialResponsibility(Guid id)
+    //    {
+    //        var existingSpecialResponsibility = await _repository.GetByIdAsync(id);
 
-            if (existingSpecialResponsibility == null)
-            {
-                return NotFound();
-            }
+    //        if (existingSpecialResponsibility == null)
+    //        {
+    //            return NotFound();
+    //        }
 
-            await _repository.DeleteAsync(id);
+    //        await _repository.DeleteAsync(id);
 
-            return NoContent();
-        }
-    }
+    //        return NoContent();
+    //    }
+    //}
 }
