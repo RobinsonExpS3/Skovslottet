@@ -22,7 +22,11 @@ builder.Services.AddDbContext<SlottetDBContext>(options =>
 //dependency injection - register repository
 //builder.Services.AddScoped<IControllerRepository, (Repositories)>();
 
-//builder.Services.AddScoped<IBaseRepository<SpecialResponsibility>, SpecialResponsibilityRepository>();
+builder.Services.AddScoped<IBaseRepository<SpecialResponsibility>, SpecialResponsibilityRepository>();
+builder.Services.AddScoped<ResidentRepository>(); 
+builder.Services.AddScoped<IBaseRepository<Resident>, ResidentRepository>();
+builder.Services.AddScoped<IBaseRepository<GroceryDay>, GroceryDayRepository>();
+builder.Services.AddScoped<IBaseRepository<PaymentMethod>, PaymentMethodRepository>();
 
 var app = builder.Build();
 

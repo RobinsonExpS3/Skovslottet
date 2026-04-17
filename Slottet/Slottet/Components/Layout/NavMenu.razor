@@ -32,27 +32,31 @@
             </button>
         </div>
 
-         <!-- Admin submenu -->
-         @if (isAdminOpen) 
-         {
-             <div class="nav-item admin-nav-item">
-                 <NavLink class="nav-link" href="addResident">
-                     <span class="bi bi-person-plus"></span> Opret nyt beboerkort
-                 </NavLink>
-             </div>
+        <!-- Admin submenu -->
+        @if (isAdminOpen) {
+            <div class="nav-item admin-nav-item">
+                <NavLink class="nav-link" href="adminResident">
+                    <span class="bi bi-person-plus"></span> Beboer
+                </NavLink>
+            </div>
 
-             <div class="nav-item admin-nav-item">
-                 <NavLink class="nav-link" href="editResident">
-                     <span class="bi bi-person-plus"></span> Rediger beboerkort
-                 </NavLink>
-             </div>
+            <div class="nav-item admin-nav-item">
+                <NavLink class="nav-link" href="adminStaff">
+                    <span class="bi bi-person-plus"></span> Personale
+                </NavLink>
+            </div>
 
-             <div class="nav-item admin-nav-item">
-                 <NavLink class="nav-link" href="editSpecialResponsibility">
-                     <span class="bi bi-person-plus"></span> Rediger særlige ansvar
-                 </NavLink>
-             </div>
-         }
+            <div class="nav-item admin-nav-item">
+                <NavLink class="nav-link" href="adminSpecialResponsibility">
+                    <span class="bi bi-person-plus"></span> Særlige ansvar
+                </NavLink>
+            </div>
+
+            <div class="nav-item admin-nav-item">
+                <NavLink class="nav-link" href="adminAudit">
+                    <span class="bi bi-person-plus"></span> Logs
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
-

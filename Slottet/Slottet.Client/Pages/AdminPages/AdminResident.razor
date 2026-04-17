@@ -1,0 +1,83 @@
+﻿@page "/adminResident"
+
+<div class="view-box">
+	<h2>Rediger beboer</h2>
+
+	<div class="table-layout">
+		<table class="table-form">
+			@if(residents == null)
+			{
+				<tr>
+					<td>Loading...</td>
+				</tr>
+			}
+			else if (loadFailed) 
+			{
+				<tr>
+					<td>Kunne ikke loade data. Prøv venligst igen senere</td>
+				</tr>
+			}
+			else
+			{
+				@foreach(var resident in residents)
+				{
+					<tr @onclick="() => SelectResident(resident)" class="@(selectedResident == resident ? "selected-row" : "")">
+						<td>@resident.ResidentName</td>
+						<td>@resident.GroceryDayName</td>
+					</tr>
+				}
+			}
+		</table>
+
+		<div class="button-column">
+			<input class="r-table-input" @bind="residentNameInput" placeholder="Indtast navn..." />
+			<select @bind="selectedGroceryDayID">
+				<option value="">Vælg handledag</option>
+				@foreach (var day in groceryDays) {
+					<option value="@day.GroceryDayID">@day.GroceryDayName</option>
+				}
+			</select>
+
+			<select multiple @onchange="OnPaymentMethodsChanged">
+				@foreach (var method in paymentMethods) {
+					<option value="@method.PaymentMethodID" selected="@selectedPaymentMethodIDs.Contains(method.PaymentMethodID)">
+						@method.PaymentMethodName
+					</option>
+				}
+			</select>
+
+			<div>
+				<label>Vælg medicintid</label>
+				<select @bind="selectedHour">
+					@for (int i = 0; i < 24; i++) {
+						<option value="@i">@i.ToString("D2")</option>
+					}
+				</select>
+				:
+				<select @bind="selectedMinute">
+					@for (int i = 0; i < 60; i += 5) {
+						<option value="@i">@i.ToString("D2")</option>
+					}
+				</select>
+				<button type="button" @onclick="AddMedicineTime">Tilføj</button>
+			</div>
+
+			<div>
+				<strong>Valgte tider:</strong>
+				@if (!medicineTimes.Any()) {
+					<p>Ingen tider valgt</p>
+				}
+				@foreach (var time in medicineTimes) {
+					<div>
+						@time.Time.ToString("HH:mm")
+						<button type="button" @onclick="() => RemoveMedicineTime(time)">Fjern tid</button>
+					</div>
+				}
+			</div>
+
+			<button type="button" class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(residentNameInput) || selectedGroceryDayID is null || selectedResident is not null)">Opret</button>
+			<button type="button" class="column-button" @onclick="Update" disabled="@(selectedResident is null)">Opdater</button>
+			<button type="button" class="column-button" @onclick="Delete" disabled="@(selectedResident is null)">Slet</button>
+		</div>
+	</div>
+</div>
