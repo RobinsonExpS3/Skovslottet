@@ -4,24 +4,23 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="">Slottet</a>
     </div>
-</div>
-<div>
-    <nav>
-    <div>
-        @* PLACEHOLDER *@
-        <button class="nav-icon-btn" disabled>
-            <i class="bi bi-list-ul"></i>
-        </button>
 
-        @* PLACEHOLDER *@
-        <button class="nav-icon-btn" disabled>
-            <i class="bi bi-card-text"></i>
-        </button>
-    </div>
+    <nav>
+        <div>
+            @* PLACEHOLDER *@
+            <button class="nav-icon-btn" disabled>
+                <i class="bi bi-list-ul"></i>
+            </button>
+
+            @* PLACEHOLDER *@
+            <button class="nav-icon-btn" disabled>
+                <i class="bi bi-card-text"></i>
+            </button>
+        </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            <NavLink class="nav-link" href="shiftboard_viewonly">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Shiftboard View
             </NavLink>
         </div>
 
@@ -33,26 +32,27 @@
             </button>
         </div>
 
-        <!-- Admin submenu -->
-        @if (isAdminOpen) {
-            <div class="nav-item admin-nav-item">
-                <NavLink class="nav-link" href="addResident">
-                    <span class="bi bi-person-plus"></span> Opret nyt beboerkort
-                </NavLink>
-            </div>
+         <!-- Admin submenu -->
+         @if (isAdminOpen) 
+         {
+             <div class="nav-item admin-nav-item">
+                 <NavLink class="nav-link" href="addResident">
+                     <span class="bi bi-person-plus"></span> Opret nyt beboerkort
+                 </NavLink>
+             </div>
 
-            <div class="nav-item admin-nav-item">
-                <NavLink class="nav-link" href="editResident">
-                    <span class="bi bi-person-plus"></span> Rediger beboerkort
-                </NavLink>
-            </div>
+             <div class="nav-item admin-nav-item">
+                 <NavLink class="nav-link" href="editResident">
+                     <span class="bi bi-person-plus"></span> Rediger beboerkort
+                 </NavLink>
+             </div>
 
-            <div class="nav-item admin-nav-item">
-                <NavLink class="nav-link" href="editSpecialResponsibility">
-                    <span class="bi bi-person-plus"></span> Rediger særlige ansvar
-                </NavLink>
-            </div>
-        }
+             <div class="nav-item admin-nav-item">
+                 <NavLink class="nav-link" href="editSpecialResponsibility">
+                     <span class="bi bi-person-plus"></span> Rediger særlige ansvar
+                 </NavLink>
+             </div>
+         }
     </nav>
 </div>
 
