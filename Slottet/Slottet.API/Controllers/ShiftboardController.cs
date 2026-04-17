@@ -82,14 +82,5 @@ namespace Slottet.API.Controllers
             return NoContent();
         }
 
-        //public ShiftboardController(IBaseRepository<ShiftBoard> repository) {
-        //    _repository = repository;
-        //}
-
-        //[HttpGet("ShiftBoards")]
-        //public async Task<ActionResult<IEnumerable<ShiftBoard>>> GetAll() {
-        //    var shiftBoard = await _repository.GetAllAsync();
-        //    return Ok(shiftBoard);
-        //}
     }
 }
