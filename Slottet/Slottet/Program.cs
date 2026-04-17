@@ -1,4 +1,4 @@
-using Slottet.Client.Pages;
+using Microsoft.AspNetCore.Components;
 using Slottet.Components;
 
 namespace Slottet
@@ -13,6 +13,12 @@ namespace Slottet
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents()
                 .AddInteractiveWebAssemblyComponents();
+
+            builder.Services.AddScoped(sp =>
+            {
+                var nav = sp.GetRequiredService<NavigationManager>();
+                return new HttpClient { BaseAddress = new Uri("https://localhost:7201/") };
+            });
 
             var app = builder.Build();
 
