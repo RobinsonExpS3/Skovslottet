@@ -1,7 +1,9 @@
-﻿namespace Slottet.Domain.Entities
-{
-    public class Department
-    {
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Slottet.Domain.Entities {
+    public class Department {
         public Guid DepartmentID { get; set; }
         public string DepartmentName { get; set; }
 
