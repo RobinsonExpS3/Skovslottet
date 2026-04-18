@@ -1,25 +1,21 @@
+using Slottet.Client.Pages.MockData;
+using Slottet.Shared;
+
 namespace Slottet.Client.Pages.AdminPages
 {
     public partial class AdminAudit
     {
+        protected ShiftBoardDTO? Model { get; set; }
 
-        public class ShiftBoard()
-        {
+        private Guid? openCardId = null;
+
+        protected override void OnInitialized() {
+            Model = ShiftBoardMockData.Create();
         }
 
-        List<ShiftBoard> shiftBoards = new();
-
-        private bool isStatusOpen;
-        int? openCardId = null;
-
-        //private void ToggleStatusCard() {
-        //    isStatusOpen = !isStatusOpen;
-        //}
-
-        private void ToggleStatusCard()
+        private void ToggleStatusCard(Guid residentCardId)
         {
-            Console.WriteLine("CLICKED");
-            isStatusOpen = !isStatusOpen;
+            openCardId = openCardId == residentCardId ? null : residentCardId;
         }
     }
 }
