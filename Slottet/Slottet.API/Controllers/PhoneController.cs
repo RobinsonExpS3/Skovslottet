@@ -12,17 +12,17 @@ namespace Slottet.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PhonesController : ControllerBase
+    public class PhoneController : ControllerBase
     {
         private readonly SlottetDBContext _context;
 
-        public PhonesController(SlottetDBContext context)
+        public PhoneController(SlottetDBContext context)
         {
             _context = context;
         }
 
         // GET: api/Phones
-        [HttpGet]
+        [HttpGet("Phones")]
         public async Task<ActionResult<IEnumerable<Phone>>> GetPhones()
         {
             return await _context.Phones.ToListAsync();
