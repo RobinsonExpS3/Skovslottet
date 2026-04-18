@@ -20,12 +20,12 @@ namespace Slottet.Infrastructure.Data
             await context.SaveChangesAsync();
 
             //await ResidentSeeder.SeedAsync(context);
-            //await StaffSeeder.SeedAsync(context); //Megan
+            await StaffSeeder.SeedAsync(context); //Megan
             await ShiftBoardSeeder.SeedAsync(context);
 
             await context.SaveChangesAsync();
 
-            //await StaffShiftSeeder.SeedAsync(context); //Megan
+            //await StaffShiftSeeder.SeedAsync(context); //Megan - OBS! FK og PK dobbelt???
             await PhoneSeeder.SeedAsync(context);
             //await ResidentPaymentMethodSeeder.SeedAsync(context);
             //await StaffResidentStatusSeeder.SeedAsync(context);
@@ -33,7 +33,7 @@ namespace Slottet.Infrastructure.Data
             //await GroceryDaySeeder.SeedAsync(context); 
             //await PNSeeder.SeedAsync(context);
             //await RiskLevelSeeder.SeedAsync(context); 
-            //await SpecialResponsibilitySeeder.SeedAsync(context); //Megan
+            //await SpecialResponsibilitySeeder.SeedAsync(context); //Megan - OBS! Placering relationelt ift. shiftboard og department
 
             await context.SaveChangesAsync();
         }

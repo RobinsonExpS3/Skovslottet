@@ -11,10 +11,10 @@ namespace Slottet.Infrastructure.Data.Seed
                 return await context.Departments.ToListAsync();
 
             var departments = new List<Department>
-        {
-            new Department { DepartmentID = Guid.NewGuid(), DepartmentName = "Skoven" },
-            new Department { DepartmentID = Guid.NewGuid(), DepartmentName = "Slottet" }
-        };
+            {
+                new Department { DepartmentID = Guid.NewGuid(), DepartmentName = "Skoven" },
+                new Department { DepartmentID = Guid.NewGuid(), DepartmentName = "Slottet" }
+            };
 
             context.Departments.AddRange(departments);
             await context.SaveChangesAsync();
