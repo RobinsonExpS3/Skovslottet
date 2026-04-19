@@ -8,11 +8,11 @@ namespace Slottet.Infrastructure.Data.Seed
         public static async Task<List<SpecialResponsibility>> SeedAsync(SlottetDBContext context)
         {
             if (await context.SpecialResponsibilities.AnyAsync())
-            return await context.SpecialResponsibilities.ToListAsync();
+                return await context.SpecialResponsibilities.ToListAsync();
 
             var specialResponsibilities = new List<SpecialResponsibility>
             {
-                new SpecialResponsibility { SpecialResponsibilityID=Guid.NewGuid(), TaskName = "Medicin Tovholder", ShiftBoardID = /* Giver ikke mening og bryder med normalform*/},
+                //new SpecialResponsibility { SpecialResponsibilityID=Guid.NewGuid(), TaskName = "Medicin Tovholder", ShiftBoardID = /* Giver ikke mening og bryder med normalform*/},
                 new SpecialResponsibility { SpecialResponsibilityID=Guid.NewGuid(), TaskName = "Omsorgsperson"},
                 new SpecialResponsibility { SpecialResponsibilityID=Guid.NewGuid(), TaskName = "Aftensmad"},
                 new SpecialResponsibility { SpecialResponsibilityID=Guid.NewGuid(), TaskName = "Hygiejne/afsprit"},
