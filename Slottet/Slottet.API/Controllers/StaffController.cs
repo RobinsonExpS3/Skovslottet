@@ -1,12 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Slottet.Application.Interfaces;
-using Slottet.Domain.Entities;
-using Slottet.Infrastructure.Data;
-using Slottet.Shared;
-
-namespace Slottet.API.Controllers
-{
+﻿{
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Slottet.Application.Interfaces;
