@@ -17,7 +17,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet("ShiftBoards")]
-        public async Task<ActionResult<IEnumerable<ShiftBoard>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ShiftBoard>>> GetAllAsync()
         {
             var shiftboards = await _context.Set<ShiftBoard>()
                 .AsNoTracking()
@@ -28,7 +28,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<ShiftBoard>> GetById(Guid id)
+        public async Task<ActionResult<ShiftBoard>> GetByIdAsync(Guid id)
         {
             var shiftboard = await _context.Set<ShiftBoard>()
                 .AsNoTracking()
@@ -41,16 +41,16 @@ namespace Slottet.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ShiftBoard>> Create([FromBody] ShiftBoard shiftboard)
+        public async Task<ActionResult<ShiftBoard>> CreateAsync([FromBody] ShiftBoard shiftboard)
         {
             _context.Set<ShiftBoard>().Add(shiftboard);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = shiftboard.ShiftBoardID }, shiftboard);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = shiftboard.ShiftBoardID }, shiftboard);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(Guid id, [FromBody] ShiftBoard shiftboard)
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] ShiftBoard shiftboard)
         {
             if (id != shiftboard.ShiftBoardID)
                 return BadRequest("Id i URL matcher ikke objektets id.");
@@ -68,7 +68,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> Delete(Guid id)
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var shiftboard = await _context.Set<ShiftBoard>()
                 .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id);
