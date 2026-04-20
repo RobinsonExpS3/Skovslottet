@@ -7,89 +7,115 @@ using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
-    //[ApiController]
-    //[Route("api/[controller]")]
-    //public class StaffController : Controller {
-    //    private readonly IBaseRepository<Staff> _repository;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using Slottet.Application.Interfaces;
+    using Slottet.Domain.Entities;
+    using Slottet.Infrastructure.Data;
+    using Slottet.Shared;
 
-    //    public StaffController(IBaseRepository<Staff> repository) {
-    //        _repository = repository;
-    //    }
+    namespace Slottet.API.Controllers
+    {
+        [ApiController]
+        [Route("api/[controller]")]
+        public class StaffController : Controller
+        {
+            private readonly IBaseRepository<Staff> _repository;
 
-    //    //Get: Staffs
-    //    [HttpGet("Staffs")]
-    //    public async Task<ActionResult<IEnumerable<Staff>>> GetAll() {
-    //        var staffs = await _repository.GetAllAsync();
-    //        return Ok(staffs);
-    //    }
+            public StaffController(SlottetDBContext context)
+            {
+                _context = context;
+            }
 
-    //    //Get: Staff by id
-    //    [HttpGet("{id}")]
-    //    public async Task<ActionResult<Staff>> GetById(Guid id) {
-    //        var staff = await _repository.GetByIdAsync(id);
+            //Get: Staffs
+            [HttpGet("Staffs")]
+            public async Task<ActionResult<IEnumerable<Staff>>> GetAll()
+            {
 
-    //        if (staff == null) {
-    //            return NotFound();
-    //        }
+                var staffs = await _context.Staffs
+                    .AsNoTracking()
+                    .ToListAsync();
+                return Ok(staffs);
+            }
 
-    //        return Ok(staff);
-    //    }
+            //Get: Staff by id
+            [HttpGet("{id}")]
+            public async Task<ActionResult<Staff>> GetById(Guid id)
+            {
+                var staff = await _context.Staff
+    
+            if (staff == null)
+                {
+                    return NotFound();
+                }
 
-    //    //Post: Staff
-    //    [HttpPost]
-    //    public async Task<ActionResult<Staff>> CreateStaff([FromBody] Staff staff) {
-    //        if (staff == null ||
-    //            string.IsNullOrWhiteSpace(staff.StaffName) ||
-    //            string.IsNullOrWhiteSpace(staff.Initials) ||
-    //            string.IsNullOrWhiteSpace(staff.Role)) {
-    //            return BadRequest();
-    //        }
+                return Ok(staff);
+            }
 
-    //        staff.StaffID = Guid.NewGuid();
+            //Post: Staff
+            [HttpPost]
+            public async Task<ActionResult<Staff>> CreateStaff([FromBody] Staff staff)
+            {
+                if (staff == null ||
+                    string.IsNullOrWhiteSpace(staff.StaffName) ||
+                    string.IsNullOrWhiteSpace(staff.Initials) ||
+                    string.IsNullOrWhiteSpace(staff.Role))
+                {
+                    return BadRequest();
+                }
 
-    //        await _repository.AddAsync(staff);
+                staff.StaffID = Guid.NewGuid();
 
-    //        return CreatedAtAction(nameof(GetById), new { id = staff.StaffID }, staff);
-    //    }
+                _context.Staffs.Add(staff);
+                await _context.SaveChangesAsync();
 
-    //    //Put: Staff by id
-    //    [HttpPut("{id}")]
-    //    public async Task<ActionResult<Staff>> UpdateStaff(Guid id, [FromBody] Staff staff) {
-    //        if (staff == null ||
-    //            string.IsNullOrWhiteSpace(staff.StaffName) ||
-    //            string.IsNullOrWhiteSpace(staff.Initials) ||
-    //            string.IsNullOrWhiteSpace(staff.Role)) {
-    //            return BadRequest();
-    //        }
+                return CreatedAtAction(nameof(GetById), new { id = staff.StaffID }, staff);
+            }
 
-    //        var existingStaff = await _repository.GetByIdAsync(id);
+            //Put: Staff by id
+            [HttpPut("{id}")]
+            public async Task<ActionResult<Staff>> UpdateStaff(Guid id, [FromBody] Staff staff)
+            {
+                if (staff == null ||
+                    string.IsNullOrWhiteSpace(staff.StaffName) ||
+                    string.IsNullOrWhiteSpace(staff.Initials) ||
+                    string.IsNullOrWhiteSpace(staff.Role))
+                {
+                    return BadRequest();
+                }
 
-    //        if (existingStaff == null) {
-    //            return NotFound();
-    //        }
+                var existingStaff = await _context.Staffs.FindAsync(id);
 
-    //        existingStaff.StaffName = staff.StaffName;
-    //        existingStaff.Initials = staff.Initials;
-    //        existingStaff.Role = staff.Role;
-    //        existingStaff.DepartmentID = staff.DepartmentID;
+                if (existingStaff == null)
+                {
+                    return NotFound();
+                }
 
-    //        await _repository.UpdateAsync(existingStaff);
+                existingStaff.StaffName = staff.StaffName;
+                existingStaff.Initials = staff.Initials;
+                existingStaff.Role = staff.Role;
+                existingStaff.DepartmentID = staff.DepartmentID;
 
-    //        return NoContent();
-    //    }
+                await _context.SaveChangesAsync();
 
-    //    //Delete: Staff by id
-    //    [HttpDelete("{id}")]
-    //    public async Task<ActionResult> DeleteStaff(Guid id) {
-    //        var existingStaff = await _repository.GetByIdAsync(id);
+                return NoContent();
+            }
 
-    //        if (existingStaff == null) {
-    //            return NotFound();
-    //        }
+            //Delete: Staff by id
+            [HttpDelete("{id}")]
+            public async Task<ActionResult> DeleteStaff(Guid id)
+            {
+                var existingStaff = await _context.Staffs.FindAsync(id);
 
-    //        await _repository.DeleteAsync(id);
+                if (existingStaff == null)
+                {
+                    return NotFound();
+                }
 
-    //        return NoContent();
-    //    }
-    //}
-}
+                _context.Staffs.Remove(existingStaff);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+        }
+    }
