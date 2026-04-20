@@ -10,7 +10,7 @@ namespace Slottet.API.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public class StaffController : Controller {
-        private readonly IBaseRepository<Staff> _repository;
+        private readonly SlottetDBContext _context;
 
     public StaffController(SlottetDBContext context)
         { 
@@ -29,12 +29,14 @@ namespace Slottet.API.Controllers
 
         //Get: Staff by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Staff>> GetById(Guid id) {
-            var staff = await _context.Staff
+        public async Task<ActionResult<Staff>> GetById(Guid id)
+        {
+            var staff = await _context.Staffs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.StaffID == id);
 
-            if (staff == null) {
+            if (staff == null)
                 return NotFound();
-            }
 
             return Ok(staff);
         }
