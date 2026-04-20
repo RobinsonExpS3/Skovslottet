@@ -10,6 +10,7 @@
         public Guid GroceryDayID { get; set; }
         public GroceryDay GroceryDay { get; set; } = null!;
 
+        public ICollection<PN> PNs { get; set; }
         public ICollection<Medicine> Medicines { get; set; }
         public ICollection<ResidentPaymentMethod> ResidentPaymentMethods { get; set; }
         public ICollection<ResidentStatus> ResidentStatuses { get; set; }
