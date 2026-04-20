@@ -6,11 +6,11 @@ using Slottet.Shared;
 
 namespace Slottet.Infrastructure.Services
 {
-    public class MedicineService : IMedicineService
+    public class MedicineDTOService : IMedicineDTOService
     {
         private readonly SlottetDBContext _context;
 
-        public MedicineService(SlottetDBContext context)
+        public MedicineDTOService(SlottetDBContext context)
         {
             _context = context;
         }

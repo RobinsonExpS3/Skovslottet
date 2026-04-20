@@ -5,7 +5,7 @@ using Slottet.Shared;
 
 namespace Slottet.Application.Interfaces
 {
-    public interface IMedicineService
+    public interface IMedicineDTOService
     {
         Task<IEnumerable<MedicineAPI_DTO>> GetAllAsync();
         Task<MedicineAPI_DTO?> GetByIdAsync(Guid id);

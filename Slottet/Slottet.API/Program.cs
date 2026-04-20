@@ -19,7 +19,7 @@ builder.Services.AddHttpClient<ShiftboardController>();
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IMedicineService, MedicineService>();
+builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
 
 
 var app = builder.Build();

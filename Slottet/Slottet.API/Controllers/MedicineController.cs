@@ -8,9 +8,9 @@ namespace Slottet.API.Controllers
     [ApiController]
     public class MedicineController : ControllerBase
     {
-        private readonly IMedicineService _medicineService;
+        private readonly IMedicineDTOService _medicineService;
 
-        public MedicineController(IMedicineService medicineService)
+        public MedicineController(IMedicineDTOService medicineService)
         {
             _medicineService = medicineService;
         }
