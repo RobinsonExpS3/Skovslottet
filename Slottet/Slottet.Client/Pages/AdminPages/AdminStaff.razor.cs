@@ -115,5 +115,6 @@ namespace Slottet.Client.Pages.AdminPages
             public string Initials { get; set; }
             public string Role { get; set; }
         }
+        
     }
 }

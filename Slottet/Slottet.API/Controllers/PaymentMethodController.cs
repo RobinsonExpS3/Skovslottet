@@ -1,21 +1,32 @@
-﻿namespace Slottet.API.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Slottet.Application.Interfaces;
+using Slottet.Domain.Entities;
+using Slottet.Infrastructure.Data;
+using Slottet.Shared;
+
+namespace Slottet.API.Controllers
 {
-    //[ApiController]
-    //[Route("api/[controller]")]
-    //public class PaymentMethodController : Controller {
-    //    private readonly IBaseRepository<PaymentMethod> _repository;
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PaymentMethodController : Controller {
+        private readonly SlottetDBContext _context;
 
-    //    public PaymentMethodController(IBaseRepository<PaymentMethod> repository) {
-    //        _repository = repository;
-    //    }
+        public PaymentMethodController(SlottetDBContext context) {
+            _context = context;
+        }
 
-    //    [HttpGet]
-    //    public async Task<ActionResult<IEnumerable<PaymentMethodDTO>>> GetAll() {
-    //        var methods = await _repository.GetAllAsync();
-    //        return Ok(methods.Select(m => new PaymentMethodDTO {
-    //            PaymentMethodID = m.PaymentMethodID,
-    //            PaymentMethodName = m.PaymentMethodName
-    //        }));
-    //    }
-    //}
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<PaymentMethodDTO>>> GetAll() {
+            var methods = await _context.PaymentMethods
+                .AsNoTracking()
+                .Select(m => new PaymentMethodDTO {
+                    PaymentMethodID = m.PaymentMethodID,
+                    PaymentMethodName = m.PaymentMethodName
+                })
+                .ToListAsync();
+
+            return Ok(methods);
+        }
+    }
 }

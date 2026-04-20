@@ -1,89 +1,98 @@
-﻿namespace Slottet.API.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Slottet.Application.Interfaces;
+using Slottet.Domain.Entities;
+using Slottet.Infrastructure.Data;
+using Slottet.Shared;
+
+namespace Slottet.API.Controllers
 {
-    //[ApiController]
-    //[Route("api/[controller]")]
-    //public class SpecialResponsibilityController : Controller
-    //{
-    //    private readonly IBaseRepository<SpecialResponsibility> _repository;
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SpecialResponsibilityController : Controller {
+        private readonly SlottetDBContext _context;
 
-    //    public SpecialResponsibilityController(IBaseRepository<SpecialResponsibility> specialResponsibilityRepository)
-    //    {
-    //        _repository = specialResponsibilityRepository;
-    //    }
+        public SpecialResponsibilityController(SlottetDBContext context) {
+            _context = context;
+        }
 
-    //    //Get: special responsibility
-    //    [HttpGet("SpecialResponsibilities")]
-    //    public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAll()
-    //    {
-    //        var specialResponsibility = await _repository.GetAllAsync();
-    //        return Ok(specialResponsibility);
-    //    }
+        //Get: special responsibility
+        [HttpGet("SpecialResponsibilities")]
+        public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAll() {
+            var specialResponsibility = await _context.SpecialResponsibilities
+                .AsNoTracking()
+                .ToListAsync();
 
-    //    //Get: special responsibility by id
-    //    [HttpGet("{id}")]
-    //    public async Task<ActionResult<SpecialResponsibility>> GetById(Guid id)
-    //    {
-    //        var specialResponsibility = await _repository.GetByIdAsync(id);
+            return Ok(specialResponsibility);
+        }
 
-    //        if (specialResponsibility == null)
-    //        {
-    //            return NotFound();
-    //        }
+        //Get: special responsibility by id
+        [HttpGet("{id}")]
+        public async Task<ActionResult<SpecialResponsibility>> GetById(Guid id) {
+            var specialResponsibility = await _context.SpecialResponsibilities
+                .AsNoTracking()
+                .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
 
-    //        return Ok(specialResponsibility);
-    //    }
+            if (specialResponsibility == null) {
+                return NotFound();
+            }
 
-    //    //Post: special responsibility
-    //    [HttpPost]
-    //    public async Task<ActionResult<SpecialResponsibility>> CreateSpecialResponsibility([FromBody] SpecialResponsibility specialResponsibility)
-    //    {
-    //        if (specialResponsibility == null)
-    //        {
-    //            return BadRequest();
-    //        }
+            return Ok(specialResponsibility);
+        }
 
-    //        await _repository.AddAsync(specialResponsibility);
+        //Post: special responsibility
+        [HttpPost]
+        public async Task<ActionResult<SpecialResponsibility>> CreateSpecialResponsibility([FromBody] SpecialResponsibility specialResponsibility) {
+            if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty) {
+                return BadRequest();
+            }
 
-    //        return CreatedAtAction(nameof(GetById), new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
-    //    }
+            if(specialResponsibility.SpecialResponsibilityID == Guid.Empty) {
+                specialResponsibility.SpecialResponsibilityID = Guid.NewGuid();
+            }
 
-    //    //Put: special responsibility by id
-    //    [HttpPut("{id}")]
-    //    public async Task<ActionResult<SpecialResponsibility>> UpdateSpecialResponsibility(Guid id, [FromBody] SpecialResponsibility specialResponsibility)
-    //    {
-    //        if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID)
-    //        {
-    //            return BadRequest();
-    //        }
+            _context.SpecialResponsibilities.Add(specialResponsibility);
+            await _context.SaveChangesAsync();
 
-    //        var existingSpecialResponsibility = await _repository.GetByIdAsync(id);
+            return CreatedAtAction(nameof(GetById), new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
+        }
 
-    //        if (existingSpecialResponsibility == null)
-    //        {
-    //            return NotFound();
-    //        }
+        //Put: special responsibility by id
+        [HttpPut("{id}")]
+        public async Task<ActionResult<SpecialResponsibility>> UpdateSpecialResponsibility(Guid id, [FromBody] SpecialResponsibility specialResponsibility) {
+            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty) {
+                return BadRequest();
+            }
 
-    //        existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
+            var existingSpecialResponsibility = await _context.SpecialResponsibilities
+                .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
 
-    //        await _repository.UpdateAsync(specialResponsibility);
+            if (existingSpecialResponsibility == null) {
+                return NotFound();
+            }
 
-    //        return NoContent();
-    //    }
+            existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
+            existingSpecialResponsibility.ShiftBoardID = specialResponsibility.ShiftBoardID;
 
-    //    //Delete: special responsibility by id
-    //    [HttpDelete("{id}")]
-    //    public async Task<ActionResult> DeleteSpecialResponsibility(Guid id)
-    //    {
-    //        var existingSpecialResponsibility = await _repository.GetByIdAsync(id);
+            await _context.SaveChangesAsync();
 
-    //        if (existingSpecialResponsibility == null)
-    //        {
-    //            return NotFound();
-    //        }
+            return NoContent();
+        }
 
-    //        await _repository.DeleteAsync(id);
+        //Delete: special responsibility by id
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteSpecialResponsibility(Guid id) {
+            var existingSpecialResponsibility = await _context.SpecialResponsibilities
+                .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
 
-    //        return NoContent();
-    //    }
-    //}
+            if (existingSpecialResponsibility == null) {
+                return NotFound();
+            }
+
+            _context.SpecialResponsibilities.Remove(existingSpecialResponsibility);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+    }
 }
