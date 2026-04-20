@@ -1,4 +1,4 @@
-﻿{
+﻿
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Slottet.Application.Interfaces;
@@ -12,9 +12,9 @@
         [Route("api/[controller]")]
         public class StaffController : Controller
         {
-            private readonly IBaseRepository<Staff> _repository;
+            private readonly SlottetDBContext _context;
 
-            public StaffController(SlottetDBContext context)
+        public StaffController(SlottetDBContext context)
             {
                 _context = context;
             }
@@ -34,8 +34,11 @@
             [HttpGet("{id}")]
             public async Task<ActionResult<Staff>> GetById(Guid id)
             {
-                var staff = await _context.Staff
-    
+                var staff = await _context.Staffs
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+
             if (staff == null)
                 {
                     return NotFound();
