@@ -4,14 +4,55 @@
 <div class="container">
     <div class="top-bar">
         <div class="date-picker">
-            <input type="date" min="2026-04-01"/>
+            <label for="audit-date">Dato</label>
+            <input id="audit-date" type="date" min="2026-04-01" value="@SelectedDateText" @onchange="OnDateChanged"/>
         </div>
-        <select class="shift-picker">
-            <option value="">Vælg vagt</option>
-            <option value="day">Dag</option>
-            <option value="evening">Aften</option>
-            <option value="night">Nat</option>
-        </select>
+        
+        <div>
+            <label for="audit-shift">Vagt</label>
+            <select id="audit-shift" class="shift-picker" value="@SelectedShift" @onchange="OnShiftChanged">
+                <option value="">Vælg vagt</option>
+                <option value="day">Dag</option>
+                <option value="evening">Aften</option>
+                <option value="night">Nat</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="audit-panel">
+        @if(IsLoading)
+        {
+            <p>Indlæser audit logs...</p>
+        }
+        else if(!string.IsNullOrWhiteSpace(ErrorMessage))
+        {
+            <p>@ErrorMessage</p>
+        }
+        else
+        {
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Tid</th>
+                        <th>Personale</th>
+                        <th>Handling</th>
+                        <th>Tabel</th>
+                        <th>Nøgle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in AuditRows) {
+                        <tr>
+                            <td>@row.PerformedAtTime.ToString("dd-MM-yyyy HH:mm")</td>
+                            <td>@row.PerformedByStaffName</td>
+                            <td>@row.Action</td>
+                            <td>@row.TableName</td>
+                            <td>@row.KeyValues</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
 
     <div class="main-panel">

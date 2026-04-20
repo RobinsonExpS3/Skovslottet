@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Slottet.API.Controllers;
+using Slottet.API.Middlewares;
+using Slottet.Application.Interfaces;
+using Slottet.Infrastructure;
+using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,9 +18,12 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient<ShiftboardController>();
 
+builder.Services.AddScoped<IAuditScope, AuditScope>();
+
 // Builder for EF Core
-builder.Services.AddDbContext<SlottetDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+        .AddInterceptors(ai.GetRequiredService<AuditInterceptor>()));
 
 
 var app = builder.Build();
@@ -35,6 +42,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<AuditScopeMiddleware>();
 
 app.UseAuthorization();
 
