@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Slottet.Domain.Entities
+{
+    public class ResidentPaymentMethod
+    {
+        public Guid ResidentID { get; set; }
+        public Guid PaymentMethodID { get; set; }
 
-namespace Slottet.Domain.Entities {
-    public class ResidentPaymentMethod {
-        public ResidentCard ResidentCardID { get; set; }
-        public PaymentMethod PaymentMethodID { get; set; }
+        public Resident Resident { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
     }
 }
