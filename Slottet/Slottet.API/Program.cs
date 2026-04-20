@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Slottet.Application.Interfaces;
 using Slottet.API.Controllers;
 using Slottet.Infrastructure.Data;
+using Slottet.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,7 @@ builder.Services.AddHttpClient<ShiftboardController>();
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IMedicineService, MedicineService>();
 
 
 var app = builder.Build();
