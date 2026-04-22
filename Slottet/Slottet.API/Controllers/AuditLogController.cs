@@ -3,15 +3,17 @@ using Slottet.Infrastructure.Data;
 using Slottet.Domain.Entities;
 using Slottet.Shared;
 using Microsoft.EntityFrameworkCore;
+using Slottet.Application.Interfaces;
 
 namespace Slottet.API.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class AuditLogController : Controller {
         private readonly SlottetDBContext _context;
+        private readonly IAuditLogDTOService _auditLogService;
 
-        public AuditLogController(SlottetDBContext context) {
-            _context = context;
+        public AuditLogController(IAuditLogDTOService auditLogService) {
+            _auditLogService = auditLogService;
         }
 
         [HttpGet]
@@ -44,20 +46,7 @@ namespace Slottet.API.Controllers {
                 };
             }
 
-            var result = await query
-                .OrderByDescending(log => log.PerformedAtTime ?? log.TimeStamp)
-                .Select(log => new AuditLogDTO {
-                    AuditLogID = log.AuditLogID,
-                    PerformedAtTime = log.PerformedAtTime ?? log.TimeStamp,
-                    Action = log.Action,
-                    TableName = log.TableName,
-                    KeyValues = log.KeyValues,
-                    OldValuesJson = log.OldValuesJson,
-                    NewValuesJson = log.NewValuesJson,
-                    PerformedByStaffID = log.PerformedByStaffID ?? Guid.Empty,
-                    PerformedByStaffName = log.PerformedByStaffName ?? "Ukendt"
-                })
-                .ToListAsync();
+            var result = await _auditLogService.GetAllAsync();
 
             return Ok(result);
         }

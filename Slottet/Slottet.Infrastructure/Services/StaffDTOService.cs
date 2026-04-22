@@ -22,6 +22,7 @@ namespace Slottet.Infrastructure.Services {
                     .Select(MapToDtoExpression())
                     .ToListAsync();
         }
+
         public async Task<StaffDTO?> GetByIdAsync(Guid id) {
             return await _context.Staffs
                     .AsNoTracking()
