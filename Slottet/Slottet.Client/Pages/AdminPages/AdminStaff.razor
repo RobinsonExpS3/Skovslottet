@@ -29,7 +29,7 @@
             <input class="sp-table-input" @bind="initialsInput" placeholder="Indtast initialer" />
             <select class="role-picker" @bind="roleInput">
                 <option value="">Vælg rolle</option>
-                <option value="staff">Pedagog</option>
+                <option value="staff">Pædagog</option>
                 <option value="admin">Administrator</option>
             </select>
             <button class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(staffNameInput) || selectedItem != null)">Opret</button>
