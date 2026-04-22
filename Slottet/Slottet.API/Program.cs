@@ -25,7 +25,6 @@ builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
         .AddInterceptors(ai.GetRequiredService<AuditInterceptor>()));
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
