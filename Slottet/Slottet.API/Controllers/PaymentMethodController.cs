@@ -17,7 +17,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PaymentMethodDTO>>> GetAll() {
+        public async Task<ActionResult<IEnumerable<PaymentMethodDTO>>> GetAllAsync() {
             var methods = await _context.PaymentMethods
                 .AsNoTracking()
                 .Select(m => new PaymentMethodDTO {

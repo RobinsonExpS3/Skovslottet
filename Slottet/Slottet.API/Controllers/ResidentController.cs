@@ -17,7 +17,7 @@ namespace Slottet.API.Controllers {
 
         //Get: residents
         [HttpGet("Residents")]
-        public async Task<ActionResult<IEnumerable<ResidentViewModel>>> GetAll() {
+        public async Task<ActionResult<IEnumerable<ResidentViewModel>>> GetAllAsync() {
             var result = await _context.Residents
                 .AsNoTracking()
                 .Select(r => new ResidentViewModel {
@@ -33,7 +33,7 @@ namespace Slottet.API.Controllers {
 
         //Get: resident by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<ResidentDTO>> GetById(Guid id) {
+        public async Task<ActionResult<ResidentDTO>> GetByIdAsync(Guid id) {
             var resident = await _context.Residents
                 .AsNoTracking()
                 .FirstOrDefaultAsync(r => r.ResidentID == id);
@@ -64,7 +64,7 @@ namespace Slottet.API.Controllers {
 
         //Post: resident
         [HttpPost]
-        public async Task<ActionResult<Resident>> CreateResident([FromBody] ResidentDTO dto) {
+        public async Task<ActionResult<Resident>> CreateAsync([FromBody] ResidentDTO dto) {
             if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty) {
                 return BadRequest();
             }
@@ -78,17 +78,17 @@ namespace Slottet.API.Controllers {
 
             _context.Residents.Add(resident);
 
-            AddPaymentMethods(resident.ResidentID, dto.PaymentMethodIDs);
-            AddMedicines(resident.ResidentID, dto.MedicineTimes);
+            AddAsync(resident.ResidentID, dto.PaymentMethodIDs);
+            AddAsync(resident.ResidentID, dto.MedicineTimes);
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetById), new { id = resident.ResidentID }, resident);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = resident.ResidentID }, resident);
         }
 
         //Put: resident by id
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateResident(Guid id, [FromBody] ResidentDTO dto) {
+        public async Task<ActionResult> UpdateAsync(Guid id, [FromBody] ResidentDTO dto) {
             if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty) {
                 return BadRequest();
             }
@@ -105,12 +105,12 @@ namespace Slottet.API.Controllers {
             var existingPaymentMethods = await _context.ResidentPaymentMethods
                 .Where(rpm => rpm.ResidentID == id).ToListAsync();
             _context.ResidentPaymentMethods.RemoveRange(existingPaymentMethods);
-            AddPaymentMethods(id, dto.PaymentMethodIDs);
+            AddAsync(id, dto.PaymentMethodIDs);
 
             var existingMedicines = await _context.Medicines
                 .Where(m => m.ResidentID == id).ToListAsync();
             _context.Medicines.RemoveRange(existingMedicines);
-            AddMedicines(id, dto.MedicineTimes);
+            AddAsync(id, dto.MedicineTimes);
 
             await _context.SaveChangesAsync();
 
@@ -119,7 +119,7 @@ namespace Slottet.API.Controllers {
 
         //Delete: resident by id
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteResident(Guid id) {
+        public async Task<ActionResult> DeleteAsync(Guid id) {
             var existingResident = await _context.Residents.FirstOrDefaultAsync(r => r.ResidentID == id);
 
             if (existingResident == null) {
@@ -160,7 +160,7 @@ namespace Slottet.API.Controllers {
             return NoContent();
         }
 
-        private void AddPaymentMethods(Guid residentID, List<Guid>? paymentMethodsIDs) {
+        private void AddAsync(Guid residentID, List<Guid>? paymentMethodsIDs) {
             if(paymentMethodsIDs == null || paymentMethodsIDs.Count == 0) {
                 return;
             }
@@ -175,7 +175,7 @@ namespace Slottet.API.Controllers {
             _context.ResidentPaymentMethods.AddRange(relationRows);
         }
 
-        private void AddMedicines(Guid residentID, List<DateTime>? medicineTimes) {
+        private void AddAsync(Guid residentID, List<DateTime>? medicineTimes) {
             if(medicineTimes == null || medicineTimes.Count == 0) {
                 return;
             }
