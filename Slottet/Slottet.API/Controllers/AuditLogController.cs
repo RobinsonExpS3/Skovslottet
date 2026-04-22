@@ -15,7 +15,7 @@ namespace Slottet.API.Controllers {
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AuditLogDTO>>> GetAsync([FromQuery] DateOnly? date, [FromQuery] string? shift) {
+        public async Task<ActionResult<IEnumerable<AuditLogDTO>>> GetAllAsync([FromQuery] DateOnly? date, [FromQuery] string? shift) {
             IQueryable<AuditLog> query = _context.AuditLogs.AsNoTracking();
 
             if(date.HasValue) {
