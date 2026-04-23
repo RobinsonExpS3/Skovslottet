@@ -5,10 +5,10 @@ using Slottet.Shared;
 
 namespace Slottet.Application.Interfaces {
     public interface IStaffDTOService {
-        Task<IEnumerable<StaffDTO>> GetAllAsync();
-        Task<StaffDTO?> GetByIdAsync(Guid id);
-        Task<StaffDTO> CreateAsync(StaffDTO dto);
-        Task<bool> UpdateAsync(Guid id, StaffDTO dto);
+        Task<IEnumerable<EditStaffDTO>> GetAllAsync();
+        Task<EditStaffDTO?> GetByIdAsync(Guid id);
+        Task<EditStaffDTO> CreateAsync(EditStaffDTO dto);
+        Task<bool> UpdateAsync(Guid id, EditStaffDTO dto);
         Task<bool> DeleteAsync(Guid id);
     }
 }

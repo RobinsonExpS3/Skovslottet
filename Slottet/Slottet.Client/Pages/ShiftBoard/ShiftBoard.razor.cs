@@ -1,4 +1,4 @@
-using Slottet.Client.Pages.MockData;
+//using Slottet.Client.Pages.MockData;
 using Slottet.Shared;
 
 namespace Slottet.Client.Pages.ShiftBoard
@@ -9,12 +9,12 @@ namespace Slottet.Client.Pages.ShiftBoard
     /// 
     public partial class ShiftBoard //Midlertidig codebehind. Skal lige prøve det af. :D
     {
-        protected ShiftBoardDTO? Model { get; set; }
+        //protected ShiftBoardDTO? Model { get; set; }
 
-        protected override void OnInitialized()
-        {
-            Model = ShiftBoardMockData.Create();
-        }
+        //protected override void OnInitialized()
+        //{
+        //    Model = ShiftBoardMockData.Create();
+        //}
 
         //private List<ResidentCardDTO> residentCards = new List<ResidentCardDTO>();
     }

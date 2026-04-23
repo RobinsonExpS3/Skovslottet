@@ -1,4 +1,5 @@
-﻿using Slottet.Application.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
 using Slottet.Infrastructure.Data;
 using Slottet.Shared;
@@ -10,7 +11,7 @@ namespace Slottet.Infrastructure.Services {
     public class AuditLogDTOService : IAuditLogDTOService {
         private readonly SlottetDBContext _context;
 
-        public StaffDTOService(SlottetDBContext context) {
+        public AuditLogDTOService(SlottetDBContext context) {
             _context = context;
         }
 
@@ -25,14 +26,14 @@ namespace Slottet.Infrastructure.Services {
         private static System.Linq.Expressions.Expression<Func<AuditLog, AuditLogDTO>> MapToDtoExpression() {
             return auditLog => new AuditLogDTO {
                 AuditLogID = auditLog.AuditLogID,
-                PerformedAtTime = auditLog.PerformedAtTime,
+                PerformedAtTime = auditLog.PerformedAtTime ?? auditLog.TimeStamp,
                 Action = auditLog.Action,
                 TableName = auditLog.TableName,
                 KeyValues = auditLog.KeyValues,
                 OldValuesJson = auditLog.OldValuesJson,
                 NewValuesJson = auditLog.NewValuesJson,
-                PerformedByStaffID = auditLog?.PerformedByStaffID,
-                PerformedByStaffName = auditLog?.PerformedByStaffName
+                PerformedByStaffID = auditLog.PerformedByStaffID ?? Guid.Empty,
+                PerformedByStaffName = auditLog.PerformedByStaffName ?? "Ukendt"
             };
         }
     }

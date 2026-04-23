@@ -15,7 +15,7 @@ namespace Slottet.Infrastructure.Services {
             _context = context;
         }
 
-        public async Task<IEnumerable<StaffDTO>> GetAllAsync() {
+        public async Task<IEnumerable<EditStaffDTO>> GetAllAsync() {
             return await _context.Staffs
                     .AsNoTracking()
                     .OrderBy(s => s.StaffID)
@@ -23,7 +23,7 @@ namespace Slottet.Infrastructure.Services {
                     .ToListAsync();
         }
 
-        public async Task<StaffDTO?> GetByIdAsync(Guid id) {
+        public async Task<EditStaffDTO?> GetByIdAsync(Guid id) {
             return await _context.Staffs
                     .AsNoTracking()
                     .Where(s => s.StaffID == id)
@@ -31,7 +31,7 @@ namespace Slottet.Infrastructure.Services {
                     .FirstOrDefaultAsync();
         }
 
-        public async Task<StaffDTO> CreateAsync(StaffDTO dto) {
+        public async Task<EditStaffDTO> CreateAsync(EditStaffDTO dto) {
             var staff = new Staff {
                 StaffID = dto.StaffID,
                 StaffName = dto.StaffName,
@@ -45,7 +45,7 @@ namespace Slottet.Infrastructure.Services {
             return MapToDTO(staff);
         }
         
-        public async Task<bool> UpdateAsync(Guid id, StaffDTO dto) {
+        public async Task<bool> UpdateAsync(Guid id, EditStaffDTO dto) {
             var existingStaff = await _context.Staffs
                 .FirstOrDefaultAsync(s => s.StaffID == id);
 
@@ -76,8 +76,8 @@ namespace Slottet.Infrastructure.Services {
             return true;
         }
 
-        private static System.Linq.Expressions.Expression<Func<Staff, StaffDTO>> MapToDtoExpression() {
-            return staff => new StaffDTO {
+        private static System.Linq.Expressions.Expression<Func<Staff, EditStaffDTO>> MapToDtoExpression() {
+            return staff => new EditStaffDTO {
                 StaffID = staff.StaffID,
                 StaffName = staff.StaffName,
                 Initials = staff.Initials,
@@ -86,8 +86,8 @@ namespace Slottet.Infrastructure.Services {
             };
         }
 
-        private static StaffDTO MapToDTO(Staff staff) {
-            return new StaffDTO {
+        private static EditStaffDTO MapToDTO(Staff staff) {
+            return new EditStaffDTO {
                 StaffID = staff.StaffID,
                 StaffName = staff.StaffName,
                 Initials = staff.Initials,

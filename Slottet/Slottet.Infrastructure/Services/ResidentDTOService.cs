@@ -15,15 +15,29 @@ namespace Slottet.Infrastructure.Services {
             _context = context;
         }
 
-        public async Task<IEnumerable<ResidentDTO>> GetAllAsync() {
-            return await _context.Residents
+        public async Task<IEnumerable<EditResidentDTO>> GetAllAsync() {
+            var residents = await _context.Residents
                 .AsNoTracking()
                 .OrderBy(r => r.ResidentID)
                 .Select(MapToDtoExpression())
                 .ToListAsync();
+
+            var groceryDaysTask = GetGroceryDayLookupAsync();
+            var paymentMethodsTask = GetPaymentMethodsLookupAsync();
+            await Task.WhenAll(groceryDaysTask, paymentMethodsTask);
+
+            var groceryDays = groceryDaysTask.Result;
+            var paymentMethods = paymentMethodsTask.Result;
+
+            foreach(var resident in residents) {
+                resident.GroceryDays = groceryDays;
+                resident.PaymentMethods = paymentMethods;
+            }
+
+            return residents;
         }
 
-        public async Task<ResidentDTO?> GetByIdAsync(Guid id) {
+        public async Task<EditResidentDTO?> GetByIdAsync(Guid id) {
             var residentDto = await _context.Residents
                 .AsNoTracking()
                 .Where(r => r.ResidentID == id)
@@ -46,10 +60,13 @@ namespace Slottet.Infrastructure.Services {
                 .Select(m => m.MedicineTime)
                 .ToListAsync();
 
+            var groceryDaysTask = await GetGroceryDayLookupAsync();
+            var paymentMethodsTask = await GetPaymentMethodsLookupAsync();
+
             return residentDto;
         }
 
-        public async Task<ResidentDTO> CreateAsync(ResidentDTO dto) {
+        public async Task<EditResidentDTO> CreateAsync(EditResidentDTO dto) {
             var resident = new Resident {
                 ResidentID = dto.ResidentID == Guid.Empty ? Guid.NewGuid() : dto.ResidentID,
                 ResidentName = dto.ResidentName,
@@ -68,7 +85,7 @@ namespace Slottet.Infrastructure.Services {
             return createdResident ?? MapToDTO(resident);
         }
 
-        public async Task<bool> UpdateAsync(Guid id, ResidentDTO dto) {
+        public async Task<bool> UpdateAsync(Guid id, EditResidentDTO dto) {
             var existingResident = await _context.Residents
                 .FirstOrDefaultAsync(r => r.ResidentID == id);
 
@@ -137,6 +154,28 @@ namespace Slottet.Infrastructure.Services {
             return true;
         }
 
+        private async Task<List<ResidentLookupDTO>> GetGroceryDayLookupAsync() {
+            return await _context.GroceryDays
+                .AsNoTracking()
+                .OrderBy(g => g.GroceryDayName)
+                .Select(g => new ResidentLookupDTO {
+                    ID = g.GroceryDayID,
+                    Name = g.GroceryDayName
+                })
+                .ToListAsync();
+        }
+
+        private async Task<List<ResidentLookupDTO>> GetPaymentMethodsLookupAsync() {
+            return await _context.PaymentMethods
+                .AsNoTracking()
+                .OrderBy(p => p.PaymentMethodName)
+                .Select(p => new ResidentLookupDTO {
+                    ID = p.PaymentMethodID,
+                    Name = p.PaymentMethodName
+                })
+                .ToListAsync();
+        }
+
         private void AddPaymentMethods(Guid residentID, List<Guid>? paymentMethodsIDs) {
             if (paymentMethodsIDs == null || paymentMethodsIDs.Count == 0) {
                 return;
@@ -168,8 +207,8 @@ namespace Slottet.Infrastructure.Services {
             _context.Medicines.AddRange(medicineRows);
         }
 
-        private static System.Linq.Expressions.Expression<Func<Resident, ResidentDTO>> MapToDtoExpression() {
-            return resident => new ResidentDTO {
+        private static System.Linq.Expressions.Expression<Func<Resident, EditResidentDTO>> MapToDtoExpression() {
+            return resident => new EditResidentDTO {
                 ResidentID = resident.ResidentID,
                 ResidentName = resident.ResidentName,
                 IsActive = resident.IsActive,
@@ -177,8 +216,8 @@ namespace Slottet.Infrastructure.Services {
             };
         }
 
-        private static ResidentDTO MapToDTO(Resident resident) {
-            return new ResidentDTO {
+        private static EditResidentDTO MapToDTO(Resident resident) {
+            return new EditResidentDTO {
                 ResidentID = resident.ResidentID,
                 ResidentName = resident.ResidentName,
                 IsActive = resident.IsActive,

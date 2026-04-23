@@ -20,7 +20,7 @@ namespace Slottet.API.Controllers
 
         //Get: Staffs
         [HttpGet("Staffs")]
-        public async Task<ActionResult<IEnumerable<StaffDTO>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<EditStaffDTO>>> GetAllAsync()
         {
             var staffs = await _staffService.GetAllAsync();
             
@@ -29,7 +29,7 @@ namespace Slottet.API.Controllers
 
         //Get: Staff by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<StaffDTO>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<EditStaffDTO>> GetByIdAsync(Guid id)
         {
             var staff = await _staffService.GetByIdAsync(id);
 
@@ -43,7 +43,7 @@ namespace Slottet.API.Controllers
 
         //Post: Staff
         [HttpPost]
-        public async Task<ActionResult<StaffDTO>> CreateAsync([FromBody] StaffDTO dto)
+        public async Task<ActionResult<EditStaffDTO>> CreateAsync([FromBody] EditStaffDTO dto)
         {
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||
@@ -60,7 +60,7 @@ namespace Slottet.API.Controllers
 
         //Put: Staff by id
         [HttpPut("{id}")]
-        public async Task<ActionResult<StaffDTO>> UpdateAsync(Guid id, [FromBody] StaffDTO dto)
+        public async Task<ActionResult<EditStaffDTO>> UpdateAsync(Guid id, [FromBody] EditStaffDTO dto)
         {
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||

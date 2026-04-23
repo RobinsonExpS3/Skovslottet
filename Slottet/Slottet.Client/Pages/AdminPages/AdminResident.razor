@@ -23,7 +23,7 @@
 				{
 					<tr @onclick="() => SelectResident(resident)" class="@(selectedResident == resident ? "selected-row" : "")">
 						<td>@resident.ResidentName</td>
-						<td>@resident.GroceryDayName</td>
+						<td>@GetGroceryDayName(resident.GroceryDayID)</td>
 					</tr>
 				}
 			}
@@ -34,14 +34,14 @@
 			<select @bind="selectedGroceryDayID">
 				<option value="">Vælg handledag</option>
 				@foreach (var day in groceryDays) {
-					<option value="@day.GroceryDayID">@day.GroceryDayName</option>
+					<option value="@day.ID">@day.Name</option>
 				}
 			</select>
 
 			<select multiple @onchange="OnPaymentMethodsChanged">
 				@foreach (var method in paymentMethods) {
-					<option value="@method.PaymentMethodID" selected="@selectedPaymentMethodIDs.Contains(method.PaymentMethodID)">
-						@method.PaymentMethodName
+					<option value="@method.ID" selected="@selectedPaymentMethodIDs.Contains(method.ID)">
+						@method.Name
 					</option>
 				}
 			</select>

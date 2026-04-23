@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using Slottet.Client.Pages.MockData;
+//using Slottet.Client.Pages.MockData;
 using Slottet.Shared;
 
 namespace Slottet.Client.Pages.AdminPages
@@ -21,12 +21,12 @@ namespace Slottet.Client.Pages.AdminPages
 
         protected string SelectedDateText => SelectedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-        protected ShiftBoardDTO? Model { get; set; }
+        //protected ShiftBoardDTO? Model { get; set; }
 
         private Guid? openCardId = null;
 
         protected override async Task OnInitializedAsync() {
-            Model = ShiftBoardMockData.Create();
+            //Model = ShiftBoardMockData.Create();
             await LoadAuditLogsAsync();
         }
 

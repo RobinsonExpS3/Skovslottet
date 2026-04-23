@@ -17,7 +17,7 @@ namespace Slottet.API.Controllers {
 
         //Get: residents
         [HttpGet("Residents")]
-        public async Task<ActionResult<IEnumerable<ResidentDTO>>> GetAllAsync() {
+        public async Task<ActionResult<IEnumerable<EditResidentDTO>>> GetAllAsync() {
             var residents = await _residentService.GetAllAsync();
 
             return Ok(residents);
@@ -25,7 +25,7 @@ namespace Slottet.API.Controllers {
 
         //Get: resident by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<ResidentDTO>> GetByIdAsync(Guid id) {
+        public async Task<ActionResult<EditResidentDTO>> GetByIdAsync(Guid id) {
             var resident = await _residentService.GetByIdAsync(id);
 
             if(resident == null) {
@@ -37,7 +37,7 @@ namespace Slottet.API.Controllers {
 
         //Post: resident
         [HttpPost]
-        public async Task<ActionResult<Resident>> CreateAsync([FromBody] ResidentDTO dto) {
+        public async Task<ActionResult<Resident>> CreateAsync([FromBody] EditResidentDTO dto) {
             if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty) {
                 return BadRequest();
             }
@@ -49,7 +49,7 @@ namespace Slottet.API.Controllers {
 
         //Put: resident by id
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateAsync(Guid id, [FromBody] ResidentDTO dto) {
+        public async Task<ActionResult> UpdateAsync(Guid id, [FromBody] EditResidentDTO dto) {
             if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty) {
                 return BadRequest();
             }
