@@ -18,7 +18,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient<ShiftboardController>();
 
+
 builder.Services.AddScoped<IAuditScope, AuditScope>();
+builder.Services.AddScoped<AuditInterceptor>();
 
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
