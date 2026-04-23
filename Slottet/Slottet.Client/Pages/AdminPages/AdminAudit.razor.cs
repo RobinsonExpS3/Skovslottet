@@ -21,12 +21,9 @@ namespace Slottet.Client.Pages.AdminPages
 
         protected string SelectedDateText => SelectedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-        //protected ShiftBoardDTO? Model { get; set; }
-
         private Guid? openCardId = null;
 
         protected override async Task OnInitializedAsync() {
-            //Model = ShiftBoardMockData.Create();
             await LoadAuditLogsAsync();
         }
 
