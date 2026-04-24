@@ -4,6 +4,8 @@ using System.Text;
 using Slottet.Application.Interfaces;
 using Slottet.Infrastructure.Data;
 using Slottet.Shared;
+using Slottet.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Slottet.Infrastructure.Services
 {
@@ -18,9 +20,11 @@ namespace Slottet.Infrastructure.Services
 
         public async Task<IEnumerable<SwapPhoneDTO>> GetAllAsync()
         {
-            return await _context.SwapPhones
+            return await _context.Phones
                 .AsNoTracking()
-                .OrderBy (p => p.)
+                .OrderBy(p => p.PhoneID)
+                .Select(MapToDtoExpression())
+                .ToListAsync();
         }
 
         public Task<SwapPhoneDTO?> GetByIdAsync(Guid id)
