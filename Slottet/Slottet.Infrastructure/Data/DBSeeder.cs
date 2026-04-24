@@ -20,7 +20,7 @@ namespace Slottet.Infrastructure.Data
             await context.SaveChangesAsync();
 
             //await ResidentSeeder.SeedAsync(context);
-            //await StaffSeeder.SeedAsync(context); //Megan
+            await StaffSeeder.SeedAsync(context); 
             await ShiftBoardSeeder.SeedAsync(context);
 
             await context.SaveChangesAsync();
@@ -31,7 +31,7 @@ namespace Slottet.Infrastructure.Data
             //await StaffResidentStatusSeeder.SeedAsync(context);
             //await DepartmentTaskSeeder.SeedAsync(context);
             //await GroceryDaySeeder.SeedAsync(context); 
-            //await PNSeeder.SeedAsync(context);
+            //await PNSeeder.SeedAsync(context);//Megan
             //await RiskLevelSeeder.SeedAsync(context); 
             //await SpecialResponsibilitySeeder.SeedAsync(context); //Megan
 
