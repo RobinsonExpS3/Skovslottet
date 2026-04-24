@@ -27,6 +27,30 @@ namespace Slottet.Client.Pages.AdminPages
             await LoadAuditLogsAsync();
         }
 
+        private async Task LoadAuditLogsAsync() {
+            IsLoading = true;
+            ErrorMessage = null;
+
+            try {
+                var query = new List<string> {
+                    $"date={SelectedDate:yyyy-MM-dd}"
+                };
+
+                if (!string.IsNullOrWhiteSpace(SelectedShift)) {
+                    query.Add($"shift={Uri.EscapeDataString(SelectedShift)}");
+                }
+
+                var url = $"api/AuditLogs?{string.Join("&", query)}";
+                AuditRows = await httpClient.GetFromJsonAsync<List<AuditLogDTO>>(url) ?? new();
+            } catch (Exception ex) {
+                ErrorMessage = $"Kunne ikke hente audit logs: {ex.Message}";
+                AuditRows = new();
+            }
+            finally {
+                IsLoading = false;
+            }
+        }
+
         private void ToggleStatusCard(Guid residentCardId)
         {
             openCardId = openCardId == residentCardId ? null : residentCardId;
@@ -49,29 +73,6 @@ namespace Slottet.Client.Pages.AdminPages
         protected async Task OnShiftChanged(ChangeEventArgs args) {
             SelectedShift = args.Value?.ToString() ?? string.Empty;
             await LoadAuditLogsAsync();
-        }
-
-        private async Task LoadAuditLogsAsync() {
-            IsLoading = true;
-            ErrorMessage = null;
-
-            try {
-                var query = new List<string> {
-                    $"date={SelectedDate:yyyy-MM-dd}"
-                };
-
-                if(!string.IsNullOrWhiteSpace(SelectedShift)) {
-                    query.Add($"shift={Uri.EscapeDataString(SelectedShift)}");
-                }
-
-                var url = $"api/AuditLogs?{string.Join("&", query)}";
-                AuditRows = await httpClient.GetFromJsonAsync<List<AuditLogDTO>>(url) ?? new();
-            } catch(Exception ex) {
-                ErrorMessage = $"Kunne ikke hente audit logs: {ex.Message}";
-                AuditRows = new();
-            } finally {
-                IsLoading = false;
-            }
         }
     }
 }
