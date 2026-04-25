@@ -44,11 +44,11 @@ namespace Slottet.Infrastructure.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateAsync(Guid phoneID, Guid staffID, SwapPhoneDTO dto)
+        public async Task<bool> UpdateAsync(SwapPhoneDTO dto)
         {
 
-            var phoneExists = await _context.Phones.AnyAsync(p => p.PhoneID == phoneID);
-            var staffExists = await _context.Staffs.AnyAsync(p => p.StaffID == staffID);
+            var phoneExists = await _context.Phones.AnyAsync(p => p.PhoneID == dto.PhoneID);
+            var staffExists = await _context.Staffs.AnyAsync(p => p.StaffID == dto.StaffID);
 
             if (!phoneExists || !staffExists)
             {
@@ -57,8 +57,8 @@ namespace Slottet.Infrastructure.Services
 
             var assignment = new StaffPhone
             {
-                PhoneID = phoneID,
-                StaffID = staffID,
+                PhoneID = dto.PhoneID,
+                StaffID = dto.StaffID,
                 AssignedAt = DateTime.UtcNow
             };
 
