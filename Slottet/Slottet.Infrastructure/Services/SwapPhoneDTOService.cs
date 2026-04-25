@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Slottet.Application.Interfaces;
 using Slottet.Infrastructure.Data;
 using Slottet.Shared;
+using Slottet.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Slottet.Infrastructure.Services
 {
