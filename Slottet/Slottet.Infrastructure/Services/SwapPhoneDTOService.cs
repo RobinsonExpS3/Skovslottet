@@ -47,8 +47,8 @@ namespace Slottet.Infrastructure.Services
         public async Task<bool> UpdateAsync(Guid phoneID, Guid staffID, SwapPhoneDTO dto)
         {
 
-            var phoneExists = await _context.Phones.AnyAsync(p => p.PhoneID == dto.PhoneID);
-            var staffExists = await _context.Staffs.AnyAsync(p => p.StaffID == dto.StaffID);
+            var phoneExists = await _context.Phones.AnyAsync(p => p.PhoneID == phoneID);
+            var staffExists = await _context.Staffs.AnyAsync(p => p.StaffID == staffID);
 
             if (!phoneExists || !staffExists)
             {
