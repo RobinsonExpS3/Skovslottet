@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
 
-    [Route("api/[controller")]
+    [Route("api/[controller]")]
     [ApiController]
     public class SwapPhoneController : ControllerBase
     {
@@ -23,23 +22,22 @@ namespace Slottet.API.Controllers
             return Ok(await _swapPhoneService.GetAllAsync());
         }
 
-        [HttpGet("{phoneId:guid}")]
-        public async Task<ActionResult<SwapPhoneDTO>> GetById(Guid phoneId)
-        {
-            var phone = await _swapPhoneService.GetByIdAsync(phoneId);
+        //[HttpGet("{phoneId:guid}")]
+        //public async Task<ActionResult<SwapPhoneDTO>> GetById(Guid phoneId)
+        //{
+        //    var phone = await _swapPhoneService.GetByIdAsync(phoneId);
 
-            if (phone == null) return NotFound();
+        //    if (phone == null) return NotFound();
 
-            return Ok(phone);
-        }
+        //    return Ok(phone);
+        //}
 
-        [HttpGet("{phoneId:guid}")]
-        public async Task<IActionResult> SwapPhone(Guid phoneId, [FromBody] SwapPhoneDTO dto)
+        [HttpPost("assign")]
+        public async Task<IActionResult> SwapPhone(Guid phoneId, Guid staffId, [FromBody] SwapPhoneDTO dto)
         {
             if (dto == null || dto.StaffID == null || dto.StaffID == Guid.Empty) return BadRequest();
 
-            var updated = await _swapPhoneService.UpdateAsync(phoneId, dto);
-
+            var updated = await _swapPhoneService.UpdateAsync(phoneId, staffId, dto);
             if (!updated) return NotFound();
 
             return NoContent();

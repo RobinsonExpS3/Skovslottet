@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Slottet.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Slottet.Application.Interfaces;
+using Slottet.Domain.Entities;
 using Slottet.Infrastructure.Data;
 using Slottet.Shared;
-using Slottet.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Slottet.Infrastructure.Services
 {
@@ -44,31 +39,27 @@ namespace Slottet.Infrastructure.Services
                         .Select(sp => (DateTime?)sp.AssignedAt)
                         .FirstOrDefault()
                 })
-                
+
                 .OrderBy(p => p.PhoneNumber)
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateAsync (Guid id, SwapPhoneDTO dto)
+        public async Task<bool> UpdateAsync(Guid phoneID, Guid staffID, SwapPhoneDTO dto)
         {
-            if (dto.StaffID == null || dto.StaffID == Guid.Empty)
-            {
-                return false;
-            }
 
             var phoneExists = await _context.Phones.AnyAsync(p => p.PhoneID == dto.PhoneID);
             var staffExists = await _context.Staffs.AnyAsync(p => p.StaffID == dto.StaffID);
 
-            if  (!phoneExists || !staffExists)
+            if (!phoneExists || !staffExists)
             {
                 return false;
             }
 
             var assignment = new StaffPhone
             {
-                PhoneID = dto.PhoneID,
-                StaffID = dto.StaffID,
-                AssignedAt = dto.AssignedAt ?? DateTime.UtcNow
+                PhoneID = phoneID,
+                StaffID = staffID,
+                AssignedAt = DateTime.UtcNow
             };
 
             _context.StaffPhones.Add(assignment);
@@ -77,7 +68,7 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
-        //public Task<SwapPhoneDTO?> GetByIdAsync(Guid id)
+        //public async Task<SwapPhoneDTO?> GetByIdAsync(Guid id)
         //{
         //    return await _context.Phones
         //        .AsNoTracking()
@@ -86,7 +77,7 @@ namespace Slottet.Infrastructure.Services
         //        .FirstOrDefaultAsync();
         //}
 
-       
+
 
         //private static System.Linq.Expressions.Expression<Func<Phone, SwapPhoneDTO>> MapToDtoExpression()
         //{
@@ -95,18 +86,18 @@ namespace Slottet.Infrastructure.Services
         //        PhoneID = phone.PhoneID,
         //        PhoneNumber = phone.PhoneNumber,
         //        StaffName = phone.StaffName,
-               
+
         //    };
         //}
 
-        //private static SwapPhoneDTO MapToDto(Phone phone)
-        //{
-        //    return new SwapPhoneDTO
-        //    {
-        //        PhoneID = phone.PhoneID,
-        //        PhoneNumber = phone.PhoneNumber,
-        //        StaffName = phone.StaffName,
-        //    };
-        //}
+        ////private static SwapPhoneDTO MapToDto(Phone phone)
+        ////{
+        ////    return new SwapPhoneDTO
+        ////    {
+        ////        PhoneID = phone.PhoneID,
+        ////        PhoneNumber = phone.PhoneNumber,
+        ////        StaffName = phone.StaffName,
+        ////    };
+        ////}
     }
 }
