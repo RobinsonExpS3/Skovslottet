@@ -1,95 +1,94 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Slottet.Application.Interfaces;
-using Slottet.Domain.Entities;
-using Slottet.Infrastructure.Data;
 using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
-    //[ApiController]
-    //[Route("api/[controller]")]
-    //public class StaffController : Controller {
-    //    private readonly IBaseRepository<Staff> _repository;
+    [ApiController]
+    [Route("api/[controller]")]
+    public class StaffController : Controller
+    {
+        private readonly IStaffDTOService _staffService;
 
-    //    public StaffController(IBaseRepository<Staff> repository) {
-    //        _repository = repository;
-    //    }
+        public StaffController(IStaffDTOService staffService)
+        {
+            _staffService = staffService;
+        }
 
-    //    //Get: Staffs
-    //    [HttpGet("Staffs")]
-    //    public async Task<ActionResult<IEnumerable<Staff>>> GetAll() {
-    //        var staffs = await _repository.GetAllAsync();
-    //        return Ok(staffs);
-    //    }
+        //Get: Staffs
+        [HttpGet("Staffs")]
+        public async Task<ActionResult<IEnumerable<EditStaffDTO>>> GetAllAsync()
+        {
+            var staffs = await _staffService.GetAllAsync();
 
-    //    //Get: Staff by id
-    //    [HttpGet("{id}")]
-    //    public async Task<ActionResult<Staff>> GetById(Guid id) {
-    //        var staff = await _repository.GetByIdAsync(id);
+            return Ok(staffs);
+        }
 
-    //        if (staff == null) {
-    //            return NotFound();
-    //        }
+        //Get: Staff by id
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EditStaffDTO>> GetByIdAsync(Guid id)
+        {
+            var staff = await _staffService.GetByIdAsync(id);
 
-    //        return Ok(staff);
-    //    }
+            if (staff == null)
+            {
+                return NotFound();
+            }
 
-    //    //Post: Staff
-    //    [HttpPost]
-    //    public async Task<ActionResult<Staff>> CreateStaff([FromBody] Staff staff) {
-    //        if (staff == null ||
-    //            string.IsNullOrWhiteSpace(staff.StaffName) ||
-    //            string.IsNullOrWhiteSpace(staff.Initials) ||
-    //            string.IsNullOrWhiteSpace(staff.Role)) {
-    //            return BadRequest();
-    //        }
+            return Ok(staff);
+        }
 
-    //        staff.StaffID = Guid.NewGuid();
+        //Post: Staff
+        [HttpPost]
+        public async Task<ActionResult<EditStaffDTO>> CreateAsync([FromBody] EditStaffDTO dto)
+        {
+            if (dto == null ||
+                string.IsNullOrWhiteSpace(dto.StaffName) ||
+                string.IsNullOrWhiteSpace(dto.Initials) ||
+                string.IsNullOrWhiteSpace(dto.Role))
+            {
+                return BadRequest();
+            }
 
-    //        await _repository.AddAsync(staff);
+            var result = await _staffService.CreateAsync(dto);
 
-    //        return CreatedAtAction(nameof(GetById), new { id = staff.StaffID }, staff);
-    //    }
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = dto.StaffID }, result);
+        }
 
-    //    //Put: Staff by id
-    //    [HttpPut("{id}")]
-    //    public async Task<ActionResult<Staff>> UpdateStaff(Guid id, [FromBody] Staff staff) {
-    //        if (staff == null ||
-    //            string.IsNullOrWhiteSpace(staff.StaffName) ||
-    //            string.IsNullOrWhiteSpace(staff.Initials) ||
-    //            string.IsNullOrWhiteSpace(staff.Role)) {
-    //            return BadRequest();
-    //        }
+        //Put: Staff by id
+        [HttpPut("{id}")]
+        public async Task<ActionResult<EditStaffDTO>> UpdateAsync(Guid id, [FromBody] EditStaffDTO dto)
+        {
+            if (dto == null ||
+                string.IsNullOrWhiteSpace(dto.StaffName) ||
+                string.IsNullOrWhiteSpace(dto.Initials) ||
+                string.IsNullOrWhiteSpace(dto.Role))
+            {
+                return BadRequest();
+            }
 
-    //        var existingStaff = await _repository.GetByIdAsync(id);
+            var updated = await _staffService.UpdateAsync(id, dto);
 
-    //        if (existingStaff == null) {
-    //            return NotFound();
-    //        }
+            if (!updated)
+            {
+                return NotFound();
+            }
 
-    //        existingStaff.StaffName = staff.StaffName;
-    //        existingStaff.Initials = staff.Initials;
-    //        existingStaff.Role = staff.Role;
-    //        existingStaff.DepartmentID = staff.DepartmentID;
+            return NoContent();
+        }
 
-    //        await _repository.UpdateAsync(existingStaff);
+        //Delete: Staff by id
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAsync(Guid id)
+        {
+            var existingStaff = await _staffService.DeleteAsync(id);
 
-    //        return NoContent();
-    //    }
+            if (!existingStaff)
+            {
+                return NotFound();
+            }
 
-    //    //Delete: Staff by id
-    //    [HttpDelete("{id}")]
-    //    public async Task<ActionResult> DeleteStaff(Guid id) {
-    //        var existingStaff = await _repository.GetByIdAsync(id);
-
-    //        if (existingStaff == null) {
-    //            return NotFound();
-    //        }
-
-    //        await _repository.DeleteAsync(id);
-
-    //        return NoContent();
-    //    }
-    //}
+            return NoContent();
+        }
+    }
 }
