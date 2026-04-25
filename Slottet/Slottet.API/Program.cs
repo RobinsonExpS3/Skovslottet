@@ -20,7 +20,7 @@ builder.Services.AddHttpClient<ShiftboardController>();
 builder.Services.AddDbContext<SlottetDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
-
+builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
 
 var app = builder.Build();
 

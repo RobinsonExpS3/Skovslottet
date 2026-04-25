@@ -8,6 +8,8 @@ namespace Slottet.Shared
     {
         public Guid PhoneID { get; set; }
         public string? PhoneNumber { get; set; }
+        public Guid StaffID { get; set; }
         public string? StaffName { get; set; }
+        public DateTime? AssignedAt { get; set; }
     }
 }

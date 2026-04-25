@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Slottet.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Slottet.Application.Interfaces;
 using Slottet.Infrastructure.Data;
 using Slottet.Shared;
@@ -18,19 +20,91 @@ namespace Slottet.Infrastructure.Services
 
         public async Task<IEnumerable<SwapPhoneDTO>> GetAllAsync()
         {
-            return await _context.SwapPhones
+            return await _context.Phones
                 .AsNoTracking()
-                .OrderBy (p => p.)
+                .Select(phone => new SwapPhoneDTO
+                {
+                    PhoneID = phone.PhoneID,
+                    PhoneNumber = phone.PhoneNumber,
+
+                    StaffID = phone.StaffPhones
+                        .OrderByDescending(sp => sp.AssignedAt)
+                        .Select(sp => sp.StaffID)
+                        .FirstOrDefault(),
+
+                    StaffName = phone.StaffPhones
+                        .OrderByDescending(sp => sp.AssignedAt)
+                        .Select(sp => sp.Staff.StaffName)
+                        .FirstOrDefault(),
+
+                    AssignedAt = phone.StaffPhones
+                        .OrderByDescending(sp => sp.AssignedAt)
+                        .Select(sp => (DateTime?)sp.AssignedAt)
+                        .FirstOrDefault()
+                })
+                
+                .OrderBy(p => p.PhoneNumber)
+                .ToListAsync();
         }
 
-        public Task<SwapPhoneDTO?> GetByIdAsync(Guid id)
+        public async Task<bool> UpdateAsync (Guid id, SwapPhoneDTO dto)
         {
-            throw new NotImplementedException();
+            if (dto.StaffID == null || dto.StaffID == Guid.Empty)
+            {
+                return false;
+            }
+
+            var phoneExists = await _context.Phones.AnyAsync(p => p.PhoneID == dto.PhoneID);
+            var staffExists = await _context.Staffs.AnyAsync(p => p.StaffID == dto.StaffID);
+
+            if  (!phoneExists || !staffExists)
+            {
+                return false;
+            }
+
+            var assignment = new StaffPhone
+            {
+                PhoneID = dto.PhoneID,
+                StaffID = dto.StaffID,
+                AssignedAt = dto.AssignedAt ?? DateTime.UtcNow
+            };
+
+            _context.StaffPhones.Add(assignment);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        public Task<bool> UpdateAsync(Guid id, SwapPhoneDTO dto)
-        {
-            throw new NotImplementedException();
-        }
+        //public Task<SwapPhoneDTO?> GetByIdAsync(Guid id)
+        //{
+        //    return await _context.Phones
+        //        .AsNoTracking()
+        //        .Where(p => p.PhoneID == id)
+        //        .Select(MapToDtoExpression())
+        //        .FirstOrDefaultAsync();
+        //}
+
+       
+
+        //private static System.Linq.Expressions.Expression<Func<Phone, SwapPhoneDTO>> MapToDtoExpression()
+        //{
+        //    return phone => new SwapPhoneDTO
+        //    {
+        //        PhoneID = phone.PhoneID,
+        //        PhoneNumber = phone.PhoneNumber,
+        //        StaffName = phone.StaffName,
+               
+        //    };
+        //}
+
+        //private static SwapPhoneDTO MapToDto(Phone phone)
+        //{
+        //    return new SwapPhoneDTO
+        //    {
+        //        PhoneID = phone.PhoneID,
+        //        PhoneNumber = phone.PhoneNumber,
+        //        StaffName = phone.StaffName,
+        //    };
+        //}
     }
 }
