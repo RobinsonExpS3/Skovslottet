@@ -59,4 +59,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseCors("blazorApp");
+
 app.Run();
