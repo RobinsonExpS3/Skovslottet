@@ -27,6 +27,15 @@ builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
         .AddInterceptors(ai.GetRequiredService<AuditInterceptor>()));
 
+builder.Services.AddCors(options => {
+    options.AddPolicy("blazorApp", policyBuilder => {
+        policyBuilder.WithOrigins("https://localhost:5001");
+        policyBuilder.AllowAnyHeader();
+        policyBuilder.AllowAnyMethod();
+        policyBuilder.AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
