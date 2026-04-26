@@ -8,5 +8,6 @@
 
         public Guid ResidentID { get; set; }
         public Resident Resident { get; set; }
+
     }
 }
