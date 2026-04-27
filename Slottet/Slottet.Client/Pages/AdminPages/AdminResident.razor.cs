@@ -34,10 +34,6 @@ namespace Slottet.Client.Pages.AdminPages
                 residents = await httpClient!.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
                 groceryDays = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
                 paymentMethods = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
-
-                //var source = residents.FirstOrDefault();
-                //groceryDays = source?.GroceryDays?.ToList() ?? new();
-                //paymentMethods = source?.PaymentMethods?.ToList() ?? new();
             } catch {
                 residents = new();
                 groceryDays = new();
@@ -65,9 +61,6 @@ namespace Slottet.Client.Pages.AdminPages
             medicineTimes = dto?.MedicineTimes
                 .Select(t => new TimeInput { Time = TimeOnly.FromDateTime(t) })
                 .ToList() ?? new();
-
-            //groceryDays = dto?.GroceryDays?.ToList() ?? groceryDays;
-            //paymentMethods = dto?.PaymentMethods?.ToList() ?? paymentMethods;
         }
 
         private async Task CreateAsync() {

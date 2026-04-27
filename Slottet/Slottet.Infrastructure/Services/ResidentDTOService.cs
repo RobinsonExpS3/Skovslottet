@@ -56,9 +56,6 @@ namespace Slottet.Infrastructure.Services {
                 .Select(m => m.MedicineTime)
                 .ToListAsync();
 
-            //var groceryDaysTask = await GetGroceryDayLookupAsync();
-            //var paymentMethodsTask = await GetPaymentMethodsLookupAsync();
-
             residentDto.GroceryDays = await GetGroceryDayLookupAsync();
             residentDto.PaymentMethods = await GetPaymentMethodsLookupAsync();
 
