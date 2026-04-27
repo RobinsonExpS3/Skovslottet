@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
-{
-
-}
 
 namespace Slottet.Infrastructure.Data.Configurations
 {
