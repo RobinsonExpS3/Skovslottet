@@ -21,7 +21,7 @@ namespace Slottet.Client.Pages.AdminPages
             try
             {
                 staffMembers = await httpClient.GetFromJsonAsync<List<Staff>>(
-                    "api/Staff/staffMembers"
+                    "api/Staff/Staffs"
                 );
             }
             catch
@@ -115,5 +115,6 @@ namespace Slottet.Client.Pages.AdminPages
             public string Initials { get; set; }
             public string Role { get; set; }
         }
+        
     }
 }

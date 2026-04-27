@@ -42,7 +42,7 @@ namespace Slottet.API.Controllers
 
         //Post: special responsibility
         [HttpPost]
-        public async Task<ActionResult<SpecialResponsibility>> CreateSpecialResponsibilityAsync([FromBody] SpecialResponsibility specialResponsibility) {
+        public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibility specialResponsibility) {
             if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty) {
                 return BadRequest();
             }
@@ -59,7 +59,7 @@ namespace Slottet.API.Controllers
 
         //Put: special responsibility by id
         [HttpPut("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> UpdateSpecialResponsibilityAsync(Guid id, [FromBody] SpecialResponsibility specialResponsibility) {
+        public async Task<ActionResult<SpecialResponsibility>> UpdateAsync(Guid id, [FromBody] SpecialResponsibility specialResponsibility) {
             if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty) {
                 return BadRequest();
             }
@@ -81,7 +81,7 @@ namespace Slottet.API.Controllers
 
         //Delete: special responsibility by id
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteSpecialResponsibilityAsync(Guid id) {
+        public async Task<ActionResult> DeleteAsync(Guid id) {
             var existingSpecialResponsibility = await _context.SpecialResponsibilities
                 .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
 
