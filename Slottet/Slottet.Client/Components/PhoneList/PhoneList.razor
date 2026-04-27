@@ -1,0 +1,68 @@
+<div class="liste-editor">
+
+    <header class="liste-header">
+        <h2>☎️ Telefonnumre</h2>
+    </header>
+
+    <div class="liste-body">
+        @for (int i = 0; i < _editItems.Count; i++)
+        {
+            var index = i;
+            <div class="liste-row">
+                <input class="liste-input liste-input--nummer"
+                       type="text"
+                       value="@_editItems[index].Number"
+                       @onchange="e => _editItems[index].Number = e.Value?.ToString() ?? string.Empty"
+                       placeholder="Telefonnummer…" />
+
+                <select class="liste-select"
+                        value="@_editItems[index].StaffName"
+                        @onchange="e => _editItems[index].StaffName = e.Value?.ToString() ?? string.Empty">
+                    <option value="">– Medarbejder –</option>
+                    @foreach (var staffMember in AllStaff)
+                    {
+                        <option value="@staffMember" selected="@(_editItems[index].StaffName == staffMember)">@staffMember</option>
+                    }
+                </select>
+
+                <button class="btn-fjern" @onclick="() => RemoveItem(index)" title="Fjern">✕</button>
+            </div>
+        }
+
+        <button class="btn-tilføj" @onclick="AddItem">+ Tilføj nummer</button>
+
+        <div class="liste-actions">
+            <button class="btn-gem" @onclick="Save">Gem ændringer</button>
+            @if (_saved)
+            {
+                <span class="gem-bekræftelse">✓ Gemt</span>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public List<PhoneEntryDto> Items    { get; set; } = default!;
+    [Parameter]                 public List<string>        AllStaff { get; set; } = new();
+    [Parameter]                 public EventCallback<List<PhoneEntryDto>> OnSave { get; set; }
+
+    private List<PhoneEntryDto> _editItems = new();
+    private bool                _saved;
+
+    protected override void OnParametersSet()
+    {
+        _editItems = Items.Select(p => new PhoneEntryDto { Number = p.Number, StaffName = p.StaffName }).ToList();
+        _saved     = false;
+    }
+
+    private void AddItem()    => _editItems.Add(new PhoneEntryDto());
+    private void RemoveItem(int i) => _editItems.RemoveAt(i);
+
+    private async Task Save()
+    {
+        Items.Clear();
+        Items.AddRange(_editItems.Where(p => !string.IsNullOrWhiteSpace(p.Number)));
+        _saved = true;
+        await OnSave.InvokeAsync(Items);
+    }
+}

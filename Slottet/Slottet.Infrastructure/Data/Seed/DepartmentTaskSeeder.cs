@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Seed
@@ -10,11 +10,15 @@ namespace Slottet.Infrastructure.Data.Seed
             if (await context.DepartmentTasks.AnyAsync())
                 return await context.DepartmentTasks.ToListAsync();
 
+            var skoven = await context.Departments.FirstOrDefaultAsync(d => d.DepartmentName == "Skoven");
+            if (skoven is null)
+                throw new InvalidOperationException("Department 'Skoven' was not found.");
+
             var departmentTasks = new List<DepartmentTask>
             {
-                new DepartmentTask { DepartmentTaskID = Guid.NewGuid(), DepartmentTaskName = "Borger kalender"},
-                new DepartmentTask { DepartmentTaskID = Guid.NewGuid(), DepartmentTaskName = "FMK"},
-                new DepartmentTask { DepartmentTaskID = Guid.NewGuid(), DepartmentTaskName = "Sundhedsplaner"}
+                new DepartmentTask { DepartmentTaskID = skoven.DepartmentID, DepartmentTaskName = "Borger kalender"},
+                new DepartmentTask { DepartmentTaskID = skoven.DepartmentID, DepartmentTaskName = "FMK"},
+                new DepartmentTask { DepartmentTaskID = skoven.DepartmentID, DepartmentTaskName = "Sundhedsplaner"}
 
             };
 

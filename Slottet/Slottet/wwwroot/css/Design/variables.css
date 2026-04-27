@@ -8,7 +8,7 @@
     --color-primary-lighter: #C8DFC4;
 
     /* ── Baggrunde ── */
-    --color-bg-page:             #E8EDE3;
+    --color-bg-page:             #F5ECD7;
     --color-bg-card:             #FAFDF8;
     --color-bg-section:          #F2F7F0;
     --color-bg-section-header:   #EAF3E7;
@@ -55,7 +55,4 @@
     --nav-width:     128px;
     --nav-bg:        var(--color-primary-dark);
     --nav-btn-size:  60px;
-    --nav-icon-size: 1.875rem;
-    --nav-btn-radius: var(--radius-nav-btn);
-
-}
+    --nav-icon-size: 1

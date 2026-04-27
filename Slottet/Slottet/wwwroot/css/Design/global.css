@@ -1,3 +1,9 @@
+/* ── Risk-farver (globale — bruges af ShiftBoard grid og BorgerKortVisning overlay) ── */
+.risk-default { background-color: var(--color-bg-section-header); }
+.risk-green   { background-color: var(--color-risk-green-bg)    !important; border-color: var(--color-risk-green-border)  !important; }
+.risk-yellow  { background-color: var(--color-risk-yellow-bg)   !important; border-color: var(--color-risk-yellow-border) !important; }
+.risk-red     { background-color: var(--color-risk-red-bg)      !important; border-color: var(--color-risk-red-border)    !important; }
+
 /* ── Nav-knapper (global override — Blazor scoped CSS rammer ikke NavLink <a>-tags) ── */
 
 .nav-icon-btn,
