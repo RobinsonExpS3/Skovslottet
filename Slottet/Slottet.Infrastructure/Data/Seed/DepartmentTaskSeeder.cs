@@ -16,9 +16,9 @@ namespace Slottet.Infrastructure.Data.Seed
 
             var departmentTasks = new List<DepartmentTask>
             {
-                new DepartmentTask { DepartmentTaskID = skoven.DepartmentID, DepartmentTaskName = "Borger kalender"},
-                new DepartmentTask { DepartmentTaskID = skoven.DepartmentID, DepartmentTaskName = "FMK"},
-                new DepartmentTask { DepartmentTaskID = skoven.DepartmentID, DepartmentTaskName = "Sundhedsplaner"}
+                new DepartmentTask { DepartmentTaskID = Guid.NewGuid(), DepartmentTaskName = "Borger kalender", DepartmentID = skoven.DepartmentID},
+                new DepartmentTask { DepartmentTaskID = Guid.NewGuid(), DepartmentTaskName = "FMK", DepartmentID = skoven.DepartmentID},
+                new DepartmentTask { DepartmentTaskID = Guid.NewGuid(), DepartmentTaskName = "Sundhedsplaner", DepartmentID = skoven.DepartmentID}
 
             };
 
