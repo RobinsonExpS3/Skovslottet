@@ -13,7 +13,7 @@ namespace Slottet.Infrastructure.Data.Configurations
             entity.Property(p => p.PNGivenTime)
                 .IsRequired();
 
-            entity.Property(p => p.PNStatus)
+            entity.Property(p => p.PNReason)
                 .IsRequired()
                 .HasMaxLength(255);
 
