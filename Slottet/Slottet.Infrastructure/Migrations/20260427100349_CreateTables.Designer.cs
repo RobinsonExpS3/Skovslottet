@@ -12,8 +12,8 @@ using Slottet.Infrastructure.Data;
 namespace Slottet.Infrastructure.Migrations
 {
     [DbContext(typeof(SlottetDBContext))]
-    [Migration("20260424085337_New-Test-Data")]
-    partial class NewTestData
+    [Migration("20260427100349_CreateTables")]
+    partial class CreateTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,50 @@ namespace Slottet.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Slottet.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<Guid>("AuditLogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("KeyValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NewValuesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValuesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PerformedAtTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("PerformedByStaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PerformedByStaffName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AuditLogID");
+
+                    b.ToTable("AuditLogs");
+                });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Department", b =>
                 {
@@ -327,6 +371,24 @@ namespace Slottet.Infrastructure.Migrations
                     b.ToTable("Staffs");
                 });
 
+            modelBuilder.Entity("Slottet.Domain.Entities.StaffPhone", b =>
+                {
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PhoneID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("StaffID", "PhoneID", "AssignedAt");
+
+                    b.HasIndex("PhoneID");
+
+                    b.ToTable("StaffPhones");
+                });
+
             modelBuilder.Entity("Slottet.Domain.Entities.StaffResidentStatus", b =>
                 {
                     b.Property<Guid>("StaffID")
@@ -476,6 +538,25 @@ namespace Slottet.Infrastructure.Migrations
                     b.Navigation("Department");
                 });
 
+            modelBuilder.Entity("Slottet.Domain.Entities.StaffPhone", b =>
+                {
+                    b.HasOne("Slottet.Domain.Entities.Phone", "Phone")
+                        .WithMany("StaffPhones")
+                        .HasForeignKey("PhoneID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
+                        .WithMany("StaffPhones")
+                        .HasForeignKey("StaffID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Phone");
+
+                    b.Navigation("Staff");
+                });
+
             modelBuilder.Entity("Slottet.Domain.Entities.StaffResidentStatus", b =>
                 {
                     b.HasOne("Slottet.Domain.Entities.ResidentStatus", "ResidentStatus")
@@ -533,6 +614,11 @@ namespace Slottet.Infrastructure.Migrations
                     b.Navigation("ResidentPaymentMethods");
                 });
 
+            modelBuilder.Entity("Slottet.Domain.Entities.Phone", b =>
+                {
+                    b.Navigation("StaffPhones");
+                });
+
             modelBuilder.Entity("Slottet.Domain.Entities.Resident", b =>
                 {
                     b.Navigation("Medicines");
@@ -565,6 +651,8 @@ namespace Slottet.Infrastructure.Migrations
 
             modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
                 {
+                    b.Navigation("StaffPhones");
+
                     b.Navigation("StaffResidentStatuses");
 
                     b.Navigation("StaffShifts");

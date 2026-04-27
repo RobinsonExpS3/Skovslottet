@@ -152,6 +152,9 @@ namespace Slottet.Infrastructure.Migrations
                     b.Property<DateTime>("PNGivenTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime>("PNRegisteredTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("PNStatus")
                         .IsRequired()
                         .HasMaxLength(255)
