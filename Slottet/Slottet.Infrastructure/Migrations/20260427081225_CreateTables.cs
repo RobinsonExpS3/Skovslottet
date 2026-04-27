@@ -6,11 +6,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Slottet.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateTable : Migration
+    public partial class CreateTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AuditLogs",
+                columns: table => new
+                {
+                    AuditLogID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TimeStamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Action = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    TableName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    KeyValues = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OldValuesJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NewValuesJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PerformedByStaffID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PerformedByStaffName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    PerformedAtTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogs", x => x.AuditLogID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Departments",
                 columns: table => new
@@ -272,9 +292,10 @@ namespace Slottet.Infrastructure.Migrations
                 columns: table => new
                 {
                     PNID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PNTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PNGivenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PNStatus = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    ResidentStatusID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ResidentID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResidentStatusID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -283,7 +304,12 @@ namespace Slottet.Infrastructure.Migrations
                         name: "FK_PNs_ResidentStatuses_ResidentStatusID",
                         column: x => x.ResidentStatusID,
                         principalTable: "ResidentStatuses",
-                        principalColumn: "ResidentStatusID",
+                        principalColumn: "ResidentStatusID");
+                    table.ForeignKey(
+                        name: "FK_PNs_Residents_ResidentID",
+                        column: x => x.ResidentID,
+                        principalTable: "Residents",
+                        principalColumn: "ResidentID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -325,6 +351,11 @@ namespace Slottet.Infrastructure.Migrations
                 name: "IX_Phones_DepartmentID",
                 table: "Phones",
                 column: "DepartmentID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PNs_ResidentID",
+                table: "PNs",
+                column: "ResidentID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PNs_ResidentStatusID",
@@ -375,6 +406,9 @@ namespace Slottet.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AuditLogs");
+
             migrationBuilder.DropTable(
                 name: "DepartmentTasks");
 
