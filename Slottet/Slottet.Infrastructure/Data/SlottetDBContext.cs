@@ -27,6 +27,10 @@ namespace Slottet.Infrastructure.Data
         public DbSet<Staff> Staffs => Set<Staff>();
         public DbSet<StaffResidentStatus> StaffResidentStatuses => Set<StaffResidentStatus>();
         public DbSet<StaffShift> StaffShifts => Set<StaffShift>();
+        public DbSet<StaffPhone> StaffPhones => Set<StaffPhone>();
+        public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+        public DbSet<StaffPN> StaffPNs => Set<StaffPN>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

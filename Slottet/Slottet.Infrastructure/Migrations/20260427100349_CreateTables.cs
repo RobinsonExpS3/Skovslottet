@@ -6,11 +6,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Slottet.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class CreateTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AuditLogs",
+                columns: table => new
+                {
+                    AuditLogID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TimeStamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Action = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    TableName = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    KeyValues = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OldValuesJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NewValuesJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PerformedByStaffID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    PerformedByStaffName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    PerformedAtTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogs", x => x.AuditLogID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Departments",
                 columns: table => new
@@ -172,6 +192,31 @@ namespace Slottet.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StaffPhones",
+                columns: table => new
+                {
+                    StaffID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PhoneID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AssignedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaffPhones", x => new { x.StaffID, x.PhoneID, x.AssignedAt });
+                    table.ForeignKey(
+                        name: "FK_StaffPhones_Phones_PhoneID",
+                        column: x => x.PhoneID,
+                        principalTable: "Phones",
+                        principalColumn: "PhoneID",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_StaffPhones_Staffs_StaffID",
+                        column: x => x.StaffID,
+                        principalTable: "Staffs",
+                        principalColumn: "StaffID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StaffShifts",
                 columns: table => new
                 {
@@ -272,9 +317,11 @@ namespace Slottet.Infrastructure.Migrations
                 columns: table => new
                 {
                     PNID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PNTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PNGivenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PNStatus = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    ResidentStatusID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    PNRegisteredTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ResidentID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ResidentStatusID = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -283,7 +330,12 @@ namespace Slottet.Infrastructure.Migrations
                         name: "FK_PNs_ResidentStatuses_ResidentStatusID",
                         column: x => x.ResidentStatusID,
                         principalTable: "ResidentStatuses",
-                        principalColumn: "ResidentStatusID",
+                        principalColumn: "ResidentStatusID");
+                    table.ForeignKey(
+                        name: "FK_PNs_Residents_ResidentID",
+                        column: x => x.ResidentID,
+                        principalTable: "Residents",
+                        principalColumn: "ResidentID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -327,6 +379,11 @@ namespace Slottet.Infrastructure.Migrations
                 column: "DepartmentID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PNs_ResidentID",
+                table: "PNs",
+                column: "ResidentID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PNs_ResidentStatusID",
                 table: "PNs",
                 column: "ResidentStatusID");
@@ -357,6 +414,11 @@ namespace Slottet.Infrastructure.Migrations
                 column: "ShiftBoardID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StaffPhones_PhoneID",
+                table: "StaffPhones",
+                column: "PhoneID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StaffResidentStatuses_ResidentStatusID",
                 table: "StaffResidentStatuses",
                 column: "ResidentStatusID");
@@ -376,13 +438,13 @@ namespace Slottet.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AuditLogs");
+
+            migrationBuilder.DropTable(
                 name: "DepartmentTasks");
 
             migrationBuilder.DropTable(
                 name: "Medicines");
-
-            migrationBuilder.DropTable(
-                name: "Phones");
 
             migrationBuilder.DropTable(
                 name: "PNs");
@@ -394,6 +456,9 @@ namespace Slottet.Infrastructure.Migrations
                 name: "SpecialResponsibilities");
 
             migrationBuilder.DropTable(
+                name: "StaffPhones");
+
+            migrationBuilder.DropTable(
                 name: "StaffResidentStatuses");
 
             migrationBuilder.DropTable(
@@ -401,6 +466,9 @@ namespace Slottet.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "PaymentMethods");
+
+            migrationBuilder.DropTable(
+                name: "Phones");
 
             migrationBuilder.DropTable(
                 name: "ResidentStatuses");
