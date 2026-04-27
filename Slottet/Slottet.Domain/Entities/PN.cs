@@ -10,5 +10,7 @@
         public Guid ResidentID { get; set; }
         public Resident Resident { get; set; }
 
+        public ICollection<StaffPN> StaffPNs { get; set; } = new List<StaffPN>();
+
     }
 }
