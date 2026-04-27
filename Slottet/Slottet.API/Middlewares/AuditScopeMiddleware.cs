@@ -30,7 +30,7 @@ namespace Slottet.API.Middlewares {
                 auditScope.PerformedByStaffID = null;
             }
 
-                await _next(context);
+            await _next(context);
         }
     }
 }
