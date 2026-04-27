@@ -1,9 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Slottet.API.Controllers;
-using Slottet.API.Middlewares;
 using Slottet.Application.Interfaces;
-using Slottet.Infrastructure;
-using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
 using Slottet.Infrastructure.Services;
 
@@ -47,6 +44,11 @@ builder.Services.AddCors(options =>
         policyBuilder.AllowCredentials();
     });
 });
+builder.Services.AddDbContext<SlottetDBContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
+builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
+builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
 
 var app = builder.Build();
 
@@ -59,8 +61,6 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<SlottetDBContext>();
 
-    
-    await context.Database.MigrateAsync();
     await DBSeeder.SeedAsync(context);
 }
 

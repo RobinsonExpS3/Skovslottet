@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Slottet.Application.Interfaces;
-using Slottet.Domain.Entities;
-using Slottet.Infrastructure.Data;
 using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class StaffController : Controller 
+    public class StaffController : Controller
     {
         private readonly IStaffDTOService _staffService;
 
@@ -23,7 +20,7 @@ namespace Slottet.API.Controllers
         public async Task<ActionResult<IEnumerable<EditStaffDTO>>> GetAllAsync()
         {
             var staffs = await _staffService.GetAllAsync();
-            
+
             return Ok(staffs);
         }
 
@@ -71,8 +68,9 @@ namespace Slottet.API.Controllers
             }
 
             var updated = await _staffService.UpdateAsync(id, dto);
-            
-            if(!updated) {
+
+            if (!updated)
+            {
                 return NotFound();
             }
 

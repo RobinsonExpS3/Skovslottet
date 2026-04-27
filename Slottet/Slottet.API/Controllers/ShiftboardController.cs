@@ -16,23 +16,23 @@ namespace Slottet.API.Controllers
             _context = context;
         }
 
-        [HttpGet("ShiftBoards")]
-        public async Task<ActionResult<IEnumerable<ShiftBoard>>> GetAllAsync()
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<ShiftBoard>>> GetAll(CancellationToken ct)
         {
-            var shiftboards = await _context.Set<ShiftBoard>()
+            var shiftboards = await _context.ShiftBoards
                 .AsNoTracking()
                 .OrderBy(s => s.StartDateTime)
-                .ToListAsync();
+                .ToListAsync(ct);
 
             return Ok(shiftboards);
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<ActionResult<ShiftBoard>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<ShiftBoard>> GetById(Guid id, CancellationToken ct)
         {
-            var shiftboard = await _context.Set<ShiftBoard>()
+            var shiftboard = await _context.ShiftBoards
                 .AsNoTracking()
-                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id);
+                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
 
             if (shiftboard is null)
                 return NotFound();
@@ -41,46 +41,52 @@ namespace Slottet.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ShiftBoard>> CreateAsync([FromBody] ShiftBoard shiftboard)
+        public async Task<ActionResult<ShiftBoard>> Create([FromBody] ShiftBoard shiftboard, CancellationToken ct)
         {
-            _context.Set<ShiftBoard>().Add(shiftboard);
-            await _context.SaveChangesAsync();
+            if (shiftboard == null)
+                return BadRequest();
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = shiftboard.ShiftBoardID }, shiftboard);
+            _context.ShiftBoards.Add(shiftboard);
+            await _context.SaveChangesAsync(ct);
+
+            return CreatedAtAction(nameof(GetById), new { id = shiftboard.ShiftBoardID }, shiftboard);
         }
 
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] ShiftBoard shiftboard)
+        public async Task<IActionResult> Update(Guid id, [FromBody] ShiftBoard shiftboard, CancellationToken ct)
         {
             if (id != shiftboard.ShiftBoardID)
                 return BadRequest("Id i URL matcher ikke objektets id.");
 
-            var exists = await _context.Set<ShiftBoard>()
-                .AnyAsync(sb => sb.ShiftBoardID == id);
+            try
+            {
+                _context.Entry(shiftboard).State = EntityState.Modified;
+                await _context.SaveChangesAsync(ct);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.ShiftBoards.AnyAsync(sb => sb.ShiftBoardID == id, ct))
+                    return NotFound();
 
-            if (!exists)
-                return NotFound();
-
-            _context.Entry(shiftboard).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+                throw;
+            }
 
             return NoContent();
         }
 
         [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeleteAsync(Guid id)
+        public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
         {
-            var shiftboard = await _context.Set<ShiftBoard>()
-                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id);
+            var shiftboard = await _context.ShiftBoards
+                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
 
             if (shiftboard == null)
                 return NotFound();
 
-            _context.Set<ShiftBoard>().Remove(shiftboard);
-            await _context.SaveChangesAsync();
+            _context.ShiftBoards.Remove(shiftboard);
+            await _context.SaveChangesAsync(ct);
 
             return NoContent();
         }
-
     }
 }

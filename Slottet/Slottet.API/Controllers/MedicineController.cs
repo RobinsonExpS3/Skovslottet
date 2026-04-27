@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Slottet.Domain.Entities;
-using Slottet.Infrastructure.Data;
+using Microsoft.AspNetCore.Mvc;
+using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
 namespace Slottet.API.Controllers
@@ -10,50 +8,29 @@ namespace Slottet.API.Controllers
     [ApiController]
     public class MedicineController : ControllerBase
     {
-        private readonly SlottetDBContext _context;
+        private readonly IMedicineDTOService _medicineService;
 
-        public MedicineController(SlottetDBContext context)
+        public MedicineController(IMedicineDTOService medicineService)
         {
-            _context = context;
+            _medicineService = medicineService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MedicineAPI_DTO>>> GetAll()
         {
-            var medicines = await _context.Set<Medicine>()
-                .AsNoTracking()
-                .OrderBy(m => m.ResidentID)
-                .Select(m => new MedicineAPI_DTO
-                {
-                    MedicineID = m.MedicineID,
-                    ResidentID = m.ResidentID,
-                    MedicineTime = m.MedicineTime,
-                    MedicineGivenTime = m.MedicineGivenTime,
-                    MedicineRegisteredTime = m.MedicineRegisteredTime
-                })
-                .ToListAsync();
-
+            var medicines = await _medicineService.GetAllAsync();
             return Ok(medicines);
         }
 
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<MedicineAPI_DTO>> GetById(Guid id)
         {
-            var medicine = await _context.Set<Medicine>()
-                .AsNoTracking()
-                .Where(m => m.MedicineID == id)
-                .Select(m => new MedicineAPI_DTO
-                {
-                    MedicineID = m.MedicineID,
-                    ResidentID = m.ResidentID,
-                    MedicineTime = m.MedicineTime,
-                    MedicineGivenTime = m.MedicineGivenTime,
-                    MedicineRegisteredTime = m.MedicineRegisteredTime
-                })
-                .FirstOrDefaultAsync();
+            var medicine = await _medicineService.GetByIdAsync(id);
 
             if (medicine == null)
+            {
                 return NotFound();
+            }
 
             return Ok(medicine);
         }
@@ -62,49 +39,27 @@ namespace Slottet.API.Controllers
         public async Task<ActionResult<MedicineAPI_DTO>> Create([FromBody] MedicineAPI_DTO dto)
         {
             if (dto == null || dto.ResidentID == Guid.Empty)
+            {
                 return BadRequest();
+            }
 
-            var medicine = new Medicine
-            {
-                MedicineID = Guid.NewGuid(),
-                ResidentID = dto.ResidentID,
-                MedicineTime = dto.MedicineTime,
-                MedicineGivenTime = dto.MedicineGivenTime ?? DateTime.Now,
-                MedicineRegisteredTime = DateTime.Now
-            };
-
-            _context.Set<Medicine>().Add(medicine);
-            await _context.SaveChangesAsync();
-
-            var result = new MedicineAPI_DTO
-            {
-                MedicineID = medicine.MedicineID,
-                ResidentID = medicine.ResidentID,
-                MedicineTime = medicine.MedicineTime,
-                MedicineGivenTime = medicine.MedicineGivenTime,
-                MedicineRegisteredTime = medicine.MedicineRegisteredTime
-            };
-
-            return CreatedAtAction(nameof(GetById), new { id = medicine.MedicineID }, result);
+            var result = await _medicineService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = result.MedicineID }, result);
         }
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] MedicineAPI_DTO dto)
         {
             if (dto == null || dto.MedicineID != id || dto.ResidentID == Guid.Empty)
+            {
                 return BadRequest();
+            }
 
-            var existingMedicine = await _context.Set<Medicine>()
-                .FirstOrDefaultAsync(m => m.MedicineID == id);
-
-            if (existingMedicine == null)
+            var updated = await _medicineService.UpdateAsync(id, dto);
+            if (!updated)
+            {
                 return NotFound();
-
-            existingMedicine.ResidentID = dto.ResidentID;
-            existingMedicine.MedicineTime = dto.MedicineTime;
-            existingMedicine.MedicineGivenTime = dto.MedicineGivenTime ?? existingMedicine.MedicineGivenTime;
-
-            await _context.SaveChangesAsync();
+            }
 
             return NoContent();
         }
@@ -112,14 +67,11 @@ namespace Slottet.API.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var medicine = await _context.Set<Medicine>()
-                .FirstOrDefaultAsync(m => m.MedicineID == id);
-
-            if (medicine == null)
+            var deleted = await _medicineService.DeleteAsync(id);
+            if (!deleted)
+            {
                 return NotFound();
-
-            _context.Set<Medicine>().Remove(medicine);
-            await _context.SaveChangesAsync();
+            }
 
             return NoContent();
         }

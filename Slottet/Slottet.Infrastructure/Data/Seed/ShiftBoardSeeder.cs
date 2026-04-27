@@ -6,8 +6,8 @@ namespace Slottet.Infrastructure.Data.Seed
     {
         public static async Task SeedAsync(SlottetDBContext context)
         {
-            var startDate = DateTime.Today;
-            var endDate = startDate.AddDays(30);
+            var startDate = DateTime.Today.AddDays(-30);
+            var endDate = startDate.AddDays(60);
 
             var shiftsToAdd = new List<ShiftBoard>();
 
@@ -24,33 +24,25 @@ namespace Slottet.Infrastructure.Data.Seed
                 shiftsToAdd.Add(new ShiftBoard
                 {
                     ShiftBoardID = Guid.NewGuid(),
-                    ShiftType = "Nat",
-                    StartDateTime = day,
-                    EndDateTime = day.AddHours(6)
-                });
-
-                shiftsToAdd.Add(new ShiftBoard
-                {
-                    ShiftBoardID = Guid.NewGuid(),
-                    ShiftType = "Morgen",
-                    StartDateTime = day.AddHours(6),
-                    EndDateTime = day.AddHours(12)
-                });
-
-                shiftsToAdd.Add(new ShiftBoard
-                {
-                    ShiftBoardID = Guid.NewGuid(),
-                    ShiftType = "Eftermiddag",
-                    StartDateTime = day.AddHours(12),
-                    EndDateTime = day.AddHours(18)
+                    ShiftType = "Dag",
+                    StartDateTime = day.AddHours(7),
+                    EndDateTime = day.AddHours(15)
                 });
 
                 shiftsToAdd.Add(new ShiftBoard
                 {
                     ShiftBoardID = Guid.NewGuid(),
                     ShiftType = "Aften",
-                    StartDateTime = day.AddHours(18),
-                    EndDateTime = nextDay
+                    StartDateTime = day.AddHours(15),
+                    EndDateTime = day.AddHours(23)
+                });
+
+                shiftsToAdd.Add(new ShiftBoard
+                {
+                    ShiftBoardID = Guid.NewGuid(),
+                    ShiftType = "Nat",
+                    StartDateTime = day.AddHours(23),
+                    EndDateTime = nextDay.AddHours(7)
                 });
             }
 
