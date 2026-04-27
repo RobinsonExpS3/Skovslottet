@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Slottet.Infrastructure\Slottet.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
 </Project>
