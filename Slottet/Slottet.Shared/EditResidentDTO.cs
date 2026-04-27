@@ -11,7 +11,6 @@ namespace Slottet.Shared {
 
         public List<Guid> PaymentMethodIDs { get; set; } = new();
         public List<DateTime> MedicineTimes { get; set; } = new();
-        public List<Guid> PNID { get; set; } = new();
 
         public List<ResidentLookupDTO> GroceryDays { get; set; } = new();
         public List<ResidentLookupDTO> PaymentMethods { get; set; } = new();
