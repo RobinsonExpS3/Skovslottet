@@ -36,7 +36,7 @@ namespace Slottet.Infrastructure.Services
             var staffPNGiven = new StaffPN
             {
                 StaffID = dto.StaffID,
-                PNID = dto.PNID,
+                PNID = dto.PNID
             };
 
             _context.StaffPNs.Update(staffPNGiven);
@@ -47,10 +47,12 @@ namespace Slottet.Infrastructure.Services
 
         private static System.Linq.Expressions.Expression<Func<StaffPN, StaffPNDTO>> MapToDtoExpression()
         {
-            return pn => new StaffPNDTO
+            return sp => new StaffPNDTO
             {
-                PNID = pn.PNID,
-                StaffID = pn.StaffID
+                StaffID = sp.StaffID,
+                StaffName = sp.Staff.StaffName,
+                PNID = sp.PNID,
+                PNName = sp.PN.PNReason
             };
         }
     }
