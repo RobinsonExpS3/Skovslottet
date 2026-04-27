@@ -30,7 +30,7 @@ namespace Slottet.Infrastructure.Data
             await PhoneSeeder.SeedAsync(context);
             await ResidentPaymentMethodSeeder.SeedAsync(context);
             //await StaffResidentStatusSeeder.SeedAsync(context);
-            //await DepartmentTaskSeeder.SeedAsync(context);
+            await DepartmentTaskSeeder.SeedAsync(context);
             //await PNSeeder.SeedAsync(context);//Megan
             //await RiskLevelSeeder.SeedAsync(context); 
             await SpecialResponsibilitySeeder.SeedAsync(context); //Megan - OBS! Placering relationelt ift. shiftboard og department
