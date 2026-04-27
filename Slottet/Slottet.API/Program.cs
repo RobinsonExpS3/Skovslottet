@@ -35,6 +35,13 @@ builder.Services.AddCors(options =>
         policyBuilder.AllowAnyMethod();
         policyBuilder.AllowCredentials();
     });
+
+    options.AddPolicy("blazorApp2", policyBuilder => {
+        policyBuilder.WithOrigins("https://localhost:7201");
+        policyBuilder.AllowAnyHeader();
+        policyBuilder.AllowAnyMethod();
+        policyBuilder.AllowCredentials();
+    });
 });
 
 var app = builder.Build();
