@@ -12,8 +12,8 @@ using Slottet.Infrastructure.Data;
 namespace Slottet.Infrastructure.Migrations
 {
     [DbContext(typeof(SlottetDBContext))]
-    [Migration("20260424092951_Test-Data-AdminStaff")]
-    partial class TestDataAdminStaff
+    [Migration("20260427075111_FirstTest")]
+    partial class FirstTest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

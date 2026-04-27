@@ -5,7 +5,7 @@
 namespace Slottet.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class TestDataAdminStaff : Migration
+    public partial class FirstTest : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
