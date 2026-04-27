@@ -22,6 +22,7 @@ namespace Slottet.API.Controllers
             return Ok(staffPNs);
         }
 
+        [HttpPost]
         public async Task<IActionResult> StaffGivesPN([FromBody] StaffPNDTO dto)
         {
 
