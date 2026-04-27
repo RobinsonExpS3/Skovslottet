@@ -22,12 +22,8 @@ namespace Slottet.Infrastructure.Services {
                 .Select(MapToDtoExpression())
                 .ToListAsync();
 
-            var groceryDaysTask = GetGroceryDayLookupAsync();
-            var paymentMethodsTask = GetPaymentMethodsLookupAsync();
-            await Task.WhenAll(groceryDaysTask, paymentMethodsTask);
-
-            var groceryDays = groceryDaysTask.Result;
-            var paymentMethods = paymentMethodsTask.Result;
+            var groceryDays = await GetGroceryDayLookupAsync();
+            var paymentMethods = await GetPaymentMethodsLookupAsync();
 
             foreach(var resident in residents) {
                 resident.GroceryDays = groceryDays;
