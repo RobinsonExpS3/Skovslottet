@@ -1,0 +1,419 @@
+/* ─────────────────────────────────────
+   RESIDENT CARD — interaktivt overlay-kort
+   ───────────────────────────────────── */
+.bkv-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Header ── */
+.bkv-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 52px 14px 20px;
+    border-bottom: 2px solid var(--color-primary-light);
+    gap: 12px;
+}
+
+.bkv-navn {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text-heading);
+}
+
+.bkv-risk-select {
+    padding: 4px 10px;
+    border: 1.5px solid rgba(0,0,0,0.2);
+    border-radius: 999px;
+    background-color: rgba(255,255,255,0.6);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    cursor: pointer;
+    appearance: auto;
+}
+
+/* ── Body ── */
+.bkv-body {
+    padding: 14px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ── 2-kolonne grid til sektionerne ── */
+.bkv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* ── Generisk sektion ── */
+.bkv-section {
+    background-color: var(--color-bg-section);
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ── Labels ── */
+.bkv-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-label);
+}
+
+.bkv-label--center {
+    text-align: center;
+}
+
+/* ── Status ── */
+.bkv-status-section {
+    grid-column: 1 / -1;
+}
+
+.bkv-status-input {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    background-color: #fff;
+    font-size: 0.88rem;
+    color: var(--color-text-dark);
+    resize: vertical;
+    font-family: inherit;
+    box-sizing: border-box;
+    line-height: 1.45;
+    text-align: left;
+}
+
+.bkv-status-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* ── Medicin ── */
+.bkv-medicin-section {
+    grid-column: 1 / -1;
+}
+
+.bkv-medicin-slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.bkv-med-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 7px 12px;
+    border-radius: var(--radius-section);
+    border: 1.5px solid var(--color-primary-light);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    min-width: 58px;
+    background: none;
+}
+
+.bkv-med-slot:active { transform: scale(0.95); }
+
+.bkv-med-given {
+    background-color: var(--color-dose-given-bg);
+    border-color: var(--color-dose-given-border);
+}
+
+.bkv-med-not-given {
+    background-color: #fff;
+    border-style: dashed;
+    border-color: #bbb;
+    opacity: 0.75;
+}
+
+.bkv-med-tid  { font-size: 0.72rem; font-weight: 700; color: var(--color-primary-dark); }
+.bkv-med-ikon { font-size: 1.1rem; }
+
+.bkv-med-add {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-section);
+    border: 2px dashed var(--color-primary-light);
+    background: none;
+    font-size: 1.3rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.bkv-med-add:hover {
+    background-color: var(--color-bg-section-header);
+    border-color: var(--color-primary);
+}
+
+.bkv-ny-medicin-form {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── PN ── */
+.bkv-pn-section {
+    grid-column: 1;
+}
+
+.bkv-pn-entry {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-primary-lighter);
+    margin-bottom: 4px;
+}
+
+/* Saved entry: looks like a card, click to edit */
+.bkv-pn-entry--saved {
+    cursor: pointer;
+    border-radius: var(--radius-section);
+    padding: 6px 8px;
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-primary-lighter);
+    transition: background-color 0.12s, border-color 0.12s;
+}
+
+.bkv-pn-entry--saved:hover {
+    background-color: var(--color-bg-medicine-header);
+    border-color: var(--color-primary-light);
+}
+
+/* Editing entry: highlighted */
+.bkv-pn-entry--editing {
+    background-color: #fff;
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    padding: 8px;
+}
+
+.bkv-pn-field {
+    font-size: 0.82rem;
+    color: var(--color-text-dark);
+    line-height: 1.3;
+}
+
+.bkv-pn-reason {
+    color: var(--color-text-muted);
+    font-size: 0.76rem;
+}
+
+.bkv-pn-udstedt {
+    font-size: 0.72rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* Gem / Annuller row inside a PN entry */
+.bkv-pn-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 2px;
+}
+
+/* ── Personale ── */
+.bkv-personale-section {
+    grid-column: 2;
+}
+
+.bkv-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.bkv-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: 999px;
+    background-color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+}
+
+.bkv-pill-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    padding: 0;
+    line-height: 1;
+}
+
+.bkv-pill-remove:hover { color: var(--color-risk-red-border); }
+
+.bkv-pill-add {
+    border-style: dashed;
+    cursor: pointer;
+    background: none;
+    font-size: 1rem;
+    padding: 4px 10px;
+}
+
+.bkv-pill-add:hover {
+    background-color: var(--color-bg-section-header);
+    border-color: var(--color-primary);
+}
+
+.bkv-staff-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 8px;
+    background-color: var(--color-bg-card);
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    margin-top: 4px;
+}
+
+.bkv-staff-pick-btn {
+    padding: 3px 10px;
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: 999px;
+    background-color: #fff;
+    font-size: 0.75rem;
+    cursor: pointer;
+    color: var(--color-text-dark);
+    transition: background-color 0.12s;
+}
+
+.bkv-staff-pick-btn:hover {
+    background-color: var(--color-bg-medicine-header);
+    border-color: var(--color-primary);
+}
+
+/* ── Handledag + Betaling ── */
+.bkv-praktisk-section {
+    grid-column: 1 / -1;
+}
+
+.bkv-praktisk-row {
+    display: flex;
+    gap: 24px;
+}
+
+.bkv-praktisk-felt {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.bkv-betaling-tekst {
+    font-size: 0.88rem;
+    color: var(--color-text-muted);
+}
+
+/* ── Fælles input/select styling ── */
+.bkv-input,
+.bkv-input-small,
+.bkv-select {
+    padding: 6px 9px;
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    background-color: #fff;
+    font-size: 0.82rem;
+    color: var(--color-text-dark);
+    font-family: inherit;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.bkv-input        { width: 100%; }
+.bkv-input-small  { width: 80px; }
+.bkv-select       { min-width: 130px; }
+
+.bkv-input:focus,
+.bkv-input-small:focus,
+.bkv-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* ── Knapper (tilføj / ok / annuller) ── */
+.bkv-btn-tilfoej {
+    align-self: flex-start;
+    background: none;
+    border: 1.5px dashed var(--color-primary-light);
+    border-radius: var(--radius-section);
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.bkv-btn-tilfoej:hover { background-color: var(--color-bg-section-header); }
+
+.bkv-btn-ok {
+    padding: 4px 12px;
+    background-color: var(--color-primary-dark);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-section);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.bkv-btn-annuller {
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+/* ── Gem ændringer bar ── */
+.bkv-save-bar {
+    padding: 12px 20px;
+    border-top: 1.5px solid var(--color-primary-lighter);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.bkv-btn-gem {
+    padding: 8px 24px;
+    background-color: var(--color-primary-dark);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-section);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.bkv-btn-gem:hover {
+    background-color: var(--color-primary-mid);
+}
+
+.bkv-gem-bekræftelse {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}

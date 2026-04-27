@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Seed
