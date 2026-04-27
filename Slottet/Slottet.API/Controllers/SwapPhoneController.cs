@@ -33,11 +33,11 @@ namespace Slottet.API.Controllers
         //}
 
         [HttpPost("assign")]
-        public async Task<IActionResult> SwapPhone(Guid phoneId, Guid staffId, [FromBody] SwapPhoneDTO dto)
+        public async Task<IActionResult> SwapPhone([FromBody] SwapPhoneDTO dto)
         {
             //if (dto == null ||  dto.StaffID == Guid.Empty) return BadRequest();
 
-            var updated = await _swapPhoneService.UpdateAsync(phoneId, staffId, dto);
+            var updated = await _swapPhoneService.UpdateAsync(dto);
             if (!updated) return NotFound();
 
             return NoContent();

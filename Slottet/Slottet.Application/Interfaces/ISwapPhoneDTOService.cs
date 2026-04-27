@@ -6,7 +6,7 @@ namespace Slottet.Application.Interfaces
     {
         Task<IEnumerable<SwapPhoneDTO>> GetAllAsync();
         //Task<SwapPhoneDTO?> GetByIdAsync(Guid phoneId);
-        Task<bool> UpdateAsync(Guid phoneID, Guid staffID, SwapPhoneDTO dto);
+        Task<bool> UpdateAsync(SwapPhoneDTO dto);
 
     }
 }
