@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Slottet.API.Controllers;
+using Slottet.API.Middlewares;
 using Slottet.Application.Interfaces;
+using Slottet.Infrastructure;
+using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
 using Slottet.Infrastructure.Services;
 
@@ -18,8 +21,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient<ShiftboardController>();
 builder.Services.AddScoped<IResidentDTOService, ResidentDTOService>();
 builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
+builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
+builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
 builder.Services.AddScoped<IAuditScope, AuditScope>();
 builder.Services.AddScoped<AuditInterceptor>();
+builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();
 
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
@@ -44,11 +50,6 @@ builder.Services.AddCors(options =>
         policyBuilder.AllowCredentials();
     });
 });
-builder.Services.AddDbContext<SlottetDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
-builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
-builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
 
 var app = builder.Build();
 
