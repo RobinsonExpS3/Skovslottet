@@ -50,7 +50,7 @@ namespace Slottet.API.Controllers
 
             var resident = await _residentService.CreateAsync(dto);
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = resident.ResidentID }, resident);
+            return CreatedAtAction("GetById", new { id = resident.ResidentID }, resident);
         }
 
         //Put: resident by id

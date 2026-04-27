@@ -54,7 +54,7 @@ namespace Slottet.API.Controllers
             _context.SpecialResponsibilities.Add(specialResponsibility);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
+            return CreatedAtAction("GetById", new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
         }
 
         //Put: special responsibility by id

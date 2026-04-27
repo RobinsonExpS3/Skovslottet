@@ -52,7 +52,7 @@ namespace Slottet.API.Controllers
 
             var result = await _staffService.CreateAsync(dto);
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = dto.StaffID }, result);
+            return CreatedAtAction("GetById", new { id = result.StaffID }, result);
         }
 
         //Put: Staff by id
