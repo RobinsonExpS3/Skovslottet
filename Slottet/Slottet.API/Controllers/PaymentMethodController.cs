@@ -17,12 +17,13 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PaymentMethodDTO>>> GetAll() {
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetAllAsync() {
             var methods = await _context.PaymentMethods
                 .AsNoTracking()
-                .Select(m => new PaymentMethodDTO {
-                    PaymentMethodID = m.PaymentMethodID,
-                    PaymentMethodName = m.PaymentMethodName
+                .OrderBy(m => m.PaymentMethodName)
+                .Select(m => new ResidentLookupDTO {
+                    ID = m.PaymentMethodID,
+                    Name = m.PaymentMethodName
                 })
                 .ToListAsync();
 

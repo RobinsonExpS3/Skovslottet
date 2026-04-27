@@ -9,13 +9,13 @@ namespace Slottet.Client.Pages.AdminPages
         [Inject]
         public HttpClient? httpClient { get; set; } = default;
 
-        private List<ResidentViewModel>? residents;
-        private ResidentViewModel? selectedResident;
+        private List<EditResidentDTO>? residents;
+        private EditResidentDTO? selectedResident;
         private bool loadFailed = false;
         private Guid? selectedGroceryDayID;
         private List<Guid> selectedPaymentMethodIDs = new();
-        private List<PaymentMethodDTO> paymentMethods = new();
-        private List<GroceryDayDTO> groceryDays = new();
+        private List<ResidentLookupDTO> paymentMethods = new();
+        private List<ResidentLookupDTO> groceryDays = new();
         private List<TimeInput> medicineTimes = new();
         private string? residentNameInput;
 
@@ -30,41 +30,36 @@ namespace Slottet.Client.Pages.AdminPages
             loadFailed = false;
 
             try {
-                residents = await httpClient!.GetFromJsonAsync<List<ResidentViewModel>>("api/Resident/Residents") ?? new();
+                residents = await httpClient!.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
+
+                var source = residents.FirstOrDefault();
+                groceryDays = source?.GroceryDays?.ToList() ?? new();
+                paymentMethods = source?.PaymentMethods?.ToList() ?? new();
             } catch {
                 residents = new();
-                loadFailed = true;
-            }
-
-            try {
-                groceryDays = await httpClient!.GetFromJsonAsync<List<GroceryDayDTO>>("api/GroceryDay") ?? new();
-            } catch {
                 groceryDays = new();
-                loadFailed = true;
-            }
-
-            try {
-                paymentMethods = await httpClient!.GetFromJsonAsync<List<PaymentMethodDTO>>("api/PaymentMethod") ?? new();
-            } catch {
                 paymentMethods = new();
                 loadFailed = true;
             }
         }
 
-        private async Task SelectResident(ResidentViewModel resident) {
+        private async Task SelectResident(EditResidentDTO resident) {
             selectedResident = resident;
             residentNameInput = resident.ResidentName;
             selectedGroceryDayID = resident.GroceryDayID;
 
-            var dto = await httpClient.GetFromJsonAsync<ResidentDTO>($"api/Resident/{resident.ResidentID}");
+            var dto = await httpClient!.GetFromJsonAsync<EditResidentDTO>($"api/Resident/{resident.ResidentID}");
             selectedPaymentMethodIDs = dto?.PaymentMethodIDs ?? new();
             medicineTimes = dto?.MedicineTimes
                 .Select(t => new TimeInput { Time = TimeOnly.FromDateTime(t) })
                 .ToList() ?? new();
+
+            groceryDays = dto?.GroceryDays?.ToList() ?? groceryDays;
+            paymentMethods = dto?.PaymentMethods?.ToList() ?? paymentMethods;
         }
 
         private async Task Create() {
-            var dto = new ResidentDTO {
+            var dto = new EditResidentDTO {
                 ResidentName = residentNameInput ?? string.Empty,
                 GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
                 PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
@@ -88,7 +83,7 @@ namespace Slottet.Client.Pages.AdminPages
                 return;
             }
 
-            var dto = new ResidentDTO {
+            var dto = new EditResidentDTO {
                 ResidentID = selectedResident.ResidentID,
                 ResidentName = residentNameInput ?? string.Empty,
                 GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
@@ -148,6 +143,10 @@ namespace Slottet.Client.Pages.AdminPages
             if (!medicineTimes.Any(t => t.Time == time)) {
                 medicineTimes.Add(new TimeInput { Time = time });
             }
+        }
+
+        private string GetGroceryDayName(Guid groceryDayId) {
+            return groceryDays.FirstOrDefault(day => day.ID == groceryDayId)?.Name ?? "Ukendt dag";
         }
 
         private void ClearForm() {

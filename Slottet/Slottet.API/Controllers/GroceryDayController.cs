@@ -17,12 +17,13 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GroceryDayDTO>>> GetAll() {
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetAllAsync() {
             var methods = await _context.GroceryDays
                 .AsNoTracking()
-                .Select(g => new GroceryDayDTO {
-                    GroceryDayID = g.GroceryDayID,
-                    GroceryDayName = g.GroceryDayName
+                .OrderBy(g => g.GroceryDayName)
+                .Select(g => new ResidentLookupDTO {
+                    ID = g.GroceryDayID,
+                    Name = g.GroceryDayName
                 })
                 .ToListAsync();
 

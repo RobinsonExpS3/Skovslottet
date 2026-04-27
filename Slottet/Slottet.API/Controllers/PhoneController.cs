@@ -23,7 +23,7 @@ namespace Slottet.API.Controllers
 
         // GET: api/Phones
         [HttpGet("Phones")]
-        public async Task<ActionResult<IEnumerable<Phone>>> GetPhones()
+        public async Task<ActionResult<IEnumerable<Phone>>> GetAllAsync()
         {
             return await _context.Phones.ToListAsync();
         }
@@ -86,7 +86,7 @@ namespace Slottet.API.Controllers
 
         // DELETE: api/Phones/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePhone(Guid id)
+        public async Task<IActionResult> DeleteAsync(Guid id)
         {
             var phone = await _context.Phones.FindAsync(id);
             if (phone == null)

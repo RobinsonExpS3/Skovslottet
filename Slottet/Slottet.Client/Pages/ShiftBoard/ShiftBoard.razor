@@ -1,4 +1,4 @@
-﻿@page "/shiftboard_viewonly"
+﻿@* @page "/shiftboard_viewonly"
 
 <div class="background-test">
 @if (Model is null)
@@ -7,7 +7,7 @@
 }
 else
 {	
-	<section class="shiftboard-header">  @* Overskrift med afdelingens navn og vagttypen *@
+	<section class="shiftboard-header">
 		<h1>@Model.DepartmentName</h1>
 		<p>
 			<strong>Vagttype: </strong>@Model.ShiftType 
@@ -130,4 +130,4 @@ else
 			</aside>
 	</section>
 }
-</div>
+</div> *@

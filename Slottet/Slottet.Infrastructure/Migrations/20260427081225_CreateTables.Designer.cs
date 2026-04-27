@@ -12,8 +12,8 @@ using Slottet.Infrastructure.Data;
 namespace Slottet.Infrastructure.Migrations
 {
     [DbContext(typeof(SlottetDBContext))]
-    [Migration("20260415195715_CreateTable")]
-    partial class CreateTable
+    [Migration("20260427081225_CreateTables")]
+    partial class CreateTables
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,50 @@ namespace Slottet.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Slottet.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<Guid>("AuditLogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("KeyValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NewValuesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValuesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PerformedAtTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("PerformedByStaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PerformedByStaffName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AuditLogID");
+
+                    b.ToTable("AuditLogs");
+                });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Department", b =>
                 {
@@ -108,18 +152,23 @@ namespace Slottet.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("PNGivenTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("PNStatus")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("PNTime")
-                        .HasColumnType("datetime2");
+                    b.Property<Guid>("ResidentID")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ResidentStatusID")
+                    b.Property<Guid?>("ResidentStatusID")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("PNID");
+
+                    b.HasIndex("ResidentID");
 
                     b.HasIndex("ResidentStatusID");
 
@@ -373,13 +422,17 @@ namespace Slottet.Infrastructure.Migrations
 
             modelBuilder.Entity("Slottet.Domain.Entities.PN", b =>
                 {
-                    b.HasOne("Slottet.Domain.Entities.ResidentStatus", "ResidentStatus")
+                    b.HasOne("Slottet.Domain.Entities.Resident", "Resident")
                         .WithMany("PNs")
-                        .HasForeignKey("ResidentStatusID")
+                        .HasForeignKey("ResidentID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ResidentStatus");
+                    b.HasOne("Slottet.Domain.Entities.ResidentStatus", null)
+                        .WithMany("PNs")
+                        .HasForeignKey("ResidentStatusID");
+
+                    b.Navigation("Resident");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Phone", b =>
@@ -524,6 +577,8 @@ namespace Slottet.Infrastructure.Migrations
             modelBuilder.Entity("Slottet.Domain.Entities.Resident", b =>
                 {
                     b.Navigation("Medicines");
+
+                    b.Navigation("PNs");
 
                     b.Navigation("ResidentPaymentMethods");
 

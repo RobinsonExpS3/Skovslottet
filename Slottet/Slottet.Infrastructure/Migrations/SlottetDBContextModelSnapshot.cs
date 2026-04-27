@@ -22,6 +22,50 @@ namespace Slottet.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Slottet.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<Guid>("AuditLogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("KeyValues")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NewValuesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValuesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PerformedAtTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("PerformedByStaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PerformedByStaffName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AuditLogID");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("Slottet.Domain.Entities.Department", b =>
                 {
                     b.Property<Guid>("DepartmentID")
@@ -106,9 +150,6 @@ namespace Slottet.Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("PNGivenTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("PNRegisteredTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("PNStatus")

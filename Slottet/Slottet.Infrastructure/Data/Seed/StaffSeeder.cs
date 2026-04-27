@@ -1,29 +1,29 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿﻿using Microsoft.EntityFrameworkCore;
 using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Seed
-{
-    public static class StaffSeeder
     {
-        public static async Task<List<Staff>> SeedAsync(SlottetDBContext context)
+        public static class StaffSeeder
         {
-            if (await context.Staffs.AnyAsync())
+            public static async Task<List<Staff>> SeedAsync(SlottetDBContext context)
             {
-                return await context.Staffs.ToListAsync();
-            }
+                if (await context.Staffs.AnyAsync())
+                {
+                    return await context.Staffs.ToListAsync();
+                }
 
-            var departments = await context.Departments.ToListAsync();
-            if (departments.Count == 0)
-            {
-                throw new InvalidOperationException("Departments must be seeded before seeding staff.");
-            }
+                var departments = await context.Departments.ToListAsync();
+                if (departments.Count == 0)
+                {
+                    throw new InvalidOperationException("Departments must be seeded before seeding staff.");
+                }
 
-            var skovenDepartmentId = departments[0].DepartmentID;
-            var slottetDepartmentId = departments.Count > 1
-                ? departments[1].DepartmentID
-                : skovenDepartmentId;
+                var skovenDepartmentId = departments[0].DepartmentID;
+                var slottetDepartmentId = departments.Count > 1
+                    ? departments[1].DepartmentID
+                    : skovenDepartmentId;
 
-            var staffs = new List<Staff>
+                var staffs = new List<Staff>
             {
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Hestemand Hestesen", DepartmentID = skovenDepartmentId, Initials = "HH", Role = "Pædagog" },
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Søren Skovfis", DepartmentID = skovenDepartmentId, Initials = "SS", Role = "Pædagog" },
@@ -31,10 +31,12 @@ namespace Slottet.Infrastructure.Data.Seed
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Peter Pedalskid", DepartmentID = slottetDepartmentId, Initials = "PP", Role = "Pædagog" },
             };
 
-            context.Staffs.AddRange(staffs);
-            await context.SaveChangesAsync();
+                context.Staffs.AddRange(staffs);
+                await context.SaveChangesAsync();
 
-            return staffs;
+                return staffs;
+            }
         }
     }
-}
+
+
