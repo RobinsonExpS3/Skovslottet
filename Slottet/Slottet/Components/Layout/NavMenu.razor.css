@@ -23,27 +23,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border: 1px solid #aaa;
-    border-radius: 6px;
-    background-color: white;
-    color: #333;
-    font-size: 1.4rem;
+    width: var(--nav-btn-size);
+    height: var(--nav-btn-size);
+    border: none;
+    border-radius: var(--nav-btn-radius);
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: var(--nav-icon-size);
     cursor: pointer;
-    text-decoration: none;
+    text-decoration: none !important;
+    transition: background-color 0.15s, color 0.15s;
 }
 
     .nav-icon-btn:hover {
-        background-color: #e0e0e0;
+        background-color: rgba(255, 255, 255, 0.12);
+        color: white !important;
     }
 
     .nav-icon-btn.active {
-        background-color: #d0d0d0;
-        border-color: #888;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white !important;
     }
 
     .nav-icon-btn:disabled {
-        opacity: 0.4;
+        opacity: 0.3;
         cursor: not-allowed;
     }
