@@ -18,15 +18,16 @@ namespace Slottet.Client.Pages.AdminPages
         private List<ResidentLookupDTO> groceryDays = new();
         private List<TimeInput> medicineTimes = new();
         private string? residentNameInput;
+        private bool _isBusy;
 
         private int selectedHour = 8;
         private int selectedMinute = 0;
 
         protected override async Task OnInitializedAsync() {
-            await LoadData();
+            await LoadDataAsync();
         }
 
-        private async Task LoadData() {
+        private async Task LoadDataAsync() {
             loadFailed = false;
 
             try {
@@ -43,7 +44,16 @@ namespace Slottet.Client.Pages.AdminPages
             }
         }
 
-        private async Task SelectResident(EditResidentDTO resident) {
+        private bool HasValidInput =>
+            !string.IsNullOrWhiteSpace(residentNameInput)
+            && selectedGroceryDayID == null
+            && selectedResident != null;
+
+        private bool CanCreate => !_isBusy && HasValidInput;
+        private bool CanUpdate => !_isBusy && selectedResident != null;
+        private bool CanDelete => !_isBusy && selectedResident != null;
+
+        private async Task SelectResidentAsync(EditResidentDTO resident) {
             selectedResident = resident;
             residentNameInput = resident.ResidentName;
             selectedGroceryDayID = resident.GroceryDayID;
@@ -58,63 +68,80 @@ namespace Slottet.Client.Pages.AdminPages
             paymentMethods = dto?.PaymentMethods?.ToList() ?? paymentMethods;
         }
 
-        private async Task Create() {
-            var dto = new EditResidentDTO {
-                ResidentName = residentNameInput ?? string.Empty,
-                GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
-                PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
-                MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
-                IsActive = true
-            };
+        private async Task CreateAsync() {
+            if(!CanCreate) return;
+            _isBusy = true;
 
-            var response = await httpClient.PostAsJsonAsync("api/Resident", dto);
+            try {
+                var dto = new EditResidentDTO {
+                    ResidentName = residentNameInput ?? string.Empty,
+                    GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
+                    PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
+                    MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
+                    IsActive = true
+                };
 
-            if (!response.IsSuccessStatusCode) {
-                return;
+                var response = await httpClient.PostAsJsonAsync("api/Resident", dto);
+
+                if (!response.IsSuccessStatusCode) {
+                    return;
+                }
+
+                ClearForm();
+                await LoadDataAsync();
+            } finally {
+                _isBusy = false;
             }
-
-            ClearForm();
-            await LoadData();
         }
 
 
-        private async Task Update() {
-            if (selectedResident == null) {
-                return;
+        private async Task UpdateAsync() {
+            if (selectedResident == null) return;
+
+            if(!CanUpdate) return;
+            _isBusy = true;
+
+            try {
+                var dto = new EditResidentDTO {
+                    ResidentID = selectedResident.ResidentID,
+                    ResidentName = residentNameInput ?? string.Empty,
+                    GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
+                    PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
+                    MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
+                    IsActive = selectedResident.IsActive
+                };
+
+                var response = await httpClient.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
+
+                if (!response.IsSuccessStatusCode) {
+                    return;
+                }
+
+                ClearForm();
+                await LoadDataAsync();
+            } finally {
+                _isBusy = false; 
             }
-
-            var dto = new EditResidentDTO {
-                ResidentID = selectedResident.ResidentID,
-                ResidentName = residentNameInput ?? string.Empty,
-                GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
-                PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
-                MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
-                IsActive = selectedResident.IsActive
-            };
-
-            var response = await httpClient.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
-
-            if (!response.IsSuccessStatusCode) {
-                return;
-            }
-
-            ClearForm();
-            await LoadData();
         }
 
-        private async Task Delete() {
-            if (selectedResident == null) {
-                return;
+        private async Task DeleteAsync() {
+            if (selectedResident == null) return;
+
+            if(!CanDelete) return;
+            _isBusy = true;
+
+            try {
+                var response = await httpClient.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
+
+                if (!response.IsSuccessStatusCode) {
+                    return;
+                }
+
+                ClearForm();
+                await LoadDataAsync();
+            } finally {
+                _isBusy = false;
             }
-
-            var response = await httpClient.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
-
-            if (!response.IsSuccessStatusCode) {
-                return;
-            }
-
-            ClearForm();
-            await LoadData();
         }
 
         private void OnPaymentMethodsChanged(ChangeEventArgs e) {
