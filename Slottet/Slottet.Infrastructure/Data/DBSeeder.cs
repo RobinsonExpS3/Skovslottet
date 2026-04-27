@@ -26,14 +26,14 @@ namespace Slottet.Infrastructure.Data
 
             await context.SaveChangesAsync();
 
-            //await StaffShiftSeeder.SeedAsync(context); //Megan - OBS! FK og PK dobbelt???
+            await StaffShiftSeeder.SeedAsync(context); 
             await PhoneSeeder.SeedAsync(context);
-            //await ResidentPaymentMethodSeeder.SeedAsync(context);
+            await ResidentPaymentMethodSeeder.SeedAsync(context);
             //await StaffResidentStatusSeeder.SeedAsync(context);
-            //await DepartmentTaskSeeder.SeedAsync(context);
+            await DepartmentTaskSeeder.SeedAsync(context);
             //await PNSeeder.SeedAsync(context);//Megan
             //await RiskLevelSeeder.SeedAsync(context); 
-            //await SpecialResponsibilitySeeder.SeedAsync(context); //Megan - OBS! Placering relationelt ift. shiftboard og department
+            await SpecialResponsibilitySeeder.SeedAsync(context); //Megan - OBS! Placering relationelt ift. shiftboard og department
 
             await context.SaveChangesAsync();
         }
