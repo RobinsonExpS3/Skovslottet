@@ -23,6 +23,7 @@ builder.Services.AddScoped<IResidentDTOService, ResidentDTOService>();
 builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
 builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
 builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
+builder.Services.AddScoped<IShiftBoardDTOService, ShiftBoardDTOService>();
 builder.Services.AddScoped<IAuditScope, AuditScope>();
 builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();
@@ -67,12 +68,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("blazorApp");
+app.UseCors("blazorApp2");
+
 app.UseMiddleware<AuditScopeMiddleware>();
 
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseCors("blazorApp");
 
 app.Run();

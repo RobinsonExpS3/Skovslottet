@@ -1,0 +1,166 @@
+/* ─────────────────────────────────────
+   DELT LISTE-EDITOR STYLING
+   Bruges af: TelefonListe, AfdelingsOpgaver, SærligtAnsvar
+   ───────────────────────────────────── */
+
+.liste-editor {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.liste-header {
+    padding: 14px 48px 14px 20px;
+    border-bottom: 2px solid var(--color-primary-light);
+    background-color: var(--color-bg-section-header);
+}
+
+.liste-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-heading);
+}
+
+.liste-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ── Række med input + slet ── */
+.liste-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Smallere nummer-input (bruges i TelefonListe) */
+.liste-input--nummer { flex: 0 0 120px; }
+
+/* Textarea variant — wrapping tekst, vokser vertikalt */
+.liste-textarea {
+    resize: vertical;
+    min-height: 48px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Wrap-variant af rækken (bruges når input er textarea) */
+.liste-row--wrap {
+    align-items: flex-start;
+}
+
+/* Fjern-knap placeret øverst når rækken er wrap */
+.btn-fjern--top {
+    margin-top: 6px;
+}
+
+/* Medarbejder-dropdown */
+.liste-select {
+    flex: 0 0 160px;
+    padding: 7px 8px;
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    background-color: var(--color-bg-section);
+    font-size: 0.82rem;
+    color: var(--color-text-dark);
+    font-family: inherit;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.liste-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: #fff;
+}
+
+.liste-input {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    background-color: var(--color-bg-section);
+    font-size: 0.85rem;
+    color: var(--color-text-dark);
+    font-family: inherit;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+
+.liste-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    background-color: #fff;
+}
+
+.btn-fjern {
+    background: none;
+    border: 1.5px solid transparent;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+    flex-shrink: 0;
+}
+
+.btn-fjern:hover {
+    background-color: var(--color-risk-red-bg);
+    border-color: var(--color-risk-red-border);
+    color: var(--color-risk-red-border);
+}
+
+/* ── Tilføj ── */
+.btn-tilføj {
+    align-self: flex-start;
+    background: none;
+    border: 1.5px dashed var(--color-primary-light);
+    border-radius: var(--radius-section);
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.btn-tilføj:hover {
+    background-color: var(--color-bg-section);
+    border-color: var(--color-primary);
+}
+
+/* ── Gem ── */
+.liste-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 4px;
+    border-top: 1px solid var(--color-primary-lighter);
+    margin-top: 4px;
+}
+
+.btn-gem {
+    padding: 8px 20px;
+    background-color: var(--color-primary-dark);
+    color: white;
+    border: none;
+    border-radius: var(--radius-section);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.btn-gem:hover {
+    background-color: var(--color-primary-mid);
+}
+
+.gem-bekræftelse {
+    font-size: 0.82rem;
+    color: var(--color-primary);
+    font-weight: 700;
+}

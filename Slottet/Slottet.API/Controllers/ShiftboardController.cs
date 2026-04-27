@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
 using Slottet.Infrastructure.Data;
+using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
@@ -9,12 +11,34 @@ namespace Slottet.API.Controllers
     [Route("api/[controller]")]
     public class ShiftboardController : ControllerBase
     {
-        private readonly SlottetDBContext _context;
+        private readonly SlottetDBContext      _context;
+        private readonly IShiftBoardDTOService _shiftBoardService;
 
-        public ShiftboardController(SlottetDBContext context)
+        public ShiftboardController(SlottetDBContext context, IShiftBoardDTOService shiftBoardService)
         {
-            _context = context;
+            _context           = context;
+            _shiftBoardService = shiftBoardService;
         }
+
+        // ── DTO endpoints ─────────────────────────────────────────────────
+
+        /// <summary>Returns the most recently started ShiftBoard as a fully assembled DTO.</summary>
+        [HttpGet("current")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetCurrent(CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetLatestAsync(ct);
+            return dto is null ? NotFound() : Ok(dto);
+        }
+
+        /// <summary>Returns a specific ShiftBoard as a fully assembled DTO.</summary>
+        [HttpGet("{id:guid}/dto")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetDto(Guid id, CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetByIdAsync(id, ct);
+            return dto is null ? NotFound() : Ok(dto);
+        }
+
+        // ── Raw CRUD endpoints ────────────────────────────────────────────
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ShiftBoard>>> GetAll(CancellationToken ct)

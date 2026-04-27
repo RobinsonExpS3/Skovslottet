@@ -416,3 +416,5 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/Slottet/Slottet.Infrastructure/Migrations/20260427113213_InitialCreate.cs
+/Slottet/Slottet.Infrastructure/Migrations/20260427113213_InitialCreate.Designer.cs

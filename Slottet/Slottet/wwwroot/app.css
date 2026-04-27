@@ -2,6 +2,7 @@
 @import url('css/Design/variables.css');
 @import url('css/Design/typography.css');
 @import url('css/Design/global.css');
+@import url('css/Design/liste-editor.css');
 
 /* ── Base ── */
 a, .btn-link {
