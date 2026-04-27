@@ -13,6 +13,7 @@ namespace Slottet.Client.Pages.AdminPages
         private string? taskNameInput;
         private SpecialResponsibility? selectedItem;
         private bool loadFailed = false;
+        private bool _isBusy;
 
         private async Task LoadData() {
             try {
@@ -29,59 +30,88 @@ namespace Slottet.Client.Pages.AdminPages
             await LoadData();
         }
 
+        private bool HasValidInput => 
+            !string.IsNullOrWhiteSpace(taskNameInput)
+            && selectedItem == null;
+
+        private bool CanCreate => !_isBusy && HasValidInput;
+        private bool CanUpdate => !_isBusy && selectedItem != null;
+        private bool CanDelete => !_isBusy && selectedItem != null;
+
         private void SelectItem(SpecialResponsibility item) {
             selectedItem = item;
             taskNameInput = item.TaskName;
         }
 
-        private async Task Create() {
-            var newItem = new SpecialResponsibility {
-                SpecialReponsibilityID = Guid.NewGuid(),
-                TaskName = taskNameInput
-            };
+        private async Task CreateAsync() {
+            if(!CanCreate) return;
+            _isBusy = true;
+            
+            try {
+                var newItem = new SpecialResponsibility {
+                    SpecialResponsibilityID = Guid.NewGuid(),
+                    TaskName = taskNameInput
+                };
 
-            var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
+                var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
 
-            if(response.IsSuccessStatusCode) {
-                await LoadData();
-                taskNameInput = string.Empty;
+                if (response.IsSuccessStatusCode) {
+                    await LoadData();
+                    taskNameInput = string.Empty;
+                }
+            } finally {
+                _isBusy = false;
             }
         }
 
-        private async Task Update() {
+        private async Task UpdateAsync() {
             if(selectedItem == null) {
                 return;
             }
 
-            selectedItem.TaskName = taskNameInput;
+            if(!CanUpdate) return;
+            _isBusy = true;
 
-            var response = await httpClient.PutAsJsonAsync($"api/SpecialResponsibility/{selectedItem.SpecialReponsibilityID}", selectedItem);
+            try {
+                selectedItem.TaskName = taskNameInput;
 
-            if(response.IsSuccessStatusCode) {
-                await LoadData();
-                selectedItem = null;
-                taskNameInput = string.Empty;
+                var response = await httpClient.PutAsJsonAsync($"api/SpecialResponsibility/{selectedItem.SpecialResponsibilityID}", selectedItem);
+
+                if (response.IsSuccessStatusCode) {
+                    await LoadData();
+                    selectedItem = null;
+                    taskNameInput = string.Empty;
+                }
+            } finally {
+                _isBusy = false; 
             }
         }
 
-        private async Task Delete() {
+        private async Task DeleteAsync() {
             if (selectedItem == null) {
                 return;
             }
 
-            var response = await httpClient.DeleteAsync($"api/SpecialResponsibility/{selectedItem.SpecialReponsibilityID}");
+            if(!CanDelete) return;
+            _isBusy = true;
 
-            if(response.IsSuccessStatusCode) {
-                await LoadData();
-                selectedItem = null;
-                taskNameInput = string.Empty;
+            try {
+                var response = await httpClient.DeleteAsync($"api/SpecialResponsibility/{selectedItem.SpecialResponsibilityID}");
+
+                if (response.IsSuccessStatusCode) {
+                    await LoadData();
+                    selectedItem = null;
+                    taskNameInput = string.Empty;
+                }
+            } finally {
+                _isBusy = false; 
             }
-
         }
 
         public class SpecialResponsibility {
-            public Guid SpecialReponsibilityID { get; set; }
+            public Guid SpecialResponsibilityID { get; set; }
             public string? TaskName { get; set; }
+            public Guid ShiftBoardID { get; set; }
         }
     }
 }
