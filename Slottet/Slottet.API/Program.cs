@@ -5,6 +5,7 @@ using Slottet.Application.Interfaces;
 using Slottet.Infrastructure;
 using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
+using Slottet.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient<ShiftboardController>();
 
+builder.Services.AddScoped<IResidentDTOService, ResidentDTOService>();
+builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
 builder.Services.AddScoped<IAuditScope, AuditScope>();
 builder.Services.AddScoped<AuditInterceptor>();
 
