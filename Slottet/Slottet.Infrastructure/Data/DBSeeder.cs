@@ -19,7 +19,8 @@ namespace Slottet.Infrastructure.Data
 
             await context.SaveChangesAsync();
 
-            //await ResidentSeeder.SeedAsync(context);
+            await GroceryDaySeeder.SeedAsync(context);
+            await ResidentSeeder.SeedAsync(context);
             await StaffSeeder.SeedAsync(context); //Megan
             await ShiftBoardSeeder.SeedAsync(context);
 
@@ -30,7 +31,6 @@ namespace Slottet.Infrastructure.Data
             //await ResidentPaymentMethodSeeder.SeedAsync(context);
             //await StaffResidentStatusSeeder.SeedAsync(context);
             //await DepartmentTaskSeeder.SeedAsync(context);
-            //await GroceryDaySeeder.SeedAsync(context); 
             //await PNSeeder.SeedAsync(context);//Megan
             //await RiskLevelSeeder.SeedAsync(context); 
             //await SpecialResponsibilitySeeder.SeedAsync(context); //Megan - OBS! Placering relationelt ift. shiftboard og department
