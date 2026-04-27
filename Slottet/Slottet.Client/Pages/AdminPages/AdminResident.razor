@@ -1,4 +1,5 @@
 ﻿@page "/adminResident"
+@rendermode InteractiveWebAssembly
 
 <div class="view-box">
 	<h2>Rediger beboer</h2>
@@ -21,8 +22,7 @@
 			{
 				@foreach(var resident in residents)
 				{
-					<tr @key="resident.ResidentID"
-						@onclick="async () => await SelectResident(resident)" 
+					<tr @onclick="() => SelectResident(resident)" 
 						class="@(selectedResident == resident ? "selected-row" : "")"
 						style="cursor: pointer;">
 						<td>@resident.ResidentName</td>
