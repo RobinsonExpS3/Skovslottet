@@ -8,28 +8,32 @@ namespace Slottet.Infrastructure.Data.Seed
         public static async Task<List<Staff>> SeedAsync(SlottetDBContext context)
         {
             if (await context.Staffs.AnyAsync())
+            {
                 return await context.Staffs.ToListAsync();
+            }
 
-            var skoven = await context.Departments.FirstOrDefaultAsync(d => d.DepartmentName == "Skoven");
+            var departments = await context.Departments.ToListAsync();
+            if (departments.Count == 0)
+            {
+                throw new InvalidOperationException("Departments must be seeded before seeding staff.");
+            }
 
-            if (skoven is null)
-                throw new InvalidOperationException("Department 'Skoven' was not found.");
+            var skovenDepartmentId = departments[0].DepartmentID;
+            var slottetDepartmentId = departments.Count > 1
+                ? departments[1].DepartmentID
+                : skovenDepartmentId;
 
             var staffs = new List<Staff>
             {
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Gunhild Johnsen", Initials = "GJ", Role = "Administrator", DepartmentID = skoven.DepartmentID },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Georg Carstensen", Initials = "GC", Role = "Pædagog", DepartmentID = skoven.DepartmentID },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Ivan Isaksen", Initials = "II", Role = "Pædagog", DepartmentID = skoven.DepartmentID },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Inga Beck", Initials = "IB", Role = "Pædagog", DepartmentID = skoven.DepartmentID },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Albert Svendsen", Initials = "AS", Role = "Pædagog", DepartmentID = skoven.DepartmentID },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Merethe Thorsen", Initials = "MT", Role = "Pædagog", DepartmentID = skoven.DepartmentID },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Maja Wolff", Initials = "MW", Role = "Pædagog", DepartmentID = skoven.DepartmentID },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Kamilla Lang", Initials = "KL", Role = "Pædagog", DepartmentID = skoven.DepartmentID },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Anker Skov", Initials = "ASK", Role = "Administrator", DepartmentID = skoven.DepartmentID },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Hestemand Hestesen", DepartmentID = skovenDepartmentId, Initials = "HH", Role = "Pædagog" },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Søren Skovfis", DepartmentID = skovenDepartmentId, Initials = "SS", Role = "Pædagog" },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Lise Lægemand", DepartmentID = slottetDepartmentId, Initials = "LL", Role = "Sygeplejerske" },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Peter Pedalskid", DepartmentID = slottetDepartmentId, Initials = "PP", Role = "Pædagog" },
             };
 
             context.Staffs.AddRange(staffs);
             await context.SaveChangesAsync();
+
             return staffs;
         }
     }

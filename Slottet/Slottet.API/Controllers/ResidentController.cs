@@ -1,31 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
 using Slottet.Infrastructure.Data;
 using Slottet.Shared;
 
-/*
 namespace Slottet.API.Controllers {
     [ApiController]
     [Route("api/[controller]")]
     public class ResidentController : Controller {
         private readonly SlottetDBContext _context;
 
-        public ResidentController(IBaseRepository<Resident> baseRepository, ResidentRepository residentRepository) {
-            _baseRepository = baseRepository;
-            _residentRepository = residentRepository;
+        public ResidentController(SlottetDBContext context) {
+            _context = context;
         }
 
         //Get: residents
         [HttpGet("Residents")]
         public async Task<ActionResult<IEnumerable<ResidentViewModel>>> GetAll() {
-            var residents = await _baseRepository.GetAllAsync();
-            var result = residents.Select(r => new ResidentViewModel {
-                ResidentID = r.ResidentID,
-                ResidentName = r.ResidentName,
-                GroceryDayID = r.GroceryDayID,
-                IsActive = r.IsActive
-            });
+            var result = await _context.Residents
+                .AsNoTracking()
+                .Select(r => new ResidentViewModel {
+                    ResidentID = r.ResidentID,
+                    ResidentName = r.ResidentName,
+                    GroceryDayID = r.GroceryDayID,
+                    IsActive = r.IsActive,
+                })
+                .ToListAsync();
 
             return Ok(result);
         }
@@ -33,7 +34,9 @@ namespace Slottet.API.Controllers {
         //Get: resident by id
         [HttpGet("{id}")]
         public async Task<ActionResult<ResidentDTO>> GetById(Guid id) {
-            var resident = await _baseRepository.GetByIdAsync(id);
+            var resident = await _context.Residents
+                .AsNoTracking()
+                .FirstOrDefaultAsync(r => r.ResidentID == id);
 
             if (resident == null) {
                 return NotFound();
@@ -44,8 +47,16 @@ namespace Slottet.API.Controllers {
                 ResidentName = resident.ResidentName,
                 GroceryDayID = resident.GroceryDayID,
                 IsActive = resident.IsActive,
-                PaymentMethodIDs = await _residentRepository.GetPaymentMethodIdsAsync(id),
-                MedicineTimes = await _residentRepository.GetMedicineTimesAsync(id)
+                PaymentMethodIDs = await _context.ResidentPaymentMethods
+                    .AsNoTracking()
+                    .Where(rpm => rpm.ResidentID == id)
+                    .Select(rpm => rpm.PaymentMethodID)
+                    .ToListAsync(),
+                MedicineTimes = await _context.Medicines
+                    .AsNoTracking()
+                    .Where(m => m.ResidentID == id)
+                    .Select(m => m.MedicineTime)
+                    .ToListAsync()
             };
 
             return Ok(dto);
@@ -65,9 +76,12 @@ namespace Slottet.API.Controllers {
                 IsActive = dto.IsActive
             };
 
-            await _baseRepository.AddAsync(resident);
-            await _residentRepository.ReplacePaymentMethodsAsync(resident.ResidentID, dto.PaymentMethodIDs);
-            await _residentRepository.ReplaceMedicineTimesAsync(resident.ResidentID, dto.MedicineTimes);
+            _context.Residents.Add(resident);
+
+            AddPaymentMethods(resident.ResidentID, dto.PaymentMethodIDs);
+            AddMedicines(resident.ResidentID, dto.MedicineTimes);
+
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = resident.ResidentID }, resident);
         }
@@ -79,16 +93,26 @@ namespace Slottet.API.Controllers {
                 return BadRequest();
             }
 
-            var existingResident = await _baseRepository.GetByIdAsync(id);
-            if (existingResident == null) return NotFound();
+            var existingResident = await _context.Residents.FirstOrDefaultAsync(r => r.ResidentID == id);
+            if (existingResident == null) {
+                return NotFound();
+            }
 
             existingResident.ResidentName = dto.ResidentName;
             existingResident.GroceryDayID = dto.GroceryDayID;
             existingResident.IsActive = dto.IsActive;
 
-            await _baseRepository.UpdateAsync(existingResident);
-            await _residentRepository.ReplacePaymentMethodsAsync(id, dto.PaymentMethodIDs);
-            await _residentRepository.ReplaceMedicineTimesAsync(id, dto.MedicineTimes);
+            var existingPaymentMethods = await _context.ResidentPaymentMethods
+                .Where(rpm => rpm.ResidentID == id).ToListAsync();
+            _context.ResidentPaymentMethods.RemoveRange(existingPaymentMethods);
+            AddPaymentMethods(id, dto.PaymentMethodIDs);
+
+            var existingMedicines = await _context.Medicines
+                .Where(m => m.ResidentID == id).ToListAsync();
+            _context.Medicines.RemoveRange(existingMedicines);
+            AddMedicines(id, dto.MedicineTimes);
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -96,17 +120,75 @@ namespace Slottet.API.Controllers {
         //Delete: resident by id
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteResident(Guid id) {
-            var existingResident = await _baseRepository.GetByIdAsync(id);
+            var existingResident = await _context.Residents.FirstOrDefaultAsync(r => r.ResidentID == id);
 
             if (existingResident == null) {
                 return NotFound();
             }
 
-            await _residentRepository.DeleteRelationsAsync(id);
-            await _baseRepository.DeleteAsync(id);
+            var residentStatusIDs = await _context.ResidentStatuses
+                .Where(rs => rs.ResidentID == id)
+                .Select(rs => rs.ResidentStatusID)
+                .ToListAsync();
+
+            if(residentStatusIDs.Count > 0) {
+                var staffResidentStatuses = await _context.StaffResidentStatuses
+                    .Where(srs => residentStatusIDs.Contains(srs.ResidentStatusID))
+                    .ToListAsync();
+                _context.StaffResidentStatuses.RemoveRange(staffResidentStatuses);
+            }
+
+            var residentStatuses = await _context.ResidentStatuses
+                .Where(rs => rs.ResidentID == id)
+                .ToListAsync();
+            _context.ResidentStatuses.RemoveRange(residentStatuses);
+
+            var residentPaymentMethods = await _context.ResidentPaymentMethods
+                .Where(rpm => rpm.ResidentID == id)
+                .ToListAsync();
+            _context.ResidentPaymentMethods.RemoveRange(residentPaymentMethods);
+
+            var medicines = await _context.Medicines
+                .Where(m => m.ResidentID == id)
+                .ToListAsync();
+            _context.Medicines.RemoveRange(medicines);
+
+            _context.Residents.Remove(existingResident);
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
+        private void AddPaymentMethods(Guid residentID, List<Guid>? paymentMethodsIDs) {
+            if(paymentMethodsIDs == null || paymentMethodsIDs.Count == 0) {
+                return;
+            }
+
+            var relationRows = paymentMethodsIDs
+                .Distinct()
+                .Select(paymentMethodID => new ResidentPaymentMethod {
+                    ResidentID = residentID,
+                    PaymentMethodID = paymentMethodID,
+                });
+
+            _context.ResidentPaymentMethods.AddRange(relationRows);
+        }
+
+        private void AddMedicines(Guid residentID, List<DateTime>? medicineTimes) {
+            if(medicineTimes == null || medicineTimes.Count == 0) {
+                return;
+            }
+
+            var medicineRows = medicineTimes.Select(medicineTime => new Medicine {
+                MedicineID = Guid.NewGuid(),
+                ResidentID = residentID,
+                MedicineTime = medicineTime,
+                MedicineGivenTime = DateTime.Now,
+                MedicineRegisteredTime = DateTime.Now
+            });
+
+            _context.Medicines.AddRange(medicineRows);
+        }
     }
 }
-*/

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Slottet.API.Controllers;
+using Slottet.Application.Interfaces;
 using Slottet.Infrastructure.Data;
+using Slottet.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +19,9 @@ builder.Services.AddHttpClient<ShiftboardController>();
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
+builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
+builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
 
 var app = builder.Build();
 
@@ -30,7 +34,6 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<SlottetDBContext>();
 
-    await context.Database.MigrateAsync();
     await DBSeeder.SeedAsync(context);
 }
 
