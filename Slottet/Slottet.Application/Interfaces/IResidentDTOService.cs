@@ -10,5 +10,8 @@ namespace Slottet.Application.Interfaces {
         Task<EditResidentDTO> CreateAsync(EditResidentDTO dto);
         Task<bool> UpdateAsync(Guid id, EditResidentDTO dto);
         Task<bool> DeleteAsync(Guid id);
+
+        Task<List<ResidentLookupDTO>> GetGroceryDaysAsync();
+        Task<List<ResidentLookupDTO>> GetPaymentMethodsAsync();
     }
 }

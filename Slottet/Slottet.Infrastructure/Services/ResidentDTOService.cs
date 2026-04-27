@@ -56,11 +56,17 @@ namespace Slottet.Infrastructure.Services {
                 .Select(m => m.MedicineTime)
                 .ToListAsync();
 
-            var groceryDaysTask = await GetGroceryDayLookupAsync();
-            var paymentMethodsTask = await GetPaymentMethodsLookupAsync();
+            //var groceryDaysTask = await GetGroceryDayLookupAsync();
+            //var paymentMethodsTask = await GetPaymentMethodsLookupAsync();
+
+            residentDto.GroceryDays = await GetGroceryDayLookupAsync();
+            residentDto.PaymentMethods = await GetPaymentMethodsLookupAsync();
 
             return residentDto;
         }
+
+        public Task<List<ResidentLookupDTO>> GetGroceryDaysAsync() => GetGroceryDayLookupAsync();
+        public Task<List<ResidentLookupDTO>> GetPaymentMethodsAsync() => GetPaymentMethodsLookupAsync();
 
         public async Task<EditResidentDTO> CreateAsync(EditResidentDTO dto) {
             var resident = new Resident {

@@ -85,5 +85,17 @@ namespace Slottet.API.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("groceryDays")]
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetGroceryDaysAsync() {
+            var groceryDays = await _residentService.GetGroceryDaysAsync();
+            return Ok(groceryDays);
+        }
+
+        [HttpGet("paymentMethods")]
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetPaymentMethodsAsync() {
+            var paymentMethods = await _residentService.GetPaymentMethodsAsync();
+            return Ok(paymentMethods);
+        }
     }
 }

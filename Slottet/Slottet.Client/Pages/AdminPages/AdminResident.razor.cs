@@ -32,10 +32,12 @@ namespace Slottet.Client.Pages.AdminPages
 
             try {
                 residents = await httpClient!.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
+                groceryDays = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
+                paymentMethods = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
 
-                var source = residents.FirstOrDefault();
-                groceryDays = source?.GroceryDays?.ToList() ?? new();
-                paymentMethods = source?.PaymentMethods?.ToList() ?? new();
+                //var source = residents.FirstOrDefault();
+                //groceryDays = source?.GroceryDays?.ToList() ?? new();
+                //paymentMethods = source?.PaymentMethods?.ToList() ?? new();
             } catch {
                 residents = new();
                 groceryDays = new();
@@ -46,8 +48,8 @@ namespace Slottet.Client.Pages.AdminPages
 
         private bool HasValidInput =>
             !string.IsNullOrWhiteSpace(residentNameInput)
-            && selectedGroceryDayID == null
-            && selectedResident != null;
+            && selectedGroceryDayID != null
+            && selectedResident == null;
 
         private bool CanCreate => !_isBusy && HasValidInput;
         private bool CanUpdate => !_isBusy && selectedResident != null;
@@ -64,8 +66,8 @@ namespace Slottet.Client.Pages.AdminPages
                 .Select(t => new TimeInput { Time = TimeOnly.FromDateTime(t) })
                 .ToList() ?? new();
 
-            groceryDays = dto?.GroceryDays?.ToList() ?? groceryDays;
-            paymentMethods = dto?.PaymentMethods?.ToList() ?? paymentMethods;
+            //groceryDays = dto?.GroceryDays?.ToList() ?? groceryDays;
+            //paymentMethods = dto?.PaymentMethods?.ToList() ?? paymentMethods;
         }
 
         private async Task CreateAsync() {
