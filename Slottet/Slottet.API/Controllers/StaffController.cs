@@ -25,7 +25,7 @@ namespace Slottet.API.Controllers
         }
 
         //Get: Staff by id
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetStaffById")]
         public async Task<ActionResult<EditStaffDTO>> GetByIdAsync(Guid id)
         {
             var staff = await _staffService.GetByIdAsync(id);
@@ -47,12 +47,19 @@ namespace Slottet.API.Controllers
                 string.IsNullOrWhiteSpace(dto.Initials) ||
                 string.IsNullOrWhiteSpace(dto.Role))
             {
-                return BadRequest();
+                return BadRequest("StaffName, Initials and Role are required.");
             }
 
-            var result = await _staffService.CreateAsync(dto);
+            try
+            {
+                var created = await _staffService.CreateAsync(dto);
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = dto.StaffID }, result);
+                return CreatedAtRoute("GetStaffById", new { id = created.StaffID }, created);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         //Put: Staff by id

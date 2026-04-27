@@ -34,10 +34,10 @@
     gap: 15px;
 }
 .button-column {
-    display:flex;
-    gap:10px;
-    flex-direction:column;
-   
+    display: flex;
+    margin-bottom: 10px;
+    gap: 10px;
+    flex-direction: column;
 }
 .list-form {
     width:300px;
@@ -65,4 +65,15 @@
     gap: 30px;
     margin-top: 20px;
     align-items:flex-start;
+}
+
+.selected-row {
+    background-color: #bcd;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.table-form tr:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
 }
