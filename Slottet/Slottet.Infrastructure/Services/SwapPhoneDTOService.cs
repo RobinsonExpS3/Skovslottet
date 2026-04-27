@@ -19,27 +19,7 @@ namespace Slottet.Infrastructure.Services
         {
             return await _context.Phones
                 .AsNoTracking()
-                .Select(phone => new SwapPhoneDTO
-                {
-                    PhoneID = phone.PhoneID,
-                    PhoneNumber = phone.PhoneNumber,
-
-                    StaffID = phone.StaffPhones
-                        .OrderByDescending(sp => sp.AssignedAt)
-                        .Select(sp => sp.StaffID)
-                        .FirstOrDefault(),
-
-                    StaffName = phone.StaffPhones
-                        .OrderByDescending(sp => sp.AssignedAt)
-                        .Select(sp => sp.Staff.StaffName)
-                        .FirstOrDefault(),
-
-                    AssignedAt = phone.StaffPhones
-                        .OrderByDescending(sp => sp.AssignedAt)
-                        .Select(sp => (DateTime?)sp.AssignedAt)
-                        .FirstOrDefault()
-                })
-
+                .Select(MapToDtoExpression())
                 .OrderBy(p => p.PhoneNumber)
                 .ToListAsync();
         }
@@ -68,36 +48,28 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
-        //public async Task<SwapPhoneDTO?> GetByIdAsync(Guid id)
-        //{
-        //    return await _context.Phones
-        //        .AsNoTracking()
-        //        .Where(p => p.PhoneID == id)
-        //        .Select(MapToDtoExpression())
-        //        .FirstOrDefaultAsync();
-        //}
+        private static System.Linq.Expressions.Expression<Func<Phone, SwapPhoneDTO>> MapToDtoExpression()
+        {
+            return phone => new SwapPhoneDTO
+            {
+                PhoneID = phone.PhoneID,
+                PhoneNumber = phone.PhoneNumber,
 
+                StaffID = phone.StaffPhones
+                    .OrderByDescending(sp => sp.AssignedAt)
+                    .Select(sp => sp.StaffID)
+                    .FirstOrDefault(),
 
+                StaffName = phone.StaffPhones
+                    .OrderByDescending(sp => sp.AssignedAt)
+                    .Select(sp => sp.Staff.StaffName)
+                    .FirstOrDefault(),
 
-        //private static System.Linq.Expressions.Expression<Func<Phone, SwapPhoneDTO>> MapToDtoExpression()
-        //{
-        //    return phone => new SwapPhoneDTO
-        //    {
-        //        PhoneID = phone.PhoneID,
-        //        PhoneNumber = phone.PhoneNumber,
-        //        StaffName = phone.StaffName,
-
-        //    };
-        //}
-
-        ////private static SwapPhoneDTO MapToDto(Phone phone)
-        ////{
-        ////    return new SwapPhoneDTO
-        ////    {
-        ////        PhoneID = phone.PhoneID,
-        ////        PhoneNumber = phone.PhoneNumber,
-        ////        StaffName = phone.StaffName,
-        ////    };
-        ////}
+                AssignedAt = phone.StaffPhones
+                    .OrderByDescending(sp => sp.AssignedAt)
+                    .Select(sp => (DateTime?)sp.AssignedAt)
+                    .FirstOrDefault()
+            };
+        }
     }
 }
