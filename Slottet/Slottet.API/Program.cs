@@ -27,6 +27,7 @@ builder.Services.AddScoped<IShiftBoardDTOService, ShiftBoardDTOService>();
 builder.Services.AddScoped<IAuditScope, AuditScope>();
 builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();
+builder.Services.AddScoped<IStaffPNDTOService, StaffPNDTOService>();
 
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>

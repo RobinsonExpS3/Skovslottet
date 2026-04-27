@@ -5,50 +5,44 @@ namespace Slottet.Infrastructure.Data.Seed
 {
     public static class ResidentPaymentMethodSeeder
     {
-        public static async Task SeedAsync(SlottetDBContext context)
+        public static async Task <List<ResidentPaymentMethod>> SeedAsync(SlottetDBContext context)
         {
-            if (await context.ResidentPaymentMethods.AnyAsync())
-                return;
+            if (await context.ResidentPaymentMethods.AnyAsync()) return await context.ResidentPaymentMethods.ToListAsync();
 
-            var residents      = await context.Residents.ToListAsync();
-            var paymentMethods = await context.PaymentMethods.ToListAsync();
+            var paymentMethods = new[] { "MobilePay", "P-kort", "Kontant", "Kort", "Udlæg"};
 
-            if (residents.Count == 0 || paymentMethods.Count == 0)
-                throw new InvalidOperationException("Residents and PaymentMethods must be seeded first.");
+            var paymentMethodyIDs = await context.PaymentMethods
+                .Where(p => paymentMethods.Contains(p.PaymentMethodName))
+                .ToDictionaryAsync(p => p.PaymentMethodName, p => p.PaymentMethodID);
 
-            Guid PM(string name) => paymentMethods.First(p => p.PaymentMethodName == name).PaymentMethodID;
+            Guid GetPaymentMethodID(string paymentMethod) => paymentMethodyIDs.TryGetValue(paymentMethod, out var id)
+                ? id
+                : throw new InvalidOperationException("Betalingsmetode ikke fundet");
 
-            var data = new (string Resident, string Payment)[]
+            var residents = new[] { "Carl Johan", "Trøffel", "Rød Fluesvamp", "Portobello", "Kantarel" };
+
+            var residentIDs = await context.Residents
+                .Where(r => residents.Contains(r.ResidentName))
+                .ToDictionaryAsync(r => r.ResidentName, r => r.ResidentID);
+
+            Guid GetResidentID(string resident) => residentIDs.TryGetValue(resident, out var id)
+                ? id
+                : throw new InvalidOperationException("Beboer ikke fundet");
+
+
+            var residentPaymentMethods = new List<ResidentPaymentMethod>
             {
-                ("Anna Bentsen",      "Kort"     ),
-                ("Carsten Didriksen", "MobilePay"),
-                ("Enaya Frederiksen", "Kontant"  ),
-                ("Gert Heller",       "MobilePay"),
-                ("Ida Jacoby",        "MobilePay"),
-                ("Karl Larsen",       "MobilePay"),
-                ("Mette Nielsen",     "MobilePay"),
-                ("Ole Pontoppidan",   "MobilePay"),
-                ("Quint Roberts",     "MobilePay"),
-                ("Søren Thomasson",   "MobilePay"),
-                ("Ulke Venja",        "MobilePay"),
-                ("Whilmer Xander",    "MobilePay"),
+                new ResidentPaymentMethod { ResidentID = GetResidentID("Carl Johan"), PaymentMethodID = GetPaymentMethodID("MobilePay") },
+                new ResidentPaymentMethod { ResidentID = GetResidentID("Trøffel"), PaymentMethodID = GetPaymentMethodID("MobilePay") },
+                new ResidentPaymentMethod { ResidentID = GetResidentID("Rød Fluesvamp"), PaymentMethodID = GetPaymentMethodID("MobilePay") },
+                new ResidentPaymentMethod { ResidentID = GetResidentID("Portobello"), PaymentMethodID = GetPaymentMethodID("Udlæg") },
+                new ResidentPaymentMethod { ResidentID = GetResidentID("Kantarel"), PaymentMethodID = GetPaymentMethodID("Kort") },
+                new ResidentPaymentMethod { ResidentID = GetResidentID("Kantarel"), PaymentMethodID = GetPaymentMethodID("Kontant") }
             };
 
-            var links = new List<ResidentPaymentMethod>();
-            foreach (var (name, payment) in data)
-            {
-                var resident = residents.FirstOrDefault(r => r.ResidentName == name);
-                if (resident is null) continue;
-
-                links.Add(new ResidentPaymentMethod
-                {
-                    ResidentID      = resident.ResidentID,
-                    PaymentMethodID = PM(payment),
-                });
-            }
-
-            context.ResidentPaymentMethods.AddRange(links);
+            context.ResidentPaymentMethods.AddRange(residentPaymentMethods);
             await context.SaveChangesAsync();
+            return residentPaymentMethods;
         }
     }
 }
