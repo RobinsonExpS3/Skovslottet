@@ -1,13 +1,13 @@
-using Slottet.Domain.Entities;
+using Slottet.Shared;
 
 namespace Slottet.Application.Interfaces
 {
     public interface ISpecialResponsibilityDTOService
     {
-        Task<IEnumerable<SpecialResponsibility>> GetAllAsync();
-        Task<SpecialResponsibility?> GetByIdAsync(Guid id);
-        Task<SpecialResponsibility> CreateAsync(SpecialResponsibility specialResponsibility);
-        Task<bool> UpdateAsync(Guid id, SpecialResponsibility specialResponsibility);
+        Task<IEnumerable<SpecialResponsibilityEntryDto>> GetAllAsync();
+        Task<SpecialResponsibilityEntryDto?> GetByIdAsync(Guid id);
+        Task<SpecialResponsibilityEntryDto> CreateAsync(SpecialResponsibilityEntryDto dto);
+        Task<bool> UpdateAsync(Guid id, SpecialResponsibilityEntryDto dto);
         Task<bool> DeleteAsync(Guid id);
     }
 }

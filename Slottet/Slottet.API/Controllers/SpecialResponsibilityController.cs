@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
+using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
@@ -40,36 +41,33 @@ namespace Slottet.API.Controllers
 
         //Post: special responsibility
         [HttpPost]
-        public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibility specialResponsibility) {
-            if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName)) {
+        public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibilityEntryDto dto)
+        {
+            if (dto == null || string.IsNullOrWhiteSpace(dto.Description))
+            {
                 return BadRequest();
             }
 
-            var createdSpecialResponsibility = await _specialResponsibilityService.CreateAsync(specialResponsibility);
-
-            _context.SpecialResponsibilities.Add(specialResponsibility);
-            await _context.SaveChangesAsync();
+            var specialResponsibility = await _specialResponsibilityService.CreateAsync(dto);
 
             return CreatedAtAction("GetById", new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
         }
 
         //Put: special responsibility by id
         [HttpPut("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> UpdateAsync(Guid id, [FromBody] SpecialResponsibility specialResponsibility) {
-            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName)) {
+        public async Task<ActionResult> UpdateAsync(Guid id, [FromBody] SpecialResponsibilityEntryDto dto)
+        {
+            if (dto == null || id != dto.SpecialResponsibilityID || string.IsNullOrWhiteSpace(dto.Description))
+            {
                 return BadRequest();
             }
 
-            var updated = await _specialResponsibilityService.UpdateAsync(id, specialResponsibility);
+            var updated = await _specialResponsibilityService.UpdateAsync(id, dto);
 
             if (!updated)
             {
                 return NotFound();
             }
-
-            existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
-
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }

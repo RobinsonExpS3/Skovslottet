@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
 using Slottet.Infrastructure.Data;
+using Slottet.Shared;
 
 namespace Slottet.Infrastructure.Services
 {
@@ -14,7 +15,7 @@ namespace Slottet.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<SpecialResponsibility>> GetAllAsync()
+        public async Task<IEnumerable<SpecialResponsibilityEntryDto>> GetAllAsync()
         {
             return await _context.SpecialResponsibilities
                 .AsNoTracking()
@@ -28,7 +29,7 @@ namespace Slottet.Infrastructure.Services
                 .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
         }
 
-        public async Task<SpecialResponsibility> CreateAsync(SpecialResponsibility specialResponsibility)
+        public async Task<SpecialResponsibility> CreateAsync(SpecialResponsibilityEntryDto dto)
         {
             if (specialResponsibility.SpecialResponsibilityID == Guid.Empty)
             {
@@ -52,7 +53,6 @@ namespace Slottet.Infrastructure.Services
             }
 
             existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
-            existingSpecialResponsibility.ShiftBoardID = specialResponsibility.ShiftBoardID;
 
             await _context.SaveChangesAsync();
             return true;
