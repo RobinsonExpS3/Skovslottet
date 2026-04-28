@@ -43,7 +43,7 @@ namespace Slottet.API.Controllers
         //Post: special responsibility
         [HttpPost]
         public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibility specialResponsibility) {
-            if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty) {
+            if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName)) {
                 return BadRequest();
             }
 
@@ -60,7 +60,7 @@ namespace Slottet.API.Controllers
         //Put: special responsibility by id
         [HttpPut("{id}")]
         public async Task<ActionResult<SpecialResponsibility>> UpdateAsync(Guid id, [FromBody] SpecialResponsibility specialResponsibility) {
-            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty) {
+            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName)) {
                 return BadRequest();
             }
 
@@ -72,7 +72,6 @@ namespace Slottet.API.Controllers
             }
 
             existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
-            existingSpecialResponsibility.ShiftBoardID = specialResponsibility.ShiftBoardID;
 
             await _context.SaveChangesAsync();
 
