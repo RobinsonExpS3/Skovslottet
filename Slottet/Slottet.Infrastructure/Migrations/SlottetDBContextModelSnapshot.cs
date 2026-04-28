@@ -63,7 +63,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasKey("AuditLogID");
 
-                    b.ToTable("AuditLogs");
+                    b.ToTable("AuditLogs", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Department", b =>
@@ -78,7 +78,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasKey("DepartmentID");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.DepartmentTask", b =>
@@ -99,7 +99,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentID");
 
-                    b.ToTable("DepartmentTasks");
+                    b.ToTable("DepartmentTasks", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.GroceryDay", b =>
@@ -115,7 +115,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasKey("GroceryDayID");
 
-                    b.ToTable("GroceryDays");
+                    b.ToTable("GroceryDays", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Medicine", b =>
@@ -140,7 +140,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("ResidentID");
 
-                    b.ToTable("Medicines");
+                    b.ToTable("Medicines", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.PN", b =>
@@ -172,7 +172,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("ResidentStatusID");
 
-                    b.ToTable("PNs");
+                    b.ToTable("PNs", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.PaymentMethod", b =>
@@ -188,7 +188,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasKey("PaymentMethodID");
 
-                    b.ToTable("PaymentMethods");
+                    b.ToTable("PaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Phone", b =>
@@ -208,7 +208,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentID");
 
-                    b.ToTable("Phones");
+                    b.ToTable("Phones", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Resident", b =>
@@ -232,7 +232,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("GroceryDayID");
 
-                    b.ToTable("Residents");
+                    b.ToTable("Residents", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.ResidentPaymentMethod", b =>
@@ -247,7 +247,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("PaymentMethodID");
 
-                    b.ToTable("ResidentPaymentMethods");
+                    b.ToTable("ResidentPaymentMethods", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.ResidentStatus", b =>
@@ -275,7 +275,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("RiskLevelID");
 
-                    b.ToTable("ResidentStatuses");
+                    b.ToTable("ResidentStatuses", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.RiskLevel", b =>
@@ -291,7 +291,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasKey("RiskLevelID");
 
-                    b.ToTable("RiskLevels");
+                    b.ToTable("RiskLevels", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.ShiftBoard", b =>
@@ -313,7 +313,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasKey("ShiftBoardID");
 
-                    b.ToTable("ShiftBoards");
+                    b.ToTable("ShiftBoards", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibility", b =>
@@ -334,7 +334,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("ShiftBoardID");
 
-                    b.ToTable("SpecialResponsibilities");
+                    b.ToTable("SpecialResponsibilities", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
@@ -365,7 +365,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentID");
 
-                    b.ToTable("Staffs");
+                    b.ToTable("Staffs", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffPN", b =>
@@ -380,7 +380,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("PNID");
 
-                    b.ToTable("StaffPNs");
+                    b.ToTable("StaffPNs", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffPhone", b =>
@@ -398,7 +398,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("PhoneID");
 
-                    b.ToTable("StaffPhones");
+                    b.ToTable("StaffPhones", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffResidentStatus", b =>
@@ -413,7 +413,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("ResidentStatusID");
 
-                    b.ToTable("StaffResidentStatuses");
+                    b.ToTable("StaffResidentStatuses", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffShift", b =>
@@ -428,7 +428,7 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasIndex("StaffID");
 
-                    b.ToTable("StaffShifts");
+                    b.ToTable("StaffShifts", (string)null);
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.DepartmentTask", b =>

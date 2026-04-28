@@ -18,12 +18,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddHttpClient<ShiftboardController>();
 builder.Services.AddScoped<IResidentDTOService, ResidentDTOService>();
 builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
 builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
 builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
 builder.Services.AddScoped<IShiftBoardDTOService, ShiftBoardDTOService>();
+builder.Services.AddScoped<IGroceryDayDTOService, GroceryDayDTOService>();
+builder.Services.AddScoped<IPaymentMethodDTOService, PaymentMethodDTOService>();
+builder.Services.AddScoped<IPhoneDTOService, PhoneDTOService>();
+builder.Services.AddScoped<ISpecialResponsibilityDTOService, SpecialResponsibilityDTOService>();
 builder.Services.AddScoped<IAuditScope, AuditScope>();
 builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();

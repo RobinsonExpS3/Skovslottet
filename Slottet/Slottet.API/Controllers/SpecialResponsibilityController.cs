@@ -1,39 +1,37 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
-using Slottet.Infrastructure.Data;
-using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SpecialResponsibilityController : Controller {
-        private readonly SlottetDBContext _context;
+    public class SpecialResponsibilityController : Controller
+    {
+        private readonly ISpecialResponsibilityDTOService _specialResponsibilityService;
 
-        public SpecialResponsibilityController(SlottetDBContext context) {
-            _context = context;
+        public SpecialResponsibilityController(ISpecialResponsibilityDTOService specialResponsibilityService)
+        {
+            _specialResponsibilityService = specialResponsibilityService;
         }
 
         //Get: special responsibility
         [HttpGet("SpecialResponsibilities")]
-        public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAllAsync() {
-            var specialResponsibility = await _context.SpecialResponsibilities
-                .AsNoTracking()
-                .ToListAsync();
+        public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAllAsync()
+        {
+            var specialResponsibilities = await _specialResponsibilityService.GetAllAsync();
 
-            return Ok(specialResponsibility);
+            return Ok(specialResponsibilities);
         }
 
         //Get: special responsibility by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> GetByIdAsync(Guid id) {
-            var specialResponsibility = await _context.SpecialResponsibilities
-                .AsNoTracking()
-                .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
+        public async Task<ActionResult<SpecialResponsibility>> GetByIdAsync(Guid id)
+        {
+            var specialResponsibility = await _specialResponsibilityService.GetByIdAsync(id);
 
-            if (specialResponsibility == null) {
+            if (specialResponsibility == null)
+            {
                 return NotFound();
             }
 
@@ -42,55 +40,47 @@ namespace Slottet.API.Controllers
 
         //Post: special responsibility
         [HttpPost]
-        public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibility specialResponsibility) {
-            if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty) {
+        public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibility specialResponsibility)
+        {
+            if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty)
+            {
                 return BadRequest();
             }
 
-            if(specialResponsibility.SpecialResponsibilityID == Guid.Empty) {
-                specialResponsibility.SpecialResponsibilityID = Guid.NewGuid();
-            }
+            var createdSpecialResponsibility = await _specialResponsibilityService.CreateAsync(specialResponsibility);
 
-            _context.SpecialResponsibilities.Add(specialResponsibility);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = createdSpecialResponsibility.SpecialResponsibilityID }, createdSpecialResponsibility);
         }
 
         //Put: special responsibility by id
         [HttpPut("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> UpdateAsync(Guid id, [FromBody] SpecialResponsibility specialResponsibility) {
-            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty) {
+        public async Task<ActionResult<SpecialResponsibility>> UpdateAsync(Guid id, [FromBody] SpecialResponsibility specialResponsibility)
+        {
+            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty)
+            {
                 return BadRequest();
             }
 
-            var existingSpecialResponsibility = await _context.SpecialResponsibilities
-                .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
+            var updated = await _specialResponsibilityService.UpdateAsync(id, specialResponsibility);
 
-            if (existingSpecialResponsibility == null) {
+            if (!updated)
+            {
                 return NotFound();
             }
-
-            existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
-            existingSpecialResponsibility.ShiftBoardID = specialResponsibility.ShiftBoardID;
-
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
         //Delete: special responsibility by id
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteAsync(Guid id) {
-            var existingSpecialResponsibility = await _context.SpecialResponsibilities
-                .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
+        public async Task<ActionResult> DeleteAsync(Guid id)
+        {
+            var deleted = await _specialResponsibilityService.DeleteAsync(id);
 
-            if (existingSpecialResponsibility == null) {
+            if (!deleted)
+            {
                 return NotFound();
             }
-
-            _context.SpecialResponsibilities.Remove(existingSpecialResponsibility);
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }

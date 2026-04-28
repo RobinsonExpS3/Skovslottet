@@ -1,59 +1,80 @@
+using Microsoft.EntityFrameworkCore;
+using Slottet.Domain.Entities;
+
 namespace Slottet.Infrastructure.Data.Seed
 {
-    //public static class ResidentStatusSeeder
-    //{
-    //    public static async Task<List<ResidentStatus>> SeedAsync(SlottetDBContext context)
-    //    {
-    //        if (await context.ResidentStatuses.AnyAsync())
-    //            return await context.ResidentStatuses.ToListAsync();
+    public static class ResidentStatusSeeder
+    {
+        public static async Task<List<ResidentStatus>> SeedAsync(SlottetDBContext context)
+        {
+            if (await context.ResidentStatuses.AnyAsync())
+                return await context.ResidentStatuses.ToListAsync();
 
-    //        var residents   = await context.Residents.ToListAsync();
-    //        var riskLevels  = await context.RiskLevels.ToListAsync();
+            var residents = await context.Residents
+                .OrderBy(r => r.ResidentName)
+                .ToListAsync();
+            var riskLevels = await context.RiskLevels.ToListAsync();
 
-    //        if (residents.Count == 0)
-    //            throw new InvalidOperationException("Residents must be seeded before ResidentStatuses.");
-    //        if (riskLevels.Count == 0)
-    //            throw new InvalidOperationException("RiskLevels must be seeded before ResidentStatuses.");
+            if (residents.Count == 0)
+                throw new InvalidOperationException("Residents must be seeded before ResidentStatuses.");
+            if (riskLevels.Count == 0)
+                throw new InvalidOperationException("RiskLevels must be seeded before ResidentStatuses.");
 
-    //        Guid Risk(string name) => riskLevels.First(r => r.RiskLevelName == name).RiskLevelID;
+            var statuses = new[]
+            {
+                "Har sovet godt og taget morgenmedicin uden problemer.",
+                "Rolig formiddag. Har spist og været ude at gå.",
+                "Virker nedtrykt og ønsker ro i dag.",
+                "Har brug for ekstra støtte og tydelig guidning.",
+                "Har været urolig i løbet af natten.",
+                "Vil gerne have faste rutiner og korte beskeder.",
+                "Følsom over for støj i fællesarealerne.",
+                "Har brug for opmuntring før aktiviteter.",
+                "Har været afventende i kontakt med personale.",
+                "Har haft behov for hyppige pauser.",
+                "Har været træt og ønsket at blive på værelset.",
+                "Ønsker rolig kontakt og én medarbejder ad gangen.",
+            };
 
-    //        var data = new (string Name, string Note, string Risk)[]
-    //        {
-    //            ("Anna Bentsen",      "Har sovet godt og taget morgenmedicin uden problemer.", "Grøn"),
-    //            ("Carsten Didriksen", "Rolig formiddag. Har spist og været ude at gå.",        "Grøn"),
-    //            ("Enaya Frederiksen", "Virker nedtrykt og ønsker ro i dag.",                   "Gul" ),
-    //            ("Gert Heller",       "Har brug for ekstra støtte og tydelig guidning.",        "Gul" ),
-    //            ("Ida Jacoby",        "Har været urolig i løbet af natten.",                    "Rød" ),
-    //            ("Karl Larsen",       "Vil gerne have faste rutiner og korte beskeder.",        "Rød" ),
-    //            ("Mette Nielsen",     "Følsom over for støj i fællesarealerne.",                "Gul" ),
-    //            ("Ole Pontoppidan",   "Har brug for opmuntring før aktiviteter.",               "Gul" ),
-    //            ("Quint Roberts",     "Har været afventende i kontakt med personale.",          "Gul" ),
-    //            ("Søren Thomasson",   "Har haft behov for hyppige pauser.",                     "Rød" ),
-    //            ("Ulke Venja",        "Har været træt og ønsket at blive på værelset.",         "Rød" ),
-    //            ("Whilmer Xander",    "Ønsker rolig kontakt og én medarbejder ad gangen.",      "Grøn"),
-    //        };
+            var risks = new[]
+            {
+                "Grøn",
+                "Grøn",
+                "Gul",
+                "Gul",
+                "Rød",
+                "Rød",
+                "Gul",
+                "Gul",
+                "Gul",
+                "Rød",
+                "Rød",
+                "Grøn",
+            };
 
-    //        var statuses = new List<ResidentStatus>();
-    //        foreach (var (name, note, risk) in data)
-    //        {
-    //            var resident = residents.FirstOrDefault(r => r.ResidentName == name);
-    //            if (resident is null) continue;
+            if (residents.Count != statuses.Length || statuses.Length != risks.Length)
+                throw new InvalidOperationException("ResidentStatuses seed data must match the number of residents.");
 
-    //            statuses.Add(new ResidentStatus
-    //            {
-    //                ResidentStatusID = Guid.NewGuid(),
-    //                ResidentID       = resident.ResidentID,
-    //                RiskLevelID      = Risk(risk),
-    //                Status           = note,
-    //                Date             = DateTime.Today,
-    //            });
-    //        }
+            Guid Risk(string name) => riskLevels
+                .First(r => r.RiskLevelName == name)
+                .RiskLevelID;
 
-    //        context.ResidentStatuses.AddRange(statuses);
-    //        await context.SaveChangesAsync();
-    //        return statuses;
-    //    }
-    //}
+            var residentStatuses = new List<ResidentStatus>();
+            for (int i = 0; i < residents.Count; i++)
+            {
+                residentStatuses.Add(new ResidentStatus
+                {
+                    ResidentStatusID = Guid.NewGuid(),
+                    ResidentID = residents[i].ResidentID,
+                    RiskLevelID = Risk(risks[i]),
+                    Status = statuses[i],
+                    Date = DateTime.Today,
+                });
+            }
+
+            context.ResidentStatuses.AddRange(residentStatuses);
+            await context.SaveChangesAsync();
+            return residentStatuses;
+        }
+    }
 }
-
-//TODO 

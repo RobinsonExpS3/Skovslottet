@@ -32,7 +32,7 @@ else
             @foreach (var resident in Model.ResidentCards.Take(12))
             {
                 var displayedMeds = resident.MedicineSchedule.Take(6).ToList();
-                var cardId        = "kort-" + resident.ResidentCardId;
+                var cardId        = "kort-" + resident.ResidentStatusID;
                 var todayDanish   = DateTime.Today.DayOfWeek switch
                 {
                     DayOfWeek.Monday    => "Mandag",

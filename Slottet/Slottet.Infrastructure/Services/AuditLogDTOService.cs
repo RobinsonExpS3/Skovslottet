@@ -23,6 +23,41 @@ namespace Slottet.Infrastructure.Services {
                     .ToListAsync();
         }
 
+        public async Task<IEnumerable<AuditLogDTO>> GetAllAsync(DateOnly? date, string? shift) {
+            IQueryable<AuditLog> query = _context.AuditLogs.AsNoTracking();
+
+            if (date.HasValue) {
+                var from = date.Value.ToDateTime(TimeOnly.MinValue);
+                var to = from.AddDays(1);
+
+                query = query.Where(log =>
+                    (log.PerformedAtTime ?? log.TimeStamp) >= from &&
+                    (log.PerformedAtTime ?? log.TimeStamp) < to);
+            }
+
+            if (!string.IsNullOrWhiteSpace(shift)) {
+                var normalizedShift = shift.Trim().ToLowerInvariant();
+
+                query = normalizedShift switch {
+                    "day" => query.Where(log =>
+                        (log.PerformedAtTime ?? log.TimeStamp).Hour >= 7 &&
+                        (log.PerformedAtTime ?? log.TimeStamp).Hour < 15),
+                    "evening" => query.Where(log =>
+                        (log.PerformedAtTime ?? log.TimeStamp).Hour >= 15 &&
+                        (log.PerformedAtTime ?? log.TimeStamp).Hour < 23),
+                    "night" => query.Where(log =>
+                        (log.PerformedAtTime ?? log.TimeStamp).Hour >= 23 ||
+                        (log.PerformedAtTime ?? log.TimeStamp).Hour < 7),
+                    _ => query
+                };
+            }
+
+            return await query
+                .OrderBy(log => log.AuditLogID)
+                .Select(MapToDtoExpression())
+                .ToListAsync();
+        }
+
         private static System.Linq.Expressions.Expression<Func<AuditLog, AuditLogDTO>> MapToDtoExpression() {
             return auditLog => new AuditLogDTO {
                 AuditLogID = auditLog.AuditLogID,

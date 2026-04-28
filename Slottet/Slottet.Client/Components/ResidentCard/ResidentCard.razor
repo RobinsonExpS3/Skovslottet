@@ -185,9 +185,9 @@
     // ── Private PN row wrapper ────────────────────────────────────────
     private class PnRow
     {
-        public ResidentCardDto.PNEntryDto  Entry     { get; set; } = new();
+        public PNEntryDto  Entry     { get; set; } = new();
         public bool        IsEditing { get; set; }
-        public ResidentCardDto.PNEntryDto? Snapshot  { get; set; }
+        public PNEntryDto? Snapshot  { get; set; }
     }
 
     // ── Draft state ───────────────────────────────────────────────────
@@ -218,7 +218,7 @@
         var label = _newMedicineLabel.Trim();
         var time  = TimeOnly.TryParse(label, out var t) ? t : TimeOnly.MinValue;
 
-        _draft.MedicineSchedule.Add(new ResidentCardDto.MedicineScheduleItemDto
+        _draft.MedicineSchedule.Add(new MedicineScheduleItemDto
         {
             Label   = label,
             Time    = time,
@@ -237,7 +237,7 @@
     {
         _pnRows.Add(new PnRow
         {
-            Entry     = new ResidentCardDto.PNEntryDto { IssuedBy = "Logged-in user" },
+            Entry     = new PNEntryDto { IssuedBy = "Logged-in user" },
             IsEditing = true,
             Snapshot  = null
         });
@@ -286,7 +286,7 @@
         Resident.GroceryDay       = _draft.GroceryDay;
         Resident.AssignedStaff    = new List<string>(_draft.AssignedStaff);
         Resident.MedicineSchedule = _draft.MedicineSchedule
-            .Select(m => new ResidentCardDto.MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
+            .Select(m => new MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
             .ToList();
         Resident.PNEntries = _pnRows
             .OrderBy(r => ParseTime(r.Entry.TimeOfAdministration))
@@ -328,8 +328,8 @@
     // ── Deep copy helpers ─────────────────────────────────────────────
     private static ResidentCardDto DeepCopy(ResidentCardDto src) => new()
     {
-        ResidentCardId   = src.ResidentCardId,
-        ResidentId       = src.ResidentId,
+        ResidentStatusID   = src.ResidentStatusID,
+        ResidentID         = src.ResidentID,
         Date             = src.Date,
         ResidentName     = src.ResidentName,
         IsActive         = src.IsActive,
@@ -339,12 +339,12 @@
         GroceryDay       = src.GroceryDay,
         AssignedStaff    = new List<string>(src.AssignedStaff),
         MedicineSchedule = src.MedicineSchedule
-            .Select(m => new ResidentCardDto.MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
+            .Select(m => new MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
             .ToList(),
         PNEntries = src.PNEntries.Select(ClonePN).ToList(),
     };
 
-    private static ResidentCardDto.PNEntryDto ClonePN(ResidentCardDto.PNEntryDto src) => new()
+    private static PNEntryDto ClonePN(PNEntryDto src) => new()
     {
         TimeOfAdministration = src.TimeOfAdministration,
         Medication           = src.Medication,

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
-using Slottet.Infrastructure.Data;
 
 namespace Slottet.API.Controllers
 {
@@ -14,36 +8,34 @@ namespace Slottet.API.Controllers
     [ApiController]
     public class PhoneController : ControllerBase
     {
-        private readonly SlottetDBContext _context;
+        private readonly IPhoneDTOService _phoneService;
 
-        public PhoneController(SlottetDBContext context)
+        public PhoneController(IPhoneDTOService phoneService)
         {
-            _context = context;
+            _phoneService = phoneService;
         }
 
-        // GET: api/Phones
         [HttpGet("Phones")]
         public async Task<ActionResult<IEnumerable<Phone>>> GetAllAsync()
         {
-            return await _context.Phones.ToListAsync();
+            var phones = await _phoneService.GetAllAsync();
+
+            return Ok(phones);
         }
 
-        // GET: api/Phones/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Phone>> GetPhone(Guid id)
         {
-            var phone = await _context.Phones.FindAsync(id);
+            var phone = await _phoneService.GetByIdAsync(id);
 
             if (phone == null)
             {
                 return NotFound();
             }
 
-            return phone;
+            return Ok(phone);
         }
 
-        // PUT: api/Phones/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPhone(Guid id, Phone phone)
         {
@@ -52,57 +44,35 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(phone).State = EntityState.Modified;
+            var updated = await _phoneService.UpdateAsync(id, phone);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PhoneExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Phones
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Phone>> PostPhone(Phone phone)
-        {
-            _context.Phones.Add(phone);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetPhone", new { id = phone.PhoneID }, phone);
-        }
-
-        // DELETE: api/Phones/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteAsync(Guid id)
-        {
-            var phone = await _context.Phones.FindAsync(id);
-            if (phone == null)
+            if (!updated)
             {
                 return NotFound();
             }
 
-            _context.Phones.Remove(phone);
-            await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
-        private bool PhoneExists(Guid id)
+        [HttpPost]
+        public async Task<ActionResult<Phone>> PostPhone(Phone phone)
         {
-            return _context.Phones.Any(e => e.PhoneID == id);
+            var createdPhone = await _phoneService.CreateAsync(phone);
+
+            return CreatedAtAction(nameof(GetPhone), new { id = createdPhone.PhoneID }, createdPhone);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            var deleted = await _phoneService.DeleteAsync(id);
+
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
         }
     }
 }
