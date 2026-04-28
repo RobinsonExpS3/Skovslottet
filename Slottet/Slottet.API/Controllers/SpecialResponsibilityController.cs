@@ -40,24 +40,23 @@ namespace Slottet.API.Controllers
 
         //Post: special responsibility
         [HttpPost]
-        public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibility specialResponsibility)
-        {
-            if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty)
-            {
+        public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibility specialResponsibility) {
+            if (specialResponsibility == null || string.IsNullOrWhiteSpace(specialResponsibility.TaskName)) {
                 return BadRequest();
             }
 
             var createdSpecialResponsibility = await _specialResponsibilityService.CreateAsync(specialResponsibility);
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = createdSpecialResponsibility.SpecialResponsibilityID }, createdSpecialResponsibility);
+            _context.SpecialResponsibilities.Add(specialResponsibility);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetById", new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
         }
 
         //Put: special responsibility by id
         [HttpPut("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> UpdateAsync(Guid id, [FromBody] SpecialResponsibility specialResponsibility)
-        {
-            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName) || specialResponsibility.ShiftBoardID == Guid.Empty)
-            {
+        public async Task<ActionResult<SpecialResponsibility>> UpdateAsync(Guid id, [FromBody] SpecialResponsibility specialResponsibility) {
+            if (specialResponsibility == null || id != specialResponsibility.SpecialResponsibilityID || string.IsNullOrWhiteSpace(specialResponsibility.TaskName)) {
                 return BadRequest();
             }
 
@@ -67,6 +66,10 @@ namespace Slottet.API.Controllers
             {
                 return NotFound();
             }
+
+            existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }

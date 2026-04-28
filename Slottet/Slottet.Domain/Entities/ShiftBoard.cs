@@ -8,6 +8,5 @@
         public DateTime EndDateTime { get; set; }
 
         public ICollection<StaffShift> StaffShifts { get; set; }
-        public ICollection<SpecialResponsibility> SpecialResponsibilities { get; set; }
     }
 }

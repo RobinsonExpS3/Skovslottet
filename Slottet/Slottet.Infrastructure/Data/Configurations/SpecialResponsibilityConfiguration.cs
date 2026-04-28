@@ -14,9 +14,9 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
-            entity.HasOne(sb => sb.ShiftBoard)
+            entity.HasOne(sb => sb.SpecialResponsibilityStaff)
                 .WithMany(sb => sb.SpecialResponsibilities)
-                .HasForeignKey(sr => sr.ShiftBoardID)
+                .HasForeignKey(sr => sr.??????)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

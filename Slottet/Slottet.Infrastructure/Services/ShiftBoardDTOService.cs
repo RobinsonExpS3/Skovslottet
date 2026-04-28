@@ -70,13 +70,7 @@ namespace Slottet.Infrastructure.Services
                     .Select(staff => staff.StaffName)
                     .OrderBy(name => name)
                     .ToList() ?? new(),
-                SpecialResponsibilities = shiftBoard.SpecialResponsibilities
-                    .Select(responsibility => new SpecialResponsibilityEntryDto
-                    {
-                        Description = responsibility.TaskName,
-                        StaffName = string.Empty
-                    })
-                    .ToList(),
+
                 ResidentCards = residents
                     .Select(MapResidentCard)
                     .ToList()
@@ -144,7 +138,6 @@ namespace Slottet.Infrastructure.Services
                 .AsNoTracking()
                 .Include(sb => sb.StaffShifts)
                     .ThenInclude(ss => ss.Staff)
-                .Include(sb => sb.SpecialResponsibilities)
                 .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
         }
 
