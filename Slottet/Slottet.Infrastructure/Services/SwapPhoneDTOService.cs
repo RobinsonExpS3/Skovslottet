@@ -40,7 +40,7 @@ namespace Slottet.Infrastructure.Services
             {
                 PhoneID = dto.PhoneID,
                 StaffID = dto.StaffID,
-                AssignedAt = DateTime.UtcNow
+                AssignedAt = DateTime.Now
             };
 
             _context.StaffPhones.Add(assignment);
