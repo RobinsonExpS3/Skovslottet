@@ -28,7 +28,6 @@ builder.Services.AddScoped<IShiftBoardDTOService, ShiftBoardDTOService>();
 builder.Services.AddScoped<IGroceryDayDTOService, GroceryDayDTOService>();
 builder.Services.AddScoped<IPaymentMethodDTOService, PaymentMethodDTOService>();
 builder.Services.AddScoped<IPhoneDTOService, PhoneDTOService>();
-builder.Services.AddScoped<ISpecialResponsibilityDTOService, SpecialResponsibilityDTOService>();
 builder.Services.AddScoped<IAuditScope, AuditScope>();
 builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();

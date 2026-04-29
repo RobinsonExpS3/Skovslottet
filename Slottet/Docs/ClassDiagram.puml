@@ -1,0 +1,420 @@
+@startuml Slottet_Class_Diagram
+title Slottet - Class diagram med projektmapper
+
+skinparam packageStyle folder
+skinparam linetype ortho
+skinparam shadowing false
+hide empty members
+hide circle
+
+package "Slottet" as SlottetRoot <<Project>> {
+  package "Components/Layout" as RootLayout <<Folder>> {
+    class NavMenu
+  }
+
+  package "Program" as RootProgram <<Folder>> {
+    class RootProgramEntry <<Program>>
+  }
+}
+
+package "Slottet.API" as API <<Project>> {
+  package "Controllers" as APIControllers <<Folder>> {
+    class AuditLogController
+    class GroceryDayController
+    class MedicineController
+    class PaymentMethodController
+    class PhoneController
+    class ResidentController
+    class ShiftboardController
+    class SpecialResponsibilityController
+    class StaffController
+    class StaffPNController
+    class SwapPhoneController
+  }
+
+  package "Middlewares" as APIMiddlewares <<Folder>> {
+    class AuditScopeMiddleware
+  }
+
+  class APIProgram <<Program>>
+}
+
+package "Slottet.Application" as Application <<Project>> {
+  package "Interfaces" as AppInterfaces <<Folder>> {
+    interface IAuditLogDTOService
+    interface IAuditScope {
+      Guid? PerformedByStaffID
+      string? PerformedByStaffName
+      DateTime? PerformedAtTime
+    }
+    interface IMedicineDTOService
+    interface INoteMedicineDTOService
+    interface IResidentDTOService
+    interface IShiftBoardDTOService
+    interface IStaffDTOService
+    interface IStaffPNDTOService
+    interface ISwapPhoneDTOService
+  }
+
+  package "Services" as AppServices <<Folder>> {
+    class Class1
+  }
+}
+
+package "Slottet.Client" as Client <<Project>> {
+  package "Components" as ClientComponents <<Folder>> {
+    class DepartmentTaskComponent <<Razor>>
+    class OverlayComponent <<Razor>>
+    class PhoneListComponent <<Razor>>
+    class ResidentCardComponent <<Razor>>
+    class SpecialResponsibilityComponent <<Razor>>
+  }
+
+  package "Pages/AdminPages" as ClientAdminPages <<Folder>> {
+    class AdminAudit <<Razor>>
+    class AdminResident <<Razor>>
+    class AdminSpecialResponsibility <<Razor>>
+    class AdminStaff <<Razor>>
+  }
+
+  package "Pages/ShiftBoard" as ClientShiftBoardPages <<Folder>> {
+    class ShiftBoardPage <<Razor>>
+    enum OverlayPanel
+    class BoundingRect <<record>>
+  }
+}
+
+package "Slottet.Domain" as Domain <<Project>> {
+  package "Entities" as DomainEntities <<Folder>> {
+    class AuditLog {
+      Guid AuditLogID
+      DateTime TimeStamp
+      string Action
+      string TableName
+      string KeyValues
+    }
+
+    class Department {
+      Guid DepartmentID
+      string DepartmentName
+    }
+
+    class DepartmentTask {
+      Guid DepartmentTaskID
+      string DepartmentTaskName
+      Guid DepartmentID
+    }
+
+    class GroceryDay {
+      Guid GroceryDayID
+      string GroceryDayName
+    }
+
+    class Medicine {
+      Guid MedicineID
+      DateTime MedicineTime
+      DateTime MedicineGivenTime
+      DateTime MedicineRegisteredTime
+      Guid ResidentID
+    }
+
+    class PaymentMethod {
+      Guid PaymentMethodID
+      string PaymentMethodName
+    }
+
+    class Phone {
+      Guid PhoneID
+      string PhoneNumber
+      Guid DepartmentID
+    }
+
+    class PN {
+      Guid PNID
+      DateTime PNGivenTime
+      string PNReason
+      DateTime PNRegisteredTime
+      Guid ResidentID
+    }
+
+    class Resident {
+      Guid ResidentID
+      string ResidentName
+      bool IsActive
+      Guid GroceryDayID
+    }
+
+    class ResidentPaymentMethod {
+      Guid ResidentID
+      Guid PaymentMethodID
+    }
+
+    class ResidentStatus {
+      Guid ResidentStatusID
+      string Status
+      DateTime Date
+      Guid ResidentID
+      Guid RiskLevelID
+    }
+
+    class RiskLevel {
+      Guid RiskLevelID
+      string RiskLevelName
+    }
+
+    class ShiftBoard {
+      Guid ShiftBoardID
+      string ShiftType
+      DateTime StartDateTime
+      DateTime EndDateTime
+    }
+
+    class SpecialResponsibility {
+      Guid SpecialResponsibilityID
+      string TaskName
+      Guid ShiftBoardID
+    }
+
+    class SpecialResponsibilityShiftBoard {
+      Guid ShiftBoardID
+      Guid SpecialResponsibilityID
+    }
+
+    class Staff {
+      Guid StaffID
+      string StaffName
+      string Initials
+      string Role
+      Guid DepartmentID
+    }
+
+    class StaffPhone {
+      Guid StaffID
+      Guid PhoneID
+      DateTime AssignedAt
+    }
+
+    class StaffPN {
+      Guid StaffID
+      Guid PNID
+    }
+
+    class StaffResidentStatus {
+      Guid StaffID
+      Guid ResidentStatusID
+    }
+
+    class StaffShift {
+      Guid ShiftBoardID
+      Guid StaffID
+    }
+  }
+}
+
+package "Slottet.Infrastructure" as Infrastructure <<Project>> {
+  package "Auditing" as InfraAuditing <<Folder>> {
+    class AuditInterceptor
+  }
+
+  package "Data" as InfraData <<Folder>> {
+    class SlottetDBContext
+    class DBSeeder
+    class SQLHelper
+
+    package "Configurations" as InfraConfigurations <<Folder>> {
+      class AuditLogConfiguration
+      class DepartmentConfiguration
+      class DepartmentTaskConfiguration
+      class GroceryDayConfiguration
+      class MedicineConfiguration
+      class PaymentMethodConfiguration
+      class PhoneConfiguration
+      class PNConfiguration
+      class ResidentConfiguration
+      class ResidentPaymentMethodConfiguration
+      class ResidentStatusConfiguration
+      class RiskLevelConfiguration
+      class ShiftBoardConfiguration
+      class SpecialResponsibilityConfiguration
+      class StaffConfiguration
+      class StaffPhoneConfiguration
+      class StaffPNConfiguration
+      class StaffResidentStatusConfiguration
+      class StaffShiftConfiguration
+    }
+
+    package "Seed" as InfraSeed <<Folder>> {
+      class DepartmentSeeder
+      class DepartmentTaskSeeder
+      class GroceryDaySeeder
+      class MedicineSeeder
+      class PaymentMethodSeeder
+      class PhoneSeeder
+      class PNSeeder
+      class ResidentPaymentMethodSeeder
+      class ResidentSeeder
+      class ResidentStatusSeeder
+      class RiskLevelSeeder
+      class ShiftBoardSeeder
+      class SpecialResponsibilitySeeder
+      class StaffResidentStatusSeeder
+      class StaffSeeder
+      class StaffShiftSeeder
+    }
+  }
+
+  package "Services" as InfraServices <<Folder>> {
+    class AuditLogDTOService
+    class MedicineDTOService
+    class NoteMedicinDTOService
+    class ResidentDTOService
+    class ShiftBoardDTOService
+    class StaffDTOService
+    class StaffPNDTOService
+    class SwapPhoneDTOService
+  }
+
+  class AuditScope
+}
+
+package "Slottet.Shared" as Shared <<Project>> {
+  class AuditLogDTO
+  class EditResidentDTO
+  class EditStaffDTO
+  class MedicineAPI_DTO
+  class NoteMedicineDTO
+  class PhoneEntryDto
+  class PNEntryDto
+  class ResidentCardDto
+  class MedicineScheduleItemDto
+  class ResidentLookupDTO
+  class ShiftBoardDTO
+  class SpecialResponsibilityEntryDto
+  class StaffPNDTO
+  class SwapPhoneDTO
+}
+
+' Project references / layer dependencies
+SlottetRoot ..> API : references
+SlottetRoot ..> Client : references
+SlottetRoot ..> Shared : references
+API ..> Application : references
+API ..> Domain : references
+API ..> Infrastructure : references
+API ..> Shared : references
+Application ..> Domain : references
+Application ..> Shared : references
+Client ..> Domain : references
+Client ..> Shared : references
+Infrastructure ..> Application : references
+Infrastructure ..> Domain : references
+
+' API to service interfaces
+AuditLogController ..> IAuditLogDTOService
+MedicineController ..> IMedicineDTOService
+PhoneController ..> ISwapPhoneDTOService
+ResidentController ..> IResidentDTOService
+ShiftboardController ..> IShiftBoardDTOService
+StaffController ..> IStaffDTOService
+StaffPNController ..> IStaffPNDTOService
+SwapPhoneController ..> ISwapPhoneDTOService
+AuditScopeMiddleware ..> IAuditScope
+
+' Interface implementations
+AuditLogDTOService ..|> IAuditLogDTOService
+MedicineDTOService ..|> IMedicineDTOService
+NoteMedicinDTOService ..|> INoteMedicineDTOService
+ResidentDTOService ..|> IResidentDTOService
+ShiftBoardDTOService ..|> IShiftBoardDTOService
+StaffDTOService ..|> IStaffDTOService
+StaffPNDTOService ..|> IStaffPNDTOService
+SwapPhoneDTOService ..|> ISwapPhoneDTOService
+AuditScope ..|> IAuditScope
+
+' Infrastructure dependencies
+SlottetDBContext ..> AuditInterceptor
+SlottetDBContext ..> AuditLogConfiguration
+SlottetDBContext ..> DepartmentConfiguration
+SlottetDBContext ..> DepartmentTaskConfiguration
+SlottetDBContext ..> GroceryDayConfiguration
+SlottetDBContext ..> MedicineConfiguration
+SlottetDBContext ..> PaymentMethodConfiguration
+SlottetDBContext ..> PhoneConfiguration
+SlottetDBContext ..> PNConfiguration
+SlottetDBContext ..> ResidentConfiguration
+SlottetDBContext ..> ResidentPaymentMethodConfiguration
+SlottetDBContext ..> ResidentStatusConfiguration
+SlottetDBContext ..> RiskLevelConfiguration
+SlottetDBContext ..> ShiftBoardConfiguration
+SlottetDBContext ..> SpecialResponsibilityConfiguration
+SlottetDBContext ..> StaffConfiguration
+SlottetDBContext ..> StaffPhoneConfiguration
+SlottetDBContext ..> StaffPNConfiguration
+SlottetDBContext ..> StaffResidentStatusConfiguration
+SlottetDBContext ..> StaffShiftConfiguration
+DBSeeder ..> InfraSeed
+
+' EF configuration targets
+AuditLogConfiguration ..> AuditLog
+DepartmentConfiguration ..> Department
+DepartmentTaskConfiguration ..> DepartmentTask
+GroceryDayConfiguration ..> GroceryDay
+MedicineConfiguration ..> Medicine
+PaymentMethodConfiguration ..> PaymentMethod
+PhoneConfiguration ..> Phone
+PNConfiguration ..> PN
+ResidentConfiguration ..> Resident
+ResidentPaymentMethodConfiguration ..> ResidentPaymentMethod
+ResidentStatusConfiguration ..> ResidentStatus
+RiskLevelConfiguration ..> RiskLevel
+ShiftBoardConfiguration ..> ShiftBoard
+SpecialResponsibilityConfiguration ..> SpecialResponsibility
+StaffConfiguration ..> Staff
+StaffPhoneConfiguration ..> StaffPhone
+StaffPNConfiguration ..> StaffPN
+StaffResidentStatusConfiguration ..> StaffResidentStatus
+StaffShiftConfiguration ..> StaffShift
+
+' Domain relationships
+Department "1" o-- "0..*" DepartmentTask
+Department "1" o-- "0..*" Phone
+Department "1" o-- "0..*" Staff
+GroceryDay "1" o-- "0..*" Resident
+Resident "1" o-- "0..*" Medicine
+Resident "1" o-- "0..*" PN
+Resident "1" o-- "0..*" ResidentStatus
+Resident "1" o-- "0..*" ResidentPaymentMethod
+PaymentMethod "1" o-- "0..*" ResidentPaymentMethod
+RiskLevel "1" o-- "0..*" ResidentStatus
+ResidentStatus "1" o-- "0..*" StaffResidentStatus
+Staff "1" o-- "0..*" StaffResidentStatus
+ShiftBoard "1" o-- "0..*" StaffShift
+Staff "1" o-- "0..*" StaffShift
+ShiftBoard "1" o-- "0..*" SpecialResponsibility
+ShiftBoard "1" o-- "0..*" SpecialResponsibilityShiftBoard
+SpecialResponsibility "1" o-- "0..*" SpecialResponsibilityShiftBoard
+Staff "1" o-- "0..*" StaffPhone
+Phone "1" o-- "0..*" StaffPhone
+Staff "1" o-- "0..*" StaffPN
+PN "1" o-- "0..*" StaffPN
+
+' Shared DTO composition
+ShiftBoardDTO "1" o-- "0..*" ResidentCardDto
+ShiftBoardDTO "1" o-- "0..*" SpecialResponsibilityEntryDto
+ShiftBoardDTO "1" o-- "0..*" PhoneEntryDto
+ResidentCardDto "1" o-- "0..*" MedicineScheduleItemDto
+ResidentCardDto "1" o-- "0..*" PNEntryDto
+EditResidentDTO "1" o-- "0..*" ResidentLookupDTO
+
+' DTO/service usage
+AuditLogDTOService ..> AuditLogDTO
+MedicineDTOService ..> MedicineAPI_DTO
+NoteMedicinDTOService ..> NoteMedicineDTO
+ResidentDTOService ..> ResidentCardDto
+ResidentDTOService ..> EditResidentDTO
+ShiftBoardDTOService ..> ShiftBoardDTO
+StaffDTOService ..> EditStaffDTO
+StaffPNDTOService ..> StaffPNDTO
+SwapPhoneDTOService ..> SwapPhoneDTO
+
+@enduml
