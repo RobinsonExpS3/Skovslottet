@@ -42,7 +42,7 @@ namespace Slottet.Infrastructure.Services
                 ResidentID = dto.ResidentID,
                 MedicineTime = dto.MedicineTime,
                 MedicineGivenTime = dto.MedicineGivenTime ?? DateTime.Now,
-                MedicineRegisteredTime = DateTime.Now
+                MedicineRegisteredTime = null
             };
 
             _context.Medicines.Add(medicine);
