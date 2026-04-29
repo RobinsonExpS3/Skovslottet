@@ -58,6 +58,18 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+
+//builder.Services.AddAuthentication("Bearer")
+//    .AddJwtBearer("Bearer", options =>
+//    {
+//        options.Authority = "https://localhost:5001";
+//        options.RequireHttpsMetadata = true;
+//        options.Audience = "slottet-api";
+//    });
+
+//builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -78,7 +90,7 @@ app.UseCors("blazorApp");
 app.UseCors("blazorApp2");
 
 app.UseMiddleware<AuditScopeMiddleware>();
-
+//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
