@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
@@ -17,16 +18,50 @@ namespace Slottet.Infrastructure.Services
 
         public async Task<IEnumerable<SpecialResponsibilityEntryDto>> GetAllAsync()
         {
-            return await _context.SpecialResponsibilities
+            var specialresponsibilities = await _context.SpecialResponsibilities
                 .AsNoTracking()
+                .OrderBy(sr => sr.TaskName)
+                .Select(MapToDtoExpression())
                 .ToListAsync();
+
+            var staffs = await GetStaffLookupAsync();
+
+            foreach (var specialResponsibility in specialresponsibilities)
+            {
+                var staff = staffs.FirstOrDefault(s => s.StaffName == specialResponsibility.StaffName);
+                if (staff != null)
+                {
+                    specialResponsibility.StaffName = staff.StaffName;
+                    specialResponsibility.StaffInitials = staff.Initials;
+                }
+            }
+
+            return specialresponsibilities;
         }
+
 
         public async Task<SpecialResponsibility?> GetByIdAsync(Guid id)
         {
-            return await _context.SpecialResponsibilities
+
+            var specialResponsibility = await _context.SpecialResponsibilities
                 .AsNoTracking()
+                .Where(sr => sr.SpecialResponsibilityID == id)
+                .Select(MapToDtoExpression())
                 .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
+
+            if (specialResponsibility != null)
+            {
+                var staff = await _context.Staffs
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.StaffName == specialResponsibility.StaffName);
+                if (staff != null)
+                {
+                    specialResponsibility.StaffName = staff.StaffName;
+                    specialResponsibility.StaffInitials = staff.Initials;
+                }
+            }
+
+            return specialResponsibility;
         }
 
         public async Task<SpecialResponsibility> CreateAsync(SpecialResponsibilityEntryDto dto)
@@ -38,6 +73,14 @@ namespace Slottet.Infrastructure.Services
 
             _context.SpecialResponsibilities.Add(specialResponsibility);
             await _context.SaveChangesAsync();
+
+            var specialResponsibility = new SpecialResponsibility
+            {
+                SpecialResponsibilityID = dto.SpecialResponsibilityID == Guid.Empty ?
+                    Guid.NewGuid() : dto.SpecialResponsibilityID,
+                TaskName = dto.Description,
+
+            };
 
             return specialResponsibility;
         }
@@ -71,6 +114,30 @@ namespace Slottet.Infrastructure.Services
             _context.SpecialResponsibilities.Remove(specialResponsibility);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        private async Task<List<StaffLookupDto>> GetStaffLookupAsync()
+        {
+            return await _context.Staffs
+                .AsNoTracking()
+                .Select(s => new StaffLookupDto
+                {
+                    ID = s.StaffID,
+                    StaffName = s.StaffName,
+                    Initials = s.Initials,
+                    Role = s.Role
+                })
+                .ToListAsync();
+        }
+
+        private static Expression<Func<SpecialResponsibility, SpecialResponsibilityEntryDto>> MapToDtoExpression()
+        {
+            return specialResponsibility => new SpecialResponsibilityEntryDto
+            {
+                SpecialResponsibilityID = specialResponsibility.SpecialResponsibilityID,
+                Description = specialResponsibility.TaskName,
+                StaffName = specialResponsibility.Staff != null ? $"{specialResponsibility.Staff.FirstName} {specialResponsibility.Staff.LastName}" : "Unassigned"
+            };
         }
     }
 }
