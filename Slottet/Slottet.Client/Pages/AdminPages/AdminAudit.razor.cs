@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-//using Slottet.Client.Pages.MockData;
 using Slottet.Shared;
 
 namespace Slottet.Client.Pages.AdminPages
@@ -40,7 +39,7 @@ namespace Slottet.Client.Pages.AdminPages
                     query.Add($"shift={Uri.EscapeDataString(SelectedShift)}");
                 }
 
-                var url = $"api/AuditLogs?{string.Join("&", query)}";
+                var url = $"api/AuditLog?{string.Join("&", query)}";
                 AuditRows = await httpClient.GetFromJsonAsync<List<AuditLogDTO>>(url) ?? new();
             } catch (Exception ex) {
                 ErrorMessage = $"Kunne ikke hente audit logs: {ex.Message}";
