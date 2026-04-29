@@ -39,8 +39,7 @@ namespace Slottet.Infrastructure.Services
             return specialresponsibilities;
         }
 
-
-        public async Task<SpecialResponsibility?> GetByIdAsync(Guid id)
+        public async Task<SpecialResponsibilityEntryDto?> GetByIdAsync(Guid id)
         {
 
             var specialResponsibility = await _context.SpecialResponsibilities
@@ -64,7 +63,7 @@ namespace Slottet.Infrastructure.Services
             return specialResponsibility;
         }
 
-        public async Task<SpecialResponsibility> CreateAsync(SpecialResponsibilityEntryDto dto)
+        public async Task<SpecialResponsibilityEntryDto> CreateAsync(SpecialResponsibilityEntryDto dto)
         {
             if (specialResponsibility.SpecialResponsibilityID == Guid.Empty)
             {
@@ -85,7 +84,7 @@ namespace Slottet.Infrastructure.Services
             return specialResponsibility;
         }
 
-        public async Task<bool> UpdateAsync(Guid id, SpecialResponsibility specialResponsibility)
+        public async Task<bool> UpdateAsync(Guid id, SpecialResponsibilityEntryDto dto)
         {
             var existingSpecialResponsibility = await _context.SpecialResponsibilities
                 .FirstOrDefaultAsync(sr => sr.SpecialResponsibilityID == id);
@@ -95,7 +94,7 @@ namespace Slottet.Infrastructure.Services
                 return false;
             }
 
-            existingSpecialResponsibility.TaskName = specialResponsibility.TaskName;
+            existingSpecialResponsibility.TaskName = dto.Description;
 
             await _context.SaveChangesAsync();
             return true;
