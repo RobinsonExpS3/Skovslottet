@@ -5,6 +5,7 @@ using Slottet.Infrastructure.Data;
 using Slottet.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Slottet.Infrastructure.Services {
@@ -58,7 +59,7 @@ namespace Slottet.Infrastructure.Services {
                 .ToListAsync();
         }
 
-        private static System.Linq.Expressions.Expression<Func<AuditLog, AuditLogDTO>> MapToDtoExpression() {
+        private static Expression<Func<AuditLog, AuditLogDTO>> MapToDtoExpression() {
             return auditLog => new AuditLogDTO {
                 AuditLogID = auditLog.AuditLogID,
                 PerformedAtTime = auditLog.PerformedAtTime ?? auditLog.TimeStamp,

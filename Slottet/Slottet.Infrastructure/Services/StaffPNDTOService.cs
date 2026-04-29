@@ -3,6 +3,7 @@ using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
 using Slottet.Infrastructure.Data;
 using Slottet.Shared;
+using System.Linq.Expressions;
 
 namespace Slottet.Infrastructure.Services
 {
@@ -45,7 +46,7 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
-        private static System.Linq.Expressions.Expression<Func<StaffPN, StaffPNDTO>> MapToDtoExpression()
+        private static Expression<Func<StaffPN, StaffPNDTO>> MapToDtoExpression()
         {
             return sp => new StaffPNDTO
             {
