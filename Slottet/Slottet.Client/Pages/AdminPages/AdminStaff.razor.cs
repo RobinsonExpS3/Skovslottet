@@ -13,7 +13,6 @@ namespace Slottet.Client.Pages.AdminPages
         private string staffNameInput = string.Empty;
         private string initialsInput = string.Empty;
         private string roleInput = string.Empty;
-        private string errorMessage = string.Empty;
         private Staff? selectedItem;
         private bool isBusy;
 
@@ -34,12 +33,10 @@ namespace Slottet.Client.Pages.AdminPages
                     "api/Staff/Staffs"
                 )
                 ?? new List<Staff>();
-                errorMessage = string.Empty;
             }
             catch
             {
                 staffMembers = new List<Staff>();
-                errorMessage = "Kunne ikke hente personale.";
             }
         }
 
@@ -62,14 +59,12 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
-                errorMessage = string.Empty;
                 var newItem = new Staff
                 {
                     StaffID = Guid.NewGuid(),
                     StaffName = staffNameInput.Trim(),
                     Initials = initialsInput.Trim(),
-                    Role = roleInput.Trim(),
-                    DepartmentID = selectedItem?.DepartmentID ?? Guid.Empty
+                    Role = roleInput.Trim()
                 };
 
                 var response = await httpClient.PostAsJsonAsync("api/Staff", newItem);
@@ -77,10 +72,6 @@ namespace Slottet.Client.Pages.AdminPages
                 {
                     await LoadData();
                     ClearForm();
-                }
-                else
-                {
-                    errorMessage = await response.Content.ReadAsStringAsync();
                 }
             }
             finally
@@ -95,7 +86,6 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
-                errorMessage = string.Empty;
                 selectedItem!.StaffName = staffNameInput.Trim();
                 selectedItem.Initials = initialsInput.Trim();
                 selectedItem.Role = roleInput.Trim();
@@ -105,10 +95,6 @@ namespace Slottet.Client.Pages.AdminPages
                 {
                     await LoadData();
                     ClearForm();
-                }
-                else
-                {
-                    errorMessage = await response.Content.ReadAsStringAsync();
                 }
             }
             finally
@@ -123,16 +109,11 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
-                errorMessage = string.Empty;
                 var response = await httpClient.DeleteAsync($"api/Staff/{selectedItem!.StaffID}");
                 if (response.IsSuccessStatusCode)
                 {
                     await LoadData();
                     ClearForm();
-                }
-                else
-                {
-                    errorMessage = await response.Content.ReadAsStringAsync();
                 }
             }
             finally
@@ -155,7 +136,6 @@ namespace Slottet.Client.Pages.AdminPages
             public string StaffName { get; set; } = string.Empty;
             public string Initials { get; set; } = string.Empty;
             public string Role { get; set; } = string.Empty;
-            public Guid DepartmentID { get; set; }
         }
         
     }

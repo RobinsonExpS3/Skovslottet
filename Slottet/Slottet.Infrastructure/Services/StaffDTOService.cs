@@ -38,17 +38,6 @@ namespace Slottet.Infrastructure.Services
 
         public async Task<EditStaffDTO> CreateAsync(EditStaffDTO dto)
         {
-            if (dto.DepartmentID == Guid.Empty)
-            {
-                dto.DepartmentID = await _context.Departments
-                    .OrderBy(d => d.DepartmentName)
-                    .Select(d => d.DepartmentID)
-                    .FirstOrDefaultAsync();
-
-                if (dto.DepartmentID == Guid.Empty)
-                    throw new ArgumentException("No departments exist. Create a department first.");
-            }
-
             var departmentExists = await _context.Departments
                 .AnyAsync(d => d.DepartmentID == dto.DepartmentID);
 
@@ -83,10 +72,7 @@ namespace Slottet.Infrastructure.Services
             existingStaff.StaffName = dto.StaffName;
             existingStaff.Initials = dto.Initials;
             existingStaff.Role = dto.Role;
-            if (dto.DepartmentID != Guid.Empty)
-            {
-                existingStaff.DepartmentID = dto.DepartmentID;
-            }
+            existingStaff.DepartmentID = dto.DepartmentID;
 
             await _context.SaveChangesAsync();
             return true;
