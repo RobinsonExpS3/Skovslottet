@@ -5,6 +5,7 @@ using Slottet.Infrastructure.Data;
 using Slottet.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Slottet.Infrastructure.Services {
@@ -206,7 +207,7 @@ namespace Slottet.Infrastructure.Services {
             _context.Medicines.AddRange(medicineRows);
         }
 
-        private static System.Linq.Expressions.Expression<Func<Resident, EditResidentDTO>> MapToDtoExpression() {
+        private static Expression<Func<Resident, EditResidentDTO>> MapToDtoExpression() {
             return resident => new EditResidentDTO {
                 ResidentID = resident.ResidentID,
                 ResidentName = resident.ResidentName,

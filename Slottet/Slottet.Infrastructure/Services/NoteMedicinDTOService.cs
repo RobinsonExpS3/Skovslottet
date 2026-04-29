@@ -1,6 +1,7 @@
 ﻿using Slottet.Application.Interfaces;
 using Slottet.Infrastructure.Data;
 using Slottet.Shared;
+using System.Linq.Expressions;
 
 namespace Slottet.Infrastructure.Services
 {
@@ -81,7 +82,7 @@ namespace Slottet.Infrastructure.Services
         //    return true;
         //}
 
-        //private static System.Linq.Expressions.Expression<Func<Medicine, NoteMedicinDTO>> MapToDtoExpression()
+        //private static Expression<Func<Medicine, NoteMedicinDTO>> MapToDtoExpression()
         //{
         //    return medicine => new NoteMedicinDTO
         //    {
