@@ -211,7 +211,7 @@ namespace Slottet.Infrastructure.Services
                 {
                     Label = medicine.MedicineTime.ToString("HH:mm"),
                     Time = TimeOnly.FromDateTime(medicine.MedicineTime),
-                    IsGiven = medicine.MedicineGivenTime != default
+                    IsGiven = medicine.MedicineGivenTime != null
                 })
                 .ToList();
         }
