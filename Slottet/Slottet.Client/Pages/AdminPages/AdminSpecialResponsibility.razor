@@ -22,7 +22,7 @@
 				@foreach(var item in specialResponsibilities)
 				{
 					<tr @onclick="() => SelectItem(item)" class="@(selectedItem == item ? "selected-row" : "")">
-						<td>@item.TaskName</td>
+						<td>@item.Description</td>
 					</tr>
 				}
 			}

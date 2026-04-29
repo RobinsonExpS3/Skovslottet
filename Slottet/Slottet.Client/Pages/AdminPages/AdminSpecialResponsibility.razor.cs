@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Slottet.Shared;
 using System.Net.Http;
 using System.Net.Http.Json;
 
@@ -9,19 +10,19 @@ namespace Slottet.Client.Pages.AdminPages
         [Inject]
         public HttpClient httpClient { get; set; }
 
-        private List<SpecialResponsibility>? specialResponsibilities;
+        private List<SpecialResponsibilityEntryDto>? specialResponsibilities;
         private string? taskNameInput;
-        private SpecialResponsibility? selectedItem;
+        private SpecialResponsibilityEntryDto? selectedItem;
         private bool loadFailed = false;
         private bool _isBusy;
 
         private async Task LoadData() {
             try {
-                specialResponsibilities = await httpClient.GetFromJsonAsync<List<SpecialResponsibility>>(
+                specialResponsibilities = await httpClient.GetFromJsonAsync<List<SpecialResponsibilityEntryDto>>(
                     "api/SpecialResponsibility/SpecialResponsibilities"
                 );
             } catch {
-                specialResponsibilities = new List<SpecialResponsibility>();
+                specialResponsibilities = new List<SpecialResponsibilityEntryDto>();
                 loadFailed = true;
             }
         }
@@ -38,9 +39,9 @@ namespace Slottet.Client.Pages.AdminPages
         private bool CanUpdate => !_isBusy && selectedItem != null;
         private bool CanDelete => !_isBusy && selectedItem != null;
 
-        private void SelectItem(SpecialResponsibility item) {
+        private void SelectItem(SpecialResponsibilityEntryDto item) {
             selectedItem = item;
-            taskNameInput = item.TaskName;
+            taskNameInput = item.Description;
         }
 
         private async Task CreateAsync() {
@@ -48,9 +49,9 @@ namespace Slottet.Client.Pages.AdminPages
             _isBusy = true;
             
             try {
-                var newItem = new SpecialResponsibility {
+                var newItem = new SpecialResponsibilityEntryDto {
                     SpecialResponsibilityID = Guid.NewGuid(),
-                    TaskName = taskNameInput
+                    Description = taskNameInput
                 };
 
                 var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
@@ -73,7 +74,7 @@ namespace Slottet.Client.Pages.AdminPages
             _isBusy = true;
 
             try {
-                selectedItem.TaskName = taskNameInput;
+                selectedItem.Description = taskNameInput;
 
                 var response = await httpClient.PutAsJsonAsync($"api/SpecialResponsibility/{selectedItem.SpecialResponsibilityID}", selectedItem);
 
@@ -106,12 +107,6 @@ namespace Slottet.Client.Pages.AdminPages
             } finally {
                 _isBusy = false; 
             }
-        }
-
-        public class SpecialResponsibility {
-            public Guid SpecialResponsibilityID { get; set; }
-            public string? TaskName { get; set; }
-            public Guid ShiftBoardID { get; set; }
         }
     }
 }
