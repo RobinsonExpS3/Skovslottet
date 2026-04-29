@@ -12,6 +12,7 @@ namespace Slottet.Client.Pages.AdminPages
         private HttpClient httpClient { get; set; } = default!;
 
         protected List<AuditLogDTO> AuditRows { get; set; } = new();
+        protected List<ResidentCardDto> ResidentCards { get; set; } = new();
         protected DateOnly SelectedDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
         protected string SelectedShift { get; set; } = string.Empty;
 
