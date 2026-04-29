@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
-using Slottet.Domain.Entities;
 using Slottet.Shared;
 
 namespace Slottet.API.Controllers
@@ -18,7 +17,7 @@ namespace Slottet.API.Controllers
 
         //Get: special responsibility
         [HttpGet("SpecialResponsibilities")]
-        public async Task<ActionResult<IEnumerable<SpecialResponsibility>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<SpecialResponsibilityEntryDto>>> GetAllAsync()
         {
             var specialResponsibilities = await _specialResponsibilityService.GetAllAsync();
 
@@ -27,7 +26,7 @@ namespace Slottet.API.Controllers
 
         //Get: special responsibility by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<SpecialResponsibility>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<SpecialResponsibilityEntryDto>> GetByIdAsync(Guid id)
         {
             var specialResponsibility = await _specialResponsibilityService.GetByIdAsync(id);
 
@@ -41,7 +40,7 @@ namespace Slottet.API.Controllers
 
         //Post: special responsibility
         [HttpPost]
-        public async Task<ActionResult<SpecialResponsibility>> CreateAsync([FromBody] SpecialResponsibilityEntryDto dto)
+        public async Task<ActionResult<SpecialResponsibilityEntryDto>> CreateAsync([FromBody] SpecialResponsibilityEntryDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.Description))
             {
