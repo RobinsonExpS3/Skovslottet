@@ -58,7 +58,7 @@ namespace Slottet.Infrastructure.Services
             var existingStaff = await _context.Staffs
                 .FirstOrDefaultAsync(s => s.StaffID == id);
 
-            if (existingStaff != null)
+            if (existingStaff == null)
             {
                 return false;
             }
