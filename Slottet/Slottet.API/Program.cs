@@ -22,7 +22,6 @@ builder.Services.AddHttpClient<ShiftboardController>();
 builder.Services.AddScoped<ISpecialResponsibilityDTOService, SpecialResponsibilityDTOService>();
 builder.Services.AddScoped<IResidentDTOService, ResidentDTOService>();
 builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
-builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
 builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
 builder.Services.AddScoped<IShiftBoardDTOService, ShiftBoardDTOService>();
 builder.Services.AddScoped<IGroceryDayDTOService, GroceryDayDTOService>();
