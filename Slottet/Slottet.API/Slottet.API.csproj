@@ -34,8 +34,4 @@
     <ProjectReference Include="..\Slottet.Shared\Slottet.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>

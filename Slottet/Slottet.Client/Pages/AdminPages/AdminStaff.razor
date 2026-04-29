@@ -1,31 +1,35 @@
 ﻿@page "/adminStaff"
 @rendermode InteractiveWebAssembly
+@using Slottet.Shared
 
-<div class="view-box">
+<div class="view-box" @onclick="ClearForm">
     <h2>Rediger personale</h2>
 
+
     <div class="table-layout">
-        <table class="table-form">
+        <table class="table-form" @onclick:stopPropagation>
             <thead>
                 <tr>
                     <th>Navn</th>
                     <th>Initialer</th>
                     <th>Rolle</th>
+                    <th>Afdeling</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in staffMembers ?? Enumerable.Empty<Staff>())
+                @foreach (var item in staffMembers)
                 {
                     <tr @onclick="() => SelectItem(item)" class="@(selectedItem == item ? "selected-row" : "")">
                         <td>@item.StaffName</td>
                         <td>@item.Initials</td>
                         <td>@(item.Role == "staff" ? "Pædagog" : item.Role == "admin" ? "Administrator" : item.Role)</td>
+                        <td>@GetDepartmentName(item.DepartmentID)</td>
                     </tr>
                 }
             </tbody>
         </table>
 
-        <div class="button-column">
+        <div class="button-column" @onclick:stopPropagation>
             <p>
                 <strong>
                     @(selectedItem == null ? "Opret ny medarbejder" : "Rediger medarbejder")
@@ -38,6 +42,13 @@
                 <option value="">Vælg rolle</option>
                 <option value="staff">Pædagog</option>
                 <option value="admin">Administrator</option>
+            </select>
+            <select class="Deparment-picker" @bind="departmentIdInput">
+                <option value="@Guid.Empty">Vælg Afdeling</option>
+                @foreach (var department in departments)
+                {
+                    <option value="@department.ID">@department.Name</option>
+                }
             </select>
             <button class="column-button" @onclick="Create" disabled="@(!CanCreate)">Opret</button>
             <button class="column-button" @onclick="Update" disabled="@(!CanUpdate)">Opdater</button>

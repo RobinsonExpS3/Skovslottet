@@ -2,6 +2,7 @@
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
+
 namespace Slottet.API.Controllers
 {
     [ApiController]
@@ -45,15 +46,15 @@ namespace Slottet.API.Controllers
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||
                 string.IsNullOrWhiteSpace(dto.Initials) ||
-                string.IsNullOrWhiteSpace(dto.Role))
+                string.IsNullOrWhiteSpace(dto.Role) ||
+                dto.DepartmentID == Guid.Empty)
             {
-                return BadRequest("StaffName, Initials and Role are required.");
+                return BadRequest("StaffName, Initials, Role, and Department are required.");
             }
 
             try
             {
                 var created = await _staffService.CreateAsync(dto);
-
                 return CreatedAtRoute("GetStaffById", new { id = created.StaffID }, created);
             }
             catch (ArgumentException ex)
@@ -69,7 +70,8 @@ namespace Slottet.API.Controllers
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||
                 string.IsNullOrWhiteSpace(dto.Initials) ||
-                string.IsNullOrWhiteSpace(dto.Role))
+                string.IsNullOrWhiteSpace(dto.Role) ||
+               dto.DepartmentID == Guid.Empty)
             {
                 return BadRequest();
             }
