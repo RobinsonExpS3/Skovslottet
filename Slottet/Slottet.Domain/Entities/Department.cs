@@ -6,7 +6,9 @@ namespace Slottet.Domain.Entities {
     public class Department {
         public Guid DepartmentID { get; set; }
         public string DepartmentName { get; set; }
-        public Phone PhoneID { get; set; }
-        public DepartmentTask DepartmentTaskID { get; set; }
+
+        public ICollection<DepartmentTask> DepartmentTasks { get; set; }
+        public ICollection<Phone> Phones { get; set; }
+        public ICollection<Staff> Staffs { get; set; }
     }
 }

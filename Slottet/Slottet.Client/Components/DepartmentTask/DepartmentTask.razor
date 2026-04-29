@@ -1,0 +1,55 @@
+<div class="liste-editor">
+
+    <header class="liste-header">
+        <h2>📝 Afdelingens opgaver</h2>
+    </header>
+
+    <div class="liste-body">
+        @for (int i = 0; i < _editItems.Count; i++)
+        {
+            var index = i;
+            <div class="liste-row liste-row--wrap">
+                <textarea class="liste-input liste-textarea"
+                          rows="2"
+                          @oninput="e => _editItems[index] = e.Value?.ToString() ?? string.Empty"
+                          placeholder="Opgave…">@_editItems[index]</textarea>
+                <button class="btn-fjern btn-fjern--top" @onclick="() => RemoveItem(index)" title="Fjern">✕</button>
+            </div>
+        }
+
+        <button class="btn-tilføj" @onclick="AddItem">+ Tilføj opgave</button>
+
+        <div class="liste-actions">
+            <button class="btn-gem" @onclick="Save">Gem ændringer</button>
+            @if (_saved)
+            {
+                <span class="gem-bekræftelse">✓ Gemt</span>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public List<string> Items { get; set; } = default!;
+    [Parameter] public EventCallback<List<string>> OnSave { get; set; }
+
+    private List<string> _editItems = new();
+    private bool         _saved;
+
+    protected override void OnParametersSet()
+    {
+        _editItems = new List<string>(Items);
+        _saved     = false;
+    }
+
+    private void AddItem()         => _editItems.Add(string.Empty);
+    private void RemoveItem(int i) => _editItems.RemoveAt(i);
+
+    private async Task Save()
+    {
+        Items.Clear();
+        Items.AddRange(_editItems.Where(x => !string.IsNullOrWhiteSpace(x)));
+        _saved = true;
+        await OnSave.InvokeAsync(Items);
+    }
+}

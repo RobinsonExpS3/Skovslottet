@@ -1,0 +1,68 @@
+<div class="liste-editor">
+
+    <header class="liste-header">
+        <h2>🔏 Særligt ansvar</h2>
+    </header>
+
+    <div class="liste-body">
+        @for (int i = 0; i < _editItems.Count; i++)
+        {
+            var index = i;
+            <div class="liste-row">
+                <input class="liste-input"
+                       type="text"
+                       value="@_editItems[index].Description"
+                       @onchange="e => _editItems[index].Description = e.Value?.ToString() ?? string.Empty"
+                       placeholder="Ansvarsområde…" />
+
+                <select class="liste-select"
+                        value="@_editItems[index].StaffName"
+                        @onchange="e => _editItems[index].StaffName = e.Value?.ToString() ?? string.Empty">
+                    <option value="">– Medarbejder –</option>
+                    @foreach (var staffMember in AllStaff)
+                    {
+                        <option value="@staffMember" selected="@(_editItems[index].StaffName == staffMember)">@staffMember</option>
+                    }
+                </select>
+
+                <button class="btn-fjern" @onclick="() => RemoveItem(index)" title="Fjern">✕</button>
+            </div>
+        }
+
+        <button class="btn-tilføj" @onclick="AddItem">+ Tilføj ansvar</button>
+
+        <div class="liste-actions">
+            <button class="btn-gem" @onclick="Save">Gem ændringer</button>
+            @if (_saved)
+            {
+                <span class="gem-bekræftelse">✓ Gemt</span>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public List<SpecialResponsibilityEntryDto> Items    { get; set; } = default!;
+    [Parameter]                 public List<string>                        AllStaff { get; set; } = new();
+    [Parameter]                 public EventCallback<List<SpecialResponsibilityEntryDto>> OnSave { get; set; }
+
+    private List<SpecialResponsibilityEntryDto> _editItems = new();
+    private bool                                _saved;
+
+    protected override void OnParametersSet()
+    {
+        _editItems = Items.Select(s => new SpecialResponsibilityEntryDto { Description = s.Description, StaffName = s.StaffName }).ToList();
+        _saved     = false;
+    }
+
+    private void AddItem()         => _editItems.Add(new SpecialResponsibilityEntryDto());
+    private void RemoveItem(int i) => _editItems.RemoveAt(i);
+
+    private async Task Save()
+    {
+        Items.Clear();
+        Items.AddRange(_editItems.Where(s => !string.IsNullOrWhiteSpace(s.Description)));
+        _saved = true;
+        await OnSave.InvokeAsync(Items);
+    }
+}

@@ -1,0 +1,40 @@
+﻿@page "/adminStaff"
+
+<div class="view-box">
+    <h2>Rediger personale</h2>
+
+    <div class="table-layout">
+        <table class="table-form">
+            @if (staffMembers == null)
+            {
+                <tr><td>Loading...</td></tr>
+            }
+            else if (loadFailed)
+            {
+                <tr><td>Kunne ikke loade data. Prøv venligst igen senere</td></tr>
+            }
+            else
+            {
+                @foreach (var item in staffMembers)
+                {
+                    <tr @onclick="() => SelectItem(item)" class="@(selectedItem == item ? "selected-row" : "")">
+                        <td>@item.StaffName</td>
+                    </tr>
+                }
+            }
+        </table>
+
+        <div class="button-column">
+            <input class="sp-table-input" @bind="staffNameInput" placeholder="Indtast navn" />
+            <input class="sp-table-input" @bind="initialsInput" placeholder="Indtast initialer" />
+            <select class="role-picker" @bind="roleInput">
+                <option value="">Vælg rolle</option>
+                <option value="staff">Pædagog</option>
+                <option value="admin">Administrator</option>
+            </select>
+            <button class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(staffNameInput) || selectedItem != null)">Opret</button>
+            <button class="column-button" @onclick="Update" disabled="@(selectedItem == null)">Opdater</button>
+            <button class="column-button" @onclick="Delete" disabled="@(selectedItem == null)">Slet</button>
+        </div>
+    </div>
+</div>
