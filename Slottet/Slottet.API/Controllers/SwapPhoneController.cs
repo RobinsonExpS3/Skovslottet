@@ -22,16 +22,6 @@ namespace Slottet.API.Controllers
             return Ok(await _swapPhoneService.GetAllAsync());
         }
 
-        //[HttpGet("{phoneId:guid}")]
-        //public async Task<ActionResult<SwapPhoneDTO>> GetById(Guid phoneId)
-        //{
-        //    var phone = await _swapPhoneService.GetByIdAsync(phoneId);
-
-        //    if (phone == null) return NotFound();
-
-        //    return Ok(phone);
-        //}
-
         [HttpPost("assign")]
         public async Task<IActionResult> SwapPhone([FromBody] SwapPhoneRecDTO dto)
         {
