@@ -18,6 +18,7 @@ namespace Slottet.Client.Pages.AdminPages
         private List<ResidentLookupDTO> groceryDays = new();
         private List<TimeInput> medicineTimes = new();
         private string? residentNameInput;
+        private bool isActiveInput = true;
 
         private int selectedHour = 8;
         private int selectedMinute = 0;
@@ -47,6 +48,7 @@ namespace Slottet.Client.Pages.AdminPages
             selectedResident = resident;
             residentNameInput = resident.ResidentName;
             selectedGroceryDayID = resident.GroceryDayID;
+            isActiveInput = resident.IsActive;
 
             var dto = await httpClient!.GetFromJsonAsync<EditResidentDTO>($"api/Resident/{resident.ResidentID}");
             selectedPaymentMethodIDs = dto?.PaymentMethodIDs ?? new();
@@ -64,7 +66,7 @@ namespace Slottet.Client.Pages.AdminPages
                 GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
                 PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
                 MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
-                IsActive = true
+                IsActive = isActiveInput
             };
 
             var response = await httpClient.PostAsJsonAsync("api/Resident", dto);
@@ -89,7 +91,7 @@ namespace Slottet.Client.Pages.AdminPages
                 GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
                 PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
                 MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
-                IsActive = selectedResident.IsActive
+                IsActive = isActiveInput
             };
 
             var response = await httpClient.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
@@ -155,6 +157,7 @@ namespace Slottet.Client.Pages.AdminPages
             selectedGroceryDayID = null;
             selectedPaymentMethodIDs.Clear();
             medicineTimes.Clear();
+            isActiveInput = true;
         }
     }
 }

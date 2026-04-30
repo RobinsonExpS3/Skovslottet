@@ -30,6 +30,10 @@
 		</table>
 
 		<div class="button-column">
+			<label>
+				<input type="checkbox" @bind="isActiveInput"/>
+				Aktiv
+            </label>
 			<input class="r-table-input" @bind="residentNameInput" placeholder="Indtast navn..." />
 			<select @bind="selectedGroceryDayID">
 				<option value="">Vælg handledag</option>
