@@ -51,26 +51,22 @@ namespace Slottet.Infrastructure.Services
 
         private static Expression<Func<Phone, SwapPhoneRecDTO>> MapToDtoExpression()
         {
-            return phone => new SwapPhoneRecDTO
-            {
-                PhoneID = phone.PhoneID,
-                PhoneNumber = phone.PhoneNumber,
-
-                StaffID = phone.StaffPhones
+            return phone => new SwapPhoneRecDTO(
+                phone.PhoneID,
+                phone.PhoneNumber,
+                phone.StaffPhones
                     .OrderByDescending(sp => sp.AssignedAt)
                     .Select(sp => sp.StaffID)
                     .FirstOrDefault(),
-
-                StaffName = phone.StaffPhones
+                phone.StaffPhones
                     .OrderByDescending(sp => sp.AssignedAt)
                     .Select(sp => sp.Staff.StaffName)
                     .FirstOrDefault(),
-
-                AssignedAt = phone.StaffPhones
+                phone.StaffPhones
                     .OrderByDescending(sp => sp.AssignedAt)
                     .Select(sp => (DateTime?)sp.AssignedAt)
                     .FirstOrDefault()
-            };
+            );
         }
     }
 }
