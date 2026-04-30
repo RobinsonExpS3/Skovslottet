@@ -16,7 +16,7 @@ namespace Slottet.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<SwapPhoneDTO>> GetAllAsync()
+        public async Task<IEnumerable<SwapPhoneRecDTO>> GetAllAsync()
         {
             return await _context.Phones
                 .AsNoTracking()
@@ -25,7 +25,7 @@ namespace Slottet.Infrastructure.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateAsync(SwapPhoneDTO dto)
+        public async Task<bool> UpdateAsync(SwapPhoneRecDTO dto)
         {
 
             var phoneExists = await _context.Phones.AnyAsync(p => p.PhoneID == dto.PhoneID);
@@ -49,9 +49,9 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
-        private static Expression<Func<Phone, SwapPhoneDTO>> MapToDtoExpression()
+        private static Expression<Func<Phone, SwapPhoneRecDTO>> MapToDtoExpression()
         {
-            return phone => new SwapPhoneDTO
+            return phone => new SwapPhoneRecDTO
             {
                 PhoneID = phone.PhoneID,
                 PhoneNumber = phone.PhoneNumber,

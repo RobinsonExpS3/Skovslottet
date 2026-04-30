@@ -4,9 +4,9 @@ namespace Slottet.Application.Interfaces
 {
     public interface ISwapPhoneDTOService
     {
-        Task<IEnumerable<SwapPhoneDTO>> GetAllAsync();
-        //Task<SwapPhoneDTO?> GetByIdAsync(Guid phoneId);
-        Task<bool> UpdateAsync(SwapPhoneDTO dto);
+        Task<IEnumerable<SwapPhoneRecDTO>> GetAllAsync();
+        //Task<SwapPhoneRecDTO?> GetByIdAsync(Guid phoneId);
+        Task<bool> UpdateAsync(SwapPhoneRecDTO dto);
 
     }
 }

@@ -17,7 +17,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SwapPhoneDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<SwapPhoneRecDTO>>> GetAll()
         {
             return Ok(await _swapPhoneService.GetAllAsync());
         }
@@ -33,7 +33,7 @@ namespace Slottet.API.Controllers
         //}
 
         [HttpPost("assign")]
-        public async Task<IActionResult> SwapPhone([FromBody] SwapPhoneDTO dto)
+        public async Task<IActionResult> SwapPhone([FromBody] SwapPhoneRecDTO dto)
         {
             //if (dto == null ||  dto.StaffID == Guid.Empty) return BadRequest();
 
