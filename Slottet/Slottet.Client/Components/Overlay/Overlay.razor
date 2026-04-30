@@ -3,32 +3,13 @@
     @* Backdrop og panel som søskende — ingen event-propagation konflikt.
        Klik på backdrop lukker. Klik på panelet rammer kun panelet. *@
 
+    @* Backdrop: klik lukker overlay *@
     <div class="overlay-backdrop" @onclick="HandleClose"></div>
 
+    @* Panel: indhold renderes her *@
     <div class="overlay-panel @SizeClass" id="@PanelId">
+        @* Luk-knap *@
         <button class="overlay-close-btn" @onclick="HandleClose" title="Luk">✕</button>
         @ChildContent
     </div>
-}
-
-@code {
-    [Parameter, EditorRequired] public bool IsVisible { get; set; }
-    [Parameter, EditorRequired] public EventCallback OnClose { get; set; }
-    [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>Unikt DOM-id på panelet — bruges af JS FLIP-animation.</summary>
-    [Parameter] public string PanelId { get; set; } = "overlay-panel";
-
-    /// <summary>"sm" | "md" (default) | "lg" | "full"</summary>
-    [Parameter] public string Size { get; set; } = "md";
-
-    private string SizeClass => Size switch
-    {
-        "sm"   => "overlay-panel--sm",
-        "lg"   => "overlay-panel--lg",
-        "full" => "overlay-panel--full",
-        _      => "overlay-panel--md"
-    };
-
-    private async Task HandleClose() => await OnClose.InvokeAsync();
 }
