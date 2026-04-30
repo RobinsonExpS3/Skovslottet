@@ -18,6 +18,13 @@ namespace Slottet.Client.Components.ResidentCard
             public PNEntryDto? Snapshot  { get; set; }
         }
 
+        // ── Static option lists ───────────────────────────────────────────
+        public static readonly IReadOnlyList<string> GroceryDays =
+        [
+            "Mandag", "Tirsdag", "Onsdag", "Torsdag",
+            "Fredag", "Lørdag", "Søndag", "Handler selv"
+        ];
+
         // ── Draft state ───────────────────────────────────────────────────
         private ResidentCardDto _draft               = default!;
         private List<PnRow>     _pnRows              = new();
