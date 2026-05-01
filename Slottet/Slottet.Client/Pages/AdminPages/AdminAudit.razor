@@ -56,97 +56,129 @@
     </div>
 
     <div class="main-panel">
-        @foreach (var resident in ResidentCards)
+        @if(IsResidentLoading)
         {
-            var isOpen = openCardId == resident.ResidentStatusID;
+            <p>Indlæser beboere...</p>
+        }
+        else if(!string.IsNullOrWhiteSpace(ResidentErrorMessage))
+        {
+            <p>@ResidentErrorMessage</p>
+        }
+        else if(ResidentCards.Count == 0)
+        {
+            <p>Ingen beboere at vise.</p>
+        }
+        else
+        {
+            @foreach (var resident in ResidentCards)
+            {
+                var isOpen = openCardId == resident.ResidentStatusID;
 
-            <div class="card @(isOpen ? "expanded" : "collapsed")"
-                 @key="resident.ResidentStatusID"
-                 @onclick="() => ToggleStatusCard(resident.ResidentStatusID)">
+                <div class="card @(isOpen ? "expanded" : "collapsed")"
+                     @key="resident.ResidentStatusID"
+                     @onclick="() => ToggleStatusCard(resident.ResidentStatusID)">
 
-                @if (!isOpen)
-                {
-                    <div class="collapsed-name">@resident.ResidentName</div>
+                    @if (!isOpen)
+                    {
+                        <div class="collapsed-name">@resident.ResidentName</div>
 
-                    <div class="staff-list">
-                        @foreach (var staff in resident.AssignedStaff)
-                        {
-                            <span class="staff-pill">@staff</span>
-                        }
-                    </div>
+                        <div class="staff-list">
+                            @foreach (var staff in resident.AssignedStaff)
+                            {
+                                <span class="staff-pill">@staff</span>
+                            }
+                        </div>
 
-                    <div class="arrow">▶</div>
-                }
-                else
-                {
-                    <article class="resident-card">
-                        <section class="resident-header @resident.RiskCssClass">
-                            <h3>@resident.ResidentName</h3>
-                        </section>
-
-                        <section class="resident-status">
-                            <h4>Seneste Status</h4>
-                            <p>@resident.LatestStatusNote</p>
-                        </section>
-
-                        <section class="medicine-section">
-                            <table class="medicine-table">
-                                <thead>
-                                    <tr>
-                                        <th>Medicin</th>
-                                        @foreach (var medicine in resident.MedicineSchedule)
-                                        {
-                                            <th>@medicine.Label</th>
-                                        }
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Givet</td>
-                                        @foreach (var medicine in resident.MedicineSchedule)
-                                        {
-                                            <td>
-                                                <div class="dose-box @(medicine.IsGiven ? "given" : "not-given")">
-                                                    @(medicine.IsGiven ? "💊" : " ")
-                                                </div>
-                                            </td>
-                                        }
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </section>
-
-                        <section class="resident-bottom-grid">
-                            <section class="pn-status">
-                                <h4>>PN</h4>
-                                <p>@resident.PNEntries</p>
+                        <div class="arrow"></div>
+                    }
+                    else
+                    {
+                        <article class="resident-card">
+                            <section class="resident-header @resident.RiskCssClass">
+                                <h3>@resident.ResidentName</h3>
                             </section>
 
-                            <section class="assigned-staff">
-                                <h4>Ansvarlig Personale</h4>
-                                <div class="staff-list">
-                                    @foreach (var staff in resident.AssignedStaff)
+                            <section class="resident-status">
+                                <h4>Seneste Status</h4>
+                                <p>@resident.LatestStatusNote</p>
+                            </section>
+
+                            <section class="medicine-section">
+                                <table class="medicine-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Medicin</th>
+                                            @foreach (var medicine in resident.MedicineSchedule)
+                                            {
+                                                <th>@medicine.Label</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Givet</td>
+                                            @foreach (var medicine in resident.MedicineSchedule)
+                                            {
+                                                <td>
+                                                    <div class="dose-box @(medicine.IsGiven ? "given" : "not-given")">
+                                                        @(medicine.IsGiven ? "💊" : " ")
+                                                    </div>
+                                                </td>
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </section>
+
+                            <section class="resident-bottom-grid">
+                                <section class="pn-status">
+                                    <h4>PN</h4>
+                                    @if(resident.PNEntries.Count == 0)
                                     {
-                                        <span class="staff-pill">@staff</span>
+                                        <p>Ingen PN registreringer</p>
                                     }
+                                    else
+                                    {
+                                        <div class="pn-entries">
+                                            @foreach(var entry in resident.PNEntries)
+                                            {
+                                                <div class="pn-entry">
+                                                    <span class="pn-field"><strong>@entry.TimeOfAdministration</strong></span>
+                                                    <span class="pn-field">@entry.Medication</span>
+                                                    <span class="pn-field">@entry.Reason</span>
+                                                    <span class="pn-issued">Udstedt af: @entry.IssuedBy</span>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </section>
+
+                                <section class="assigned-staff">
+                                    <h4>Ansvarlig Personale</h4>
+                                    <div class="staff-list">
+                                        @foreach (var staff in resident.AssignedStaff)
+                                        {
+                                            <span class="staff-pill">@staff</span>
+                                        }
+                                    </div>
+                                </section>
+                            </section>
+
+                            <section class="resident-footer-grid">
+                                <div class="payment-method">
+                                    <h4>Betaling</h4>
+                                    <p>@resident.PaymentMethod</p>
+                                </div>
+
+                                <div class="grocery-day">
+                                    <h4>Handledag</h4>
+                                    <p>@resident.GroceryDay</p>
                                 </div>
                             </section>
-                        </section>
-
-                        <section class="resident-footer-grid">
-                            <div class="payment-method">
-                                <h4>Betaling</h4>
-                                <p>@resident.PaymentMethod</p>
-                            </div>
-
-                            <div class="grocery-day">
-                                <h4>Handledag</h4>
-                                <p>@resident.GroceryDay</p>
-                            </div>
-                        </section>
-                    </article>
-                }
-            </div>
+                        </article>
+                    }
+                </div>
+            }
         }
     </div>
 </div>

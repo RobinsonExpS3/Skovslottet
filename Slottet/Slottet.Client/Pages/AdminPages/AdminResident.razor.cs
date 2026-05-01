@@ -32,8 +32,8 @@ namespace Slottet.Client.Pages.AdminPages
 
             try {
                 residents = await httpClient!.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
-                groceryDays = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
-                paymentMethods = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
+                groceryDays = await httpClient!.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
+                paymentMethods = await httpClient!.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
             } catch {
                 residents = new();
                 groceryDays = new();
@@ -106,7 +106,7 @@ namespace Slottet.Client.Pages.AdminPages
                     IsActive = selectedResident.IsActive
                 };
 
-                var response = await httpClient.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
+                var response = await httpClient!.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
 
                 if (!response.IsSuccessStatusCode) {
                     return;
@@ -126,7 +126,7 @@ namespace Slottet.Client.Pages.AdminPages
             _isBusy = true;
 
             try {
-                var response = await httpClient.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
+                var response = await httpClient!.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
 
                 if (!response.IsSuccessStatusCode) {
                     return;

@@ -19,12 +19,16 @@ namespace Slottet.Client.Pages.AdminPages
         protected bool IsLoading { get; set; }
         protected string? ErrorMessage { get; set; }
 
+        protected bool IsResidentLoading { get; set; }
+        protected string? ResidentErrorMessage { get; set; }
+
         protected string SelectedDateText => SelectedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
         private Guid? openCardId = null;
 
         protected override async Task OnInitializedAsync() {
             await LoadAuditLogsAsync();
+            await LoadResidentCardsAsync();
         }
 
         private async Task LoadAuditLogsAsync() {
@@ -48,6 +52,20 @@ namespace Slottet.Client.Pages.AdminPages
             }
             finally {
                 IsLoading = false;
+            }
+        }
+
+        private async Task LoadResidentCardsAsync() {
+            IsResidentLoading = true;
+            ResidentErrorMessage = null;
+
+            try {
+                var dto = await httpClient.GetFromJsonAsync<ShiftBoardDTO>("api/shiftboard/current");
+                ResidentCards = dto?.ResidentCards ?? new();
+            } catch(Exception ex) {
+                ResidentErrorMessage = $"Kunne ikke hente beboere: {ex.Message}";
+            } finally {
+                IsResidentLoading = false;
             }
         }
 
