@@ -4,7 +4,7 @@ using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Configurations
 {
-    /*public class StaffPNConfiguration : IEntityTypeConfiguration<StaffPN>
+    public class StaffPNConfiguration : IEntityTypeConfiguration<StaffPN>
     {
         public void Configure(EntityTypeBuilder<StaffPN> entity)
         {
@@ -20,5 +20,5 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .HasForeignKey(spn => spn.PNID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
-    }*/
+    }
 }
