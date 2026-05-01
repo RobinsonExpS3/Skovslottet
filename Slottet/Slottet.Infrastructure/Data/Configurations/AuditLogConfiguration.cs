@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Configurations {
     public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog> {
+        /// <summary>
+        /// Configures the Entity Framework model for the AuditLog entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the AuditLog entity.</param>
         public void Configure(EntityTypeBuilder<AuditLog> entity) {
             entity.HasKey(a => a.AuditLogID);
 

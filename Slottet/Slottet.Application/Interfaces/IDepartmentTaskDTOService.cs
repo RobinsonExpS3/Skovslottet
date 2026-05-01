@@ -7,6 +7,6 @@ namespace Slottet.Application.Interfaces
 {
     public interface IDepartmentTaskDTOService
     {
-        Task<IEnumerable<DepartmentTaskDTO>> GetAll();
+        Task<IEnumerable<DepartmentTaskDTO>> GetAllDepartmentTasksAsync();
     }
 }

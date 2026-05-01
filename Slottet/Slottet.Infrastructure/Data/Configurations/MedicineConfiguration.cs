@@ -1,9 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Configurations {
     public class MedicineConfiguration : IEntityTypeConfiguration<Medicine> {
+        /// <summary>
+        /// Configures the Entity Framework model for the Medicine entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the Medicine entity.</param>
         public void Configure(EntityTypeBuilder<Medicine> entity) {
             entity.HasKey(m => new { m.MedicineID });
 

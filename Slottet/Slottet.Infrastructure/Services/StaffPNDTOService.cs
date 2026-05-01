@@ -16,7 +16,11 @@ namespace Slottet.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<StaffPNDTO>> GetAllAsync()
+        /// <summary>
+        /// Gets all PN assignments given by staff members and returns them as a list of StaffPNDTO objects.
+        /// </summary>
+        /// <returns>Returns a list of StaffPNDTO objects.</returns>
+        public async Task<IEnumerable<StaffPNDTO>> GetAllStaffPNsAsync()
         {
             return await _context.StaffPNs
                 .AsNoTracking()
@@ -25,7 +29,13 @@ namespace Slottet.Infrastructure.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> UpdateAsync(StaffPNDTO dto)
+        /// <summary>
+        /// Function to update the binding between PN and Staff, so that you can see who has given what to whom.
+        /// <remarks>If the staff member does not exist, returns false.</remarks>
+        /// </summary>
+        /// <param name="dto">DTO object containing PN and staff information.</param>
+        /// <returns>Returns true if the update is successful, otherwise false.</returns>
+        public async Task<bool> PostStaffPNAsync(StaffPNDTO dto)
         {
             var staffExists = _context.Staffs.Any(s => s.StaffID == dto.StaffID);
 
@@ -46,6 +56,10 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
+        /// <summary>
+        /// Maps DTO to Entity using LINQ, it provides better performance as there are no joins needed.
+        /// </summary>
+        /// <returns>Returns a LINQ expression that can be used to map StaffPN to StaffPNDTO.</returns>
         private static Expression<Func<StaffPN, StaffPNDTO>> MapToDtoExpression()
         {
             return sp => new StaffPNDTO

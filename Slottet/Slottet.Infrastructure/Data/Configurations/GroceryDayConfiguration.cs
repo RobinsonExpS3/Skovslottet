@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
@@ -6,6 +6,10 @@ namespace Slottet.Infrastructure.Data.Configurations
 {
     public class GroceryDayConfiguration : IEntityTypeConfiguration<GroceryDay>
     {
+        /// <summary>
+        /// Configures the Entity Framework model for the GroceryDay entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the GroceryDay entity.</param>
         public void Configure(EntityTypeBuilder<GroceryDay> entity)
         {
             entity.HasKey(g => g.GroceryDayID);

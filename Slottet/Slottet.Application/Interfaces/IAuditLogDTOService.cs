@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Slottet.Application.Interfaces {
     public interface IAuditLogDTOService {
-        Task<IEnumerable<AuditLogDTO>> GetAllAsync();
-        Task<IEnumerable<AuditLogDTO>> GetAllAsync(DateOnly? date, string? shift);
+        Task<IEnumerable<AuditLogDTO>> GetAllAuditLogsAsync();
+        Task<IEnumerable<AuditLogDTO>> GetAllAuditLogsAsync(DateOnly? date, string? shift);
     }
 }

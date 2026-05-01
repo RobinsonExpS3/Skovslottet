@@ -16,8 +16,12 @@ namespace Slottet.API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Gets all departments as lookup DTO objects.
+        /// </summary>
+        /// <returns>Returns all departments ordered by department name.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DepartmentLookupDTO>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<DepartmentLookupDTO>>> GetAllDepartmentsAsync()
         {
             var departments = await _context.Departments
                 .AsNoTracking()

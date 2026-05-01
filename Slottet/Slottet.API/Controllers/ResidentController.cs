@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
-using Slottet.Domain.Entities;
 using Slottet.Shared;
 
 namespace Slottet.API.Controllers
@@ -16,20 +15,27 @@ namespace Slottet.API.Controllers
             _residentService = residentService;
         }
 
-        //Get: residents
+        /// <summary>
+        /// Gets all active residents as DTO objects.
+        /// </summary>
+        /// <returns>Returns all active residents.</returns>
         [HttpGet("Residents")]
-        public async Task<ActionResult<IEnumerable<EditResidentDTO>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<EditResidentDTO>>> GetAllResidentsAsync()
         {
-            var residents = await _residentService.GetAllAsync();
+            var residents = await _residentService.GetAllResidentsAsync();
 
             return Ok(residents);
         }
 
-        //Get: resident by id
+        /// <summary>
+        /// Gets a resident by ID.
+        /// </summary>
+        /// <param name="id">The ID of the resident to retrieve.</param>
+        /// <returns>Returns the resident if found, otherwise NotFound.</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<EditResidentDTO>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<EditResidentDTO>> GetResidentByIdAsync(Guid id)
         {
-            var resident = await _residentService.GetByIdAsync(id);
+            var resident = await _residentService.GetResidentByIdAsync(id);
 
             if (resident == null)
             {
@@ -39,30 +45,43 @@ namespace Slottet.API.Controllers
             return Ok(resident);
         }
 
-        //Post: resident
+        /// <summary>
+        /// Creates a new resident.
+        /// </summary>
+        /// <param name="dto">DTO object containing resident information.</param>
+        /// <returns>Returns the created resident.</returns>
         [HttpPost]
-        public async Task<ActionResult<Resident>> CreateAsync([FromBody] EditResidentDTO dto)
+        public async Task<ActionResult<EditResidentDTO>> PostResidentAsync([FromBody] EditResidentDTO dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty)
             {
                 return BadRequest();
             }
 
-            var resident = await _residentService.CreateAsync(dto);
+            var resident = await _residentService.PostResidentAsync(dto);
+            if (resident == null)
+            {
+                return BadRequest();
+            }
 
-            return CreatedAtAction("GetById", new { id = resident.ResidentID }, resident);
+            return CreatedAtAction(nameof(GetResidentByIdAsync), new { id = resident.ResidentID }, resident);
         }
 
-        //Put: resident by id
+        /// <summary>
+        /// Updates a resident by ID.
+        /// </summary>
+        /// <param name="id">The ID of the resident to update.</param>
+        /// <param name="dto">DTO object containing updated resident information.</param>
+        /// <returns>Returns NoContent if the update succeeds, otherwise BadRequest or NotFound.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateAsync(Guid id, [FromBody] EditResidentDTO dto)
+        public async Task<ActionResult> PutResidentAsync(Guid id, [FromBody] EditResidentDTO dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty)
             {
                 return BadRequest();
             }
 
-            var updated = await _residentService.UpdateAsync(id, dto);
+            var updated = await _residentService.PutResidentAsync(id, dto);
 
             if (!updated)
             {
@@ -72,11 +91,15 @@ namespace Slottet.API.Controllers
             return NoContent();
         }
 
-        //Delete: resident by id
+        /// <summary>
+        /// Deletes a resident by ID.
+        /// </summary>
+        /// <param name="id">The ID of the resident to delete.</param>
+        /// <returns>Returns NoContent if the deletion succeeds, otherwise NotFound.</returns>
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteAsync(Guid id)
+        public async Task<ActionResult> DeleteResidentAsync(Guid id)
         {
-            var deleted = await _residentService.DeleteAsync(id);
+            var deleted = await _residentService.DeleteResidentAsync(id);
 
             if (!deleted)
             {
@@ -86,15 +109,23 @@ namespace Slottet.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Gets grocery day lookup values used when editing residents.
+        /// </summary>
+        /// <returns>Returns all grocery day lookup values.</returns>
         [HttpGet("groceryDays")]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetGroceryDaysAsync() {
-            var groceryDays = await _residentService.GetGroceryDaysAsync();
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentGroceryDaysAsync() {
+            var groceryDays = await _residentService.GetResidentGroceryDaysAsync();
             return Ok(groceryDays);
         }
 
+        /// <summary>
+        /// Gets payment method lookup values used when editing residents.
+        /// </summary>
+        /// <returns>Returns all payment method lookup values.</returns>
         [HttpGet("paymentMethods")]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetPaymentMethodsAsync() {
-            var paymentMethods = await _residentService.GetPaymentMethodsAsync();
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentPaymentMethodsAsync() {
+            var paymentMethods = await _residentService.GetResidentPaymentMethodsAsync();
             return Ok(paymentMethods);
         }
     }

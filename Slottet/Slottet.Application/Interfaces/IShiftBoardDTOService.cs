@@ -1,16 +1,15 @@
 using Slottet.Shared;
-using Slottet.Domain.Entities;
 
 namespace Slottet.Application.Interfaces
 {
     public interface IShiftBoardDTOService
     {
-        Task<ShiftBoardDTO?>  GetByIdAsync(Guid id, CancellationToken ct = default);
-        Task<ShiftBoardDTO?>  GetLatestAsync(CancellationToken ct = default);
-        Task<IEnumerable<ShiftBoard>> GetAllShiftBoardsAsync(CancellationToken ct = default);
-        Task<ShiftBoard?> GetShiftBoardByIdAsync(Guid id, CancellationToken ct = default);
-        Task<ShiftBoard> CreateShiftBoardAsync(ShiftBoard shiftBoard, CancellationToken ct = default);
-        Task<bool> UpdateShiftBoardAsync(Guid id, ShiftBoard shiftBoard, CancellationToken ct = default);
+        Task<ShiftBoardDTO?> GetCurrentShiftBoardAsync(CancellationToken ct = default);
+        Task<ShiftBoardDTO?> GetShiftBoardDtoByIdAsync(Guid id, CancellationToken ct = default);
+        Task<IEnumerable<ShiftBoardEntryDTO>> GetAllShiftBoardsAsync(CancellationToken ct = default);
+        Task<ShiftBoardEntryDTO?> GetShiftBoardByIdAsync(Guid id, CancellationToken ct = default);
+        Task<ShiftBoardEntryDTO?> PostShiftBoardAsync(ShiftBoardEntryDTO dto, CancellationToken ct = default);
+        Task<bool> PutShiftBoardAsync(Guid id, ShiftBoardEntryDTO dto, CancellationToken ct = default);
         Task<bool> DeleteShiftBoardAsync(Guid id, CancellationToken ct = default);
     }
 }

@@ -1,13 +1,13 @@
-using Slottet.Domain.Entities;
+using Slottet.Shared;
 
 namespace Slottet.Application.Interfaces
 {
     public interface IPhoneDTOService
     {
-        Task<IEnumerable<Phone>> GetAllAsync();
-        Task<Phone?> GetByIdAsync(Guid id);
-        Task<Phone> CreateAsync(Phone phone);
-        Task<bool> UpdateAsync(Guid id, Phone phone);
-        Task<bool> DeleteAsync(Guid id);
+        Task<IEnumerable<PhoneDTO>> GetAllPhonesAsync();
+        Task<PhoneDTO?> GetPhoneByIdAsync(Guid id);
+        Task<PhoneDTO?> PostPhoneAsync(PhoneDTO dto);
+        Task<bool> PutPhoneAsync(Guid id, PhoneDTO dto);
+        Task<bool> DeletePhoneAsync(Guid id);
     }
 }

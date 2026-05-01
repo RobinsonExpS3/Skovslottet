@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Slottet.API.Controllers;
 using Slottet.API.Middlewares;
@@ -69,6 +70,39 @@ builder.Services.AddCors(options =>
 //builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exception = context.Features
+            .Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>()
+            ?.Error;
+
+        var statusCode = exception switch
+        {
+            DbUpdateConcurrencyException => StatusCodes.Status409Conflict,
+            DbUpdateException => StatusCodes.Status400BadRequest,
+            ArgumentException => StatusCodes.Status400BadRequest,
+            _ => StatusCodes.Status500InternalServerError
+        };
+
+        context.Response.StatusCode = statusCode;
+
+        await context.Response.WriteAsJsonAsync(new ProblemDetails
+        {
+            Status = statusCode,
+            Title = exception switch
+            {
+                DbUpdateConcurrencyException => "Data blev ændret af en anden bruger.",
+                DbUpdateException => "Ændringen kunne ikke gemmes i databasen.",
+                ArgumentException => "Ugyldige data.",
+                _ => "Der opstod en uventet fejl."
+            }
+        });
+    });
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -16,10 +16,14 @@ namespace Slottet.API.Controllers
             _departmentTaskService = departmentTaskService;
         }
 
+        /// <summary>
+        /// Gets all department tasks as DTO objects.
+        /// </summary>
+        /// <returns>Returns all department tasks.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DepartmentTaskDTO>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<DepartmentTaskDTO>>> GetAllDepartmentTasksAsync()
         {
-            var departmentTasks = await _departmentTaskService.GetAll();
+            var departmentTasks = await _departmentTaskService.GetAllDepartmentTasksAsync();
             return Ok(departmentTasks);
         }
     }

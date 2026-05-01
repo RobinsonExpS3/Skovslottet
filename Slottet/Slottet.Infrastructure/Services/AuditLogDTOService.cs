@@ -16,7 +16,11 @@ namespace Slottet.Infrastructure.Services {
             _context = context;
         }
 
-        public async Task<IEnumerable<AuditLogDTO>> GetAllAsync() {
+        /// <summary>
+        /// Sends a query to the database to retrieve all audit log objects and maps them to DTO objects.
+        /// </summary>
+        /// <returns>Returns a list of AuditLogDTO objects.</returns>
+        public async Task<IEnumerable<AuditLogDTO>> GetAllAuditLogsAsync() {
             return await _context.AuditLogs
                     .AsNoTracking()
                     .OrderBy(s => s.AuditLogID)
@@ -24,7 +28,13 @@ namespace Slottet.Infrastructure.Services {
                     .ToListAsync();
         }
 
-        public async Task<IEnumerable<AuditLogDTO>> GetAllAsync(DateOnly? date, string? shift) {
+        /// <summary>
+        /// Sends a query to the database to retrieve audit log objects filtered by date and shift.
+        /// </summary>
+        /// <param name="date">The date to filter audit logs by, or null to include all dates.</param>
+        /// <param name="shift">The shift name to filter audit logs by, or null to include all shifts.</param>
+        /// <returns>Returns a filtered list of AuditLogDTO objects.</returns>
+        public async Task<IEnumerable<AuditLogDTO>> GetAllAuditLogsAsync(DateOnly? date, string? shift) {
             IQueryable<AuditLog> query = _context.AuditLogs.AsNoTracking();
 
             if (date.HasValue) {
@@ -59,6 +69,12 @@ namespace Slottet.Infrastructure.Services {
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Creates an expression that maps an AuditLog entity to an AuditLogDTO for use in LINQ queries.
+        /// </summary>
+        /// <remarks>This expression can be used with LINQ providers such as Entity Framework to perform
+        /// efficient server-side projection of AuditLog entities to AuditLogDTO objects.</remarks>
+        /// <returns>An expression that projects an AuditLog object into an AuditLogDTO instance.</returns>
         private static Expression<Func<AuditLog, AuditLogDTO>> MapToDtoExpression() {
             return auditLog => new AuditLogDTO {
                 AuditLogID = auditLog.AuditLogID,

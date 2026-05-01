@@ -16,20 +16,27 @@ namespace Slottet.API.Controllers
             _staffService = staffService;
         }
 
-        //Get: Staffs
+        /// <summary>
+        /// Gets all staff as DTO objects.
+        /// </summary>
+        /// <returns>Returns all staff.</returns>
         [HttpGet("Staffs")]
-        public async Task<ActionResult<IEnumerable<EditStaffDTO>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<EditStaffDTO>>> GetAllStaffAsync()
         {
-            var staffs = await _staffService.GetAllAsync();
+            var staffs = await _staffService.GetAllStaffAsync();
 
             return Ok(staffs);
         }
 
-        //Get: Staff by id
+        /// <summary>
+        /// Gets a staff member by ID.
+        /// </summary>
+        /// <param name="id">The ID of the staff member to retrieve.</param>
+        /// <returns>Returns the staff member if found, otherwise NotFound.</returns>
         [HttpGet("{id}", Name = "GetStaffById")]
-        public async Task<ActionResult<EditStaffDTO>> GetByIdAsync(Guid id)
+        public async Task<ActionResult<EditStaffDTO>> GetStaffByIdAsync(Guid id)
         {
-            var staff = await _staffService.GetByIdAsync(id);
+            var staff = await _staffService.GetStaffByIdAsync(id);
 
             if (staff == null)
             {
@@ -39,9 +46,13 @@ namespace Slottet.API.Controllers
             return Ok(staff);
         }
 
-        //Post: Staff
+        /// <summary>
+        /// Creates a new staff member.
+        /// </summary>
+        /// <param name="dto">DTO object containing staff information.</param>
+        /// <returns>Returns the created staff member.</returns>
         [HttpPost]
-        public async Task<ActionResult<EditStaffDTO>> CreateAsync([FromBody] EditStaffDTO dto)
+        public async Task<ActionResult<EditStaffDTO>> PostStaffAsync([FromBody] EditStaffDTO dto)
         {
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||
@@ -52,14 +63,23 @@ namespace Slottet.API.Controllers
                 return BadRequest("StaffName, Initials, Role, and Department are required.");
             }
 
-            var result = await _staffService.CreateAsync(dto);
+            var result = await _staffService.PostStaffAsync(dto);
+            if (result == null)
+            {
+                return BadRequest();
+            }
 
-            return CreatedAtAction("GetById", new { id = result.StaffID }, result);
+            return CreatedAtAction(nameof(GetStaffByIdAsync), new { id = result.StaffID }, result);
         }
 
-        //Put: Staff by id
+        /// <summary>
+        /// Updates a staff member by ID.
+        /// </summary>
+        /// <param name="id">The ID of the staff member to update.</param>
+        /// <param name="dto">DTO object containing updated staff information.</param>
+        /// <returns>Returns NoContent if the update succeeds, otherwise BadRequest or NotFound.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<EditStaffDTO>> UpdateAsync(Guid id, [FromBody] EditStaffDTO dto)
+        public async Task<ActionResult<EditStaffDTO>> PutStaffAsync(Guid id, [FromBody] EditStaffDTO dto)
         {
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||
@@ -70,7 +90,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            var updated = await _staffService.UpdateAsync(id, dto);
+            var updated = await _staffService.PutStaffAsync(id, dto);
 
             if (!updated)
             {
@@ -80,11 +100,15 @@ namespace Slottet.API.Controllers
             return NoContent();
         }
 
-        //Delete: Staff by id
+        /// <summary>
+        /// Deletes a staff member by ID.
+        /// </summary>
+        /// <param name="id">The ID of the staff member to delete.</param>
+        /// <returns>Returns NoContent if the deletion succeeds, otherwise NotFound.</returns>
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteAsync(Guid id)
+        public async Task<ActionResult> DeleteStaffAsync(Guid id)
         {
-            var existingStaff = await _staffService.DeleteAsync(id);
+            var existingStaff = await _staffService.DeleteStaffAsync(id);
 
             if (!existingStaff)
             {

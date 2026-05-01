@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
@@ -6,6 +6,10 @@ namespace Slottet.Infrastructure.Data.Configurations
 {
     public class SpecialResponsibilityStaffConfiguration : IEntityTypeConfiguration<SpecialResponsibilityStaff>
     {
+        /// <summary>
+        /// Configures the Entity Framework model for the SpecialResponsibilityStaff entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the SpecialResponsibilityStaff entity.</param>
         public void Configure(EntityTypeBuilder<SpecialResponsibilityStaff> entity)
         {
             entity.HasKey(x => new { x.SpecialResponsibilityID, x.StaffID, x.AssignedAt });

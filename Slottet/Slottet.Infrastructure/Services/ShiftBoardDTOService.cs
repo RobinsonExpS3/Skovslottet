@@ -15,7 +15,12 @@ namespace Slottet.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<ShiftBoardDTO?> GetLatestAsync(CancellationToken ct = default)
+        /// <summary>
+        /// Sends a query to the database to retrieve the latest shift board and maps it to a DTO object.
+        /// </summary>
+        /// <param name="ct">Cancellation token used to cancel the database query.</param>
+        /// <returns>Returns the latest ShiftBoardDTO object if found, otherwise null.</returns>
+        public async Task<ShiftBoardDTO?> GetCurrentShiftBoardAsync(CancellationToken ct = default)
         {
             var latestId = await _context.ShiftBoards
                 .AsNoTracking()
@@ -25,10 +30,16 @@ namespace Slottet.Infrastructure.Services
 
             return latestId == Guid.Empty
                 ? null
-                : await GetByIdAsync(latestId, ct);
+                : await GetShiftBoardDtoByIdAsync(latestId, ct);
         }
 
-        public async Task<ShiftBoardDTO?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        /// <summary>
+        /// Sends a query to the database to retrieve a shift board based on a specific ID and maps it to a DTO object.
+        /// </summary>
+        /// <param name="id">The ID of the shift board to retrieve.</param>
+        /// <param name="ct">Cancellation token used to cancel the database query.</param>
+        /// <returns>Returns a ShiftBoardDTO object if found, otherwise null.</returns>
+        public async Task<ShiftBoardDTO?> GetShiftBoardDtoByIdAsync(Guid id, CancellationToken ct = default)
         {
             var shiftBoard = await GetShiftBoardAsync(id, ct);
             if (shiftBoard is null)
@@ -77,29 +88,78 @@ namespace Slottet.Infrastructure.Services
             };
         }
 
-        public async Task<IEnumerable<ShiftBoard>> GetAllShiftBoardsAsync(CancellationToken ct = default)
+        /// <summary>
+        /// Sends a query to the database to retrieve all shift board objects.
+        /// </summary>
+        /// <param name="ct">Cancellation token used to cancel the database query.</param>
+        /// <returns>Returns a list of ShiftBoard objects.</returns>
+        public async Task<IEnumerable<ShiftBoardEntryDTO>> GetAllShiftBoardsAsync(CancellationToken ct = default)
         {
             return await _context.ShiftBoards
                 .AsNoTracking()
                 .OrderBy(s => s.StartDateTime)
+                .Select(shiftBoard => new ShiftBoardEntryDTO
+                {
+                    ShiftBoardID = shiftBoard.ShiftBoardID,
+                    ShiftType = shiftBoard.ShiftType,
+                    StartDateTime = shiftBoard.StartDateTime,
+                    EndDateTime = shiftBoard.EndDateTime
+                })
                 .ToListAsync(ct);
         }
 
-        public async Task<ShiftBoard?> GetShiftBoardByIdAsync(Guid id, CancellationToken ct = default)
+        /// <summary>
+        /// Sends a query to the database to retrieve a shift board object based on a specific ID.
+        /// </summary>
+        /// <param name="id">The ID of the shift board to retrieve.</param>
+        /// <param name="ct">Cancellation token used to cancel the database query.</param>
+        /// <returns>Returns a ShiftBoard object if found, otherwise null.</returns>
+        public async Task<ShiftBoardEntryDTO?> GetShiftBoardByIdAsync(Guid id, CancellationToken ct = default)
         {
             return await _context.ShiftBoards
                 .AsNoTracking()
-                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
+                .Where(sb => sb.ShiftBoardID == id)
+                .Select(shiftBoard => new ShiftBoardEntryDTO
+                {
+                    ShiftBoardID = shiftBoard.ShiftBoardID,
+                    ShiftType = shiftBoard.ShiftType,
+                    StartDateTime = shiftBoard.StartDateTime,
+                    EndDateTime = shiftBoard.EndDateTime
+                })
+                .FirstOrDefaultAsync(ct);
         }
 
-        public async Task<ShiftBoard> CreateShiftBoardAsync(ShiftBoard shiftBoard, CancellationToken ct = default)
+        /// <summary>
+        /// Creates a new shift board object in the database.
+        /// </summary>
+        /// <param name="dto">DTO object containing shift board information.</param>
+        /// <param name="ct">Cancellation token used to cancel the database operation.</param>
+        /// <returns>Returns the created ShiftBoardEntryDTO object.</returns>
+        public async Task<ShiftBoardEntryDTO?> PostShiftBoardAsync(ShiftBoardEntryDTO dto, CancellationToken ct = default)
         {
+            var shiftBoard = new ShiftBoard
+            {
+                ShiftBoardID = dto.ShiftBoardID == Guid.Empty ? Guid.NewGuid() : dto.ShiftBoardID,
+                ShiftType = dto.ShiftType,
+                StartDateTime = dto.StartDateTime,
+                EndDateTime = dto.EndDateTime
+            };
+
             _context.ShiftBoards.Add(shiftBoard);
             await _context.SaveChangesAsync(ct);
-            return shiftBoard;
+
+            var createdShiftBoard = await GetShiftBoardByIdAsync(shiftBoard.ShiftBoardID, ct);
+            return createdShiftBoard;
         }
 
-        public async Task<bool> UpdateShiftBoardAsync(Guid id, ShiftBoard shiftBoard, CancellationToken ct = default)
+        /// <summary>
+        /// Updates a shift board object in the database based on the provided ID and ShiftBoard object.
+        /// </summary>
+        /// <param name="id">The ID of the shift board to update.</param>
+        /// <param name="dto">DTO object containing updated shift board information.</param>
+        /// <param name="ct">Cancellation token used to cancel the database operation.</param>
+        /// <returns>Returns true if the update is successful, otherwise false.</returns>
+        public async Task<bool> PutShiftBoardAsync(Guid id, ShiftBoardEntryDTO dto, CancellationToken ct = default)
         {
             var existingShiftBoard = await _context.ShiftBoards
                 .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
@@ -109,14 +169,20 @@ namespace Slottet.Infrastructure.Services
                 return false;
             }
 
-            existingShiftBoard.ShiftType = shiftBoard.ShiftType;
-            existingShiftBoard.StartDateTime = shiftBoard.StartDateTime;
-            existingShiftBoard.EndDateTime = shiftBoard.EndDateTime;
+            existingShiftBoard.ShiftType = dto.ShiftType;
+            existingShiftBoard.StartDateTime = dto.StartDateTime;
+            existingShiftBoard.EndDateTime = dto.EndDateTime;
 
             await _context.SaveChangesAsync(ct);
             return true;
         }
 
+        /// <summary>
+        /// Deletes a shift board object from the database based on the given ID.
+        /// </summary>
+        /// <param name="id">The ID of the shift board to delete.</param>
+        /// <param name="ct">Cancellation token used to cancel the database operation.</param>
+        /// <returns>Returns true if the deletion is successful, otherwise false.</returns>
         public async Task<bool> DeleteShiftBoardAsync(Guid id, CancellationToken ct = default)
         {
             var shiftBoard = await _context.ShiftBoards
@@ -132,6 +198,12 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
+        /// <summary>
+        /// Gets a shift board with the related staff shift and staff data needed for DTO mapping.
+        /// </summary>
+        /// <param name="id">The ID of the shift board to retrieve.</param>
+        /// <param name="ct">Cancellation token used to cancel the database query.</param>
+        /// <returns>Returns a ShiftBoard object if found, otherwise null.</returns>
         private async Task<ShiftBoard?> GetShiftBoardAsync(Guid id, CancellationToken ct)
         {
             return await _context.ShiftBoards
@@ -141,6 +213,12 @@ namespace Slottet.Infrastructure.Services
                 .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
         }
 
+        /// <summary>
+        /// Gets a department with the related task, staff, and phone data needed for DTO mapping.
+        /// </summary>
+        /// <param name="id">The ID of the department to retrieve.</param>
+        /// <param name="ct">Cancellation token used to cancel the database query.</param>
+        /// <returns>Returns a Department object if found, otherwise null.</returns>
         private async Task<Department?> GetDepartmentAsync(Guid id, CancellationToken ct)
         {
             return await _context.Departments
@@ -153,6 +231,11 @@ namespace Slottet.Infrastructure.Services
                 .FirstOrDefaultAsync(d => d.DepartmentID == id, ct);
         }
 
+        /// <summary>
+        /// Gets all active residents with the related data needed for resident card mapping.
+        /// </summary>
+        /// <param name="ct">Cancellation token used to cancel the database query.</param>
+        /// <returns>Returns a list of active Resident objects.</returns>
         private async Task<List<Resident>> GetActiveResidentsAsync(CancellationToken ct)
         {
             return await _context.Residents
@@ -173,6 +256,11 @@ namespace Slottet.Infrastructure.Services
                 .ToListAsync(ct);
         }
 
+        /// <summary>
+        /// Creates a new ResidentCardDto instance by mapping the properties of the specified Resident entity.
+        /// </summary>
+        /// <param name="resident">The Resident entity to map from. Cannot be null.</param>
+        /// <returns>A ResidentCardDto containing the mapped values from the specified Resident entity.</returns>
         private static ResidentCardDto MapResidentCard(Resident resident)
         {
             var today = DateTime.Today;
@@ -202,6 +290,12 @@ namespace Slottet.Infrastructure.Services
             };
         }
 
+        /// <summary>
+        /// Creates medicine schedule DTO objects for a resident on the specified date.
+        /// </summary>
+        /// <param name="resident">The Resident entity containing medicine information.</param>
+        /// <param name="date">The date used to filter medicine times.</param>
+        /// <returns>Returns a list of MedicineScheduleItemDto objects.</returns>
         private static List<MedicineScheduleItemDto> MapMedicineSchedule(Resident resident, DateTime date)
         {
             return resident.Medicines
@@ -216,6 +310,12 @@ namespace Slottet.Infrastructure.Services
                 .ToList();
         }
 
+        /// <summary>
+        /// Creates PN entry DTO objects for a resident on the specified date.
+        /// </summary>
+        /// <param name="resident">The Resident entity containing PN information.</param>
+        /// <param name="date">The date used to filter PN entries.</param>
+        /// <returns>Returns a list of PNEntryDto objects.</returns>
         private static List<PNEntryDto> MapPNEntries(Resident resident, DateTime date)
         {
             return resident.PNs
