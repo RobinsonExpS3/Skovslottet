@@ -1,33 +1,26 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
-using Slottet.Domain.Entities;
-using Slottet.Infrastructure.Data;
 using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class GroceryDayController : Controller {
-        private readonly SlottetDBContext _context;
+    public class GroceryDayController : Controller
+    {
+        private readonly IGroceryDayDTOService _groceryDayService;
 
-        public GroceryDayController(SlottetDBContext context) {
-            _context = context;
+        public GroceryDayController(IGroceryDayDTOService groceryDayService)
+        {
+            _groceryDayService = groceryDayService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetAllAsync() {
-            var methods = await _context.GroceryDays
-                .AsNoTracking()
-                .OrderBy(g => g.GroceryDayName)
-                .Select(g => new ResidentLookupDTO {
-                    ID = g.GroceryDayID,
-                    Name = g.GroceryDayName
-                })
-                .ToListAsync();
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetAllAsync()
+        {
+            var groceryDays = await _groceryDayService.GetAllAsync();
 
-            return Ok(methods);
+            return Ok(groceryDays);
         }
     }
 }

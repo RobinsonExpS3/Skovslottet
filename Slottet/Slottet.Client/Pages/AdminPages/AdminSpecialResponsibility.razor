@@ -1,4 +1,5 @@
 ﻿@page "/adminSpecialResponsibility"
+@rendermode InteractiveWebAssembly
 
 <div class="view-box">
 	<h2>Rediger særligt ansvar</h2>
@@ -21,7 +22,7 @@
 				@foreach(var item in specialResponsibilities)
 				{
 					<tr @onclick="() => SelectItem(item)" class="@(selectedItem == item ? "selected-row" : "")">
-						<td>@item.TaskName</td>
+						<td>@item.Description</td>
 					</tr>
 				}
 			}
@@ -29,9 +30,9 @@
 		
 		<div class="button-column">
 			<input class="sp-table-input" @bind="taskNameInput" placeholder="Indtast særligt ansvar..." />
-			<button class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(taskNameInput) || selectedItem != null)">Opret</button>
-			<button class="column-button" @onclick="Update" disabled="@(selectedItem == null)">Opdater</button>
-			<button class="column-button" @onclick="Delete" disabled="@(selectedItem == null)">Slet</button>
+			<button class="column-button" @onclick="CreateAsync" disabled="@(!CanCreate)">Opret</button>
+			<button class="column-button" @onclick="UpdateAsync" disabled="@(!CanUpdate)">Opdater</button>
+			<button class="column-button" @onclick="DeleteAsync" disabled="@(!CanDelete)">Slet</button>
 		</div>
 	</div>
 </div>

@@ -50,7 +50,7 @@ namespace Slottet.API.Controllers
 
             var resident = await _residentService.CreateAsync(dto);
 
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = resident.ResidentID }, resident);
+            return CreatedAtAction("GetById", new { id = resident.ResidentID }, resident);
         }
 
         //Put: resident by id
@@ -84,6 +84,18 @@ namespace Slottet.API.Controllers
             }
 
             return NoContent();
+        }
+
+        [HttpGet("groceryDays")]
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetGroceryDaysAsync() {
+            var groceryDays = await _residentService.GetGroceryDaysAsync();
+            return Ok(groceryDays);
+        }
+
+        [HttpGet("paymentMethods")]
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetPaymentMethodsAsync() {
+            var paymentMethods = await _residentService.GetPaymentMethodsAsync();
+            return Ok(paymentMethods);
         }
     }
 }

@@ -14,6 +14,7 @@
         public ICollection<StaffResidentStatus> StaffResidentStatuses { get; set; }
 
         public ICollection<StaffPhone> StaffPhones { get; set; } = new List<StaffPhone>();
+        public ICollection<StaffPN> StaffPNs { get; set; } = new List<StaffPN>();
 
     }
 }

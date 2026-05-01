@@ -1,4 +1,4 @@
-﻿@* @page "/adminAudit"
+﻿@page "/adminAudit"
 @rendermode InteractiveWebAssembly
 
 <div class="container">
@@ -56,13 +56,13 @@
     </div>
 
     <div class="main-panel">
-        @foreach (var resident in Model.ResidentCards)
+        @foreach (var resident in ResidentCards)
         {
-            var isOpen = openCardId == resident.ResidentCardId;
+            var isOpen = openCardId == resident.ResidentStatusID;
 
             <div class="card @(isOpen ? "expanded" : "collapsed")"
-                 @key="resident.ResidentCardId"
-                 @onclick="() => ToggleStatusCard(resident.ResidentCardId)">
+                 @key="resident.ResidentStatusID"
+                 @onclick="() => ToggleStatusCard(resident.ResidentStatusID)">
 
                 @if (!isOpen)
                 {
@@ -119,7 +119,7 @@
                         <section class="resident-bottom-grid">
                             <section class="pn-status">
                                 <h4>>PN</h4>
-                                <p>@resident.PNStatus</p>
+                                <p>@resident.PNEntries</p>
                             </section>
 
                             <section class="assigned-staff">
@@ -149,4 +149,4 @@
             </div>
         }
     </div>
-</div> *@
+</div>

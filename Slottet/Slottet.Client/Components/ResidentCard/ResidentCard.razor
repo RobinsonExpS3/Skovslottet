@@ -1,0 +1,197 @@
+<div class="bkv-card">
+
+    @* ── HEADER: Navn + Risk dropdown ── *@
+    <header class="bkv-header @_draft.RiskCssClass">
+        @* Beboernavn *@
+        <span class="bkv-navn">@_draft.ResidentName</span>
+        @* Risikoniveau *@
+        <select class="bkv-risk-select" @bind="_draft.RiskLevel">
+            <option value="Grøn">Grøn</option>
+            <option value="Gul">Gul</option>
+            <option value="Rød">Rød</option>
+        </select>
+    </header>
+
+    <div class="bkv-body">
+
+        @* ── SENESTE STATUS ── *@
+        <section class="bkv-section bkv-status-section">
+            <span class="bkv-label bkv-label--center">Seneste Status</span>
+            @* Statusnotat *@
+            <textarea class="bkv-status-input"
+                      rows="2"
+                      @bind="_draft.LatestStatusNote"
+                      placeholder="Skriv seneste status…"></textarea>
+        </section>
+
+        <div class="bkv-grid">
+
+            @* ── MEDICIN ── *@
+            <section class="bkv-section bkv-medicin-section">
+                <span class="bkv-label">Medicin</span>
+
+                <div class="bkv-medicin-slots">
+                    @* Medicin-knapper: toggle givet/ikke givet *@
+                    @foreach (var med in _draft.MedicineSchedule)
+                    {
+                        <button type="button"
+                                class="bkv-med-slot @(med.IsGiven ? "bkv-med-given" : "bkv-med-not-given")"
+                                @onclick="() => med.IsGiven = !med.IsGiven">
+                            <span class="bkv-med-tid">@med.Label</span>
+                            <span class="bkv-med-ikon">@(med.IsGiven ? "💊" : "·")</span>
+                        </button>
+                    }
+
+                    @if (_showNewMedicineForm)
+                    {
+                        @* Ny medicin: indtastningsform *@
+                        <div class="bkv-ny-medicin-form">
+                            @* Tidspunkt *@
+                            <input class="bkv-input-small"
+                                   type="text"
+                                   value="@_newMedicineLabel"
+                                   @onchange="e => _newMedicineLabel = FormatTime(e.Value?.ToString())"
+                                   placeholder="08:00" />
+                            @* Gem-knap *@
+                            <button type="button" class="bkv-btn-ok" @onclick="AddMedicine">OK</button>
+                            @* Annullér-knap *@
+                            <button type="button" class="bkv-btn-annuller"
+                                    @onclick="() => { _showNewMedicineForm = false; _newMedicineLabel = string.Empty; }">✕</button>
+                        </div>
+                    }
+                    else
+                    {
+                        @* Tilføj ny medicin *@
+                        <button type="button" class="bkv-med-add" @onclick="() => _showNewMedicineForm = true">+</button>
+                    }
+                </div>
+            </section>
+
+            @* ── PN ── *@
+            <section class="bkv-section bkv-pn-section">
+                <span class="bkv-label">PN</span>
+
+                @foreach (var row in _pnRows)
+                {
+                    var localRow = row;
+
+                    @if (localRow.IsEditing)
+                    {
+                        @* PN Editing mode: show inputs + Gem / Annuller *@
+                        <div class="bkv-pn-entry bkv-pn-entry--editing">
+                            @* Tidspunkt *@
+                            <input class="bkv-input" type="text"
+                                   value="@localRow.Entry.TimeOfAdministration"
+                                   @onchange="e => localRow.Entry.TimeOfAdministration = FormatTime(e.Value?.ToString())"
+                                   placeholder="Tidspunkt" />
+                            @* Præparat *@
+                            <input class="bkv-input" type="text"
+                                   value="@localRow.Entry.Medication"
+                                   @onchange="e => localRow.Entry.Medication = e.Value?.ToString() ?? string.Empty"
+                                   placeholder="Præparat" />
+                            @* Årsag *@
+                            <input class="bkv-input" type="text"
+                                   value="@localRow.Entry.Reason"
+                                   @onchange="e => localRow.Entry.Reason = e.Value?.ToString() ?? string.Empty"
+                                   placeholder="Årsag" />
+                            @* Udstedt af *@
+                            <span class="bkv-pn-udstedt">Udstedt af: @localRow.Entry.IssuedBy</span>
+                            <div class="bkv-pn-actions">
+                                @* PN-OK-Knap *@
+                                <button type="button" class="bkv-btn-ok"
+                                        @onclick="() => SavePnRow(localRow)">Gem</button>
+                                @* PN-Annullér-Knap *@
+                                <button type="button" class="bkv-btn-annuller"
+                                        @onclick="() => CancelPnRow(localRow)">Annuller</button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        @* Saved mode: read-only display, click to edit *@
+                        <div class="bkv-pn-entry bkv-pn-entry--saved"
+                             @onclick="() => localRow.IsEditing = true"
+                             title="Klik for at redigere">
+                            <span class="bkv-pn-field"><strong>@localRow.Entry.TimeOfAdministration</strong></span>
+                            <span class="bkv-pn-field">@localRow.Entry.Medication</span>
+                            <span class="bkv-pn-field bkv-pn-reason">@localRow.Entry.Reason</span>
+                            <span class="bkv-pn-udstedt">Udstedt af: @localRow.Entry.IssuedBy</span>
+                        </div>
+                    }
+                }
+
+                @* Tilføj ny PN *@
+                <button type="button" class="bkv-btn-tilfoej" @onclick="AddPN">+ Tilføj PN</button>
+            </section>
+
+            @* ── ANSVARLIGT PERSONALE ── *@
+            <section class="bkv-section bkv-personale-section">
+                <span class="bkv-label">Ansvarligt personale</span>
+
+                <div class="bkv-pills">
+                    @* Tildelt personale: pills med fjern-knap *@
+                    @foreach (var staffMember in _draft.AssignedStaff)
+                    {
+                        var localMember = staffMember;
+                        <span class="bkv-pill">
+                            @localMember
+                            @* Fjern personale *@
+                            <button type="button" class="bkv-pill-remove"
+                                    @onclick="() => RemoveStaff(localMember)">×</button>
+                        </span>
+                    }
+                    @* Åbn personale-picker *@
+                    <button type="button"
+                            class="bkv-pill bkv-pill-add"
+                            @onclick="() => _showStaffPicker = !_showStaffPicker">+</button>
+                </div>
+
+                @if (_showStaffPicker)
+                {
+                    @* Personale-picker: vælg fra tilgængeligt personale *@
+                    <div class="bkv-staff-picker">
+                        @foreach (var staffMember in AllStaff.Where(n => !_draft.AssignedStaff.Contains(n)))
+                        {
+                            var localMember = staffMember;
+                            <button type="button" class="bkv-staff-pick-btn"
+                                    @onclick="() => AddStaff(localMember)">@localMember</button>
+                        }
+                    </div>
+                }
+            </section>
+
+            @* ── HANDLEDAG + BETALING ── *@
+            <section class="bkv-section bkv-praktisk-section">
+                <div class="bkv-praktisk-row">
+                    <div class="bkv-praktisk-felt">
+                        @* Handledag *@
+                        <span class="bkv-label">Handledag</span>
+                        <select class="bkv-select" @bind="_draft.GroceryDay">
+                            <option value="">–</option>
+                            @* Handledage *@
+                            @foreach (var day in GroceryDays)
+                            {
+                                <option>@day</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="bkv-praktisk-felt">
+                        @* Betalingsmetode *@
+                        <span class="bkv-label">Betaling</span>
+                        <span class="bkv-betaling-tekst">@(_draft.PaymentMethod ?? "–")</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    @* ── GEM ÆNDRINGER ── *@
+    <div class="bkv-save-bar">
+        @* Gem-knap *@
+        <button type="button" class="bkv-btn-gem" @onclick="SaveChanges">
+            Gem ændringer
+        </button>
+    </div>
+
+</div>

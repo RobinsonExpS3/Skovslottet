@@ -23,11 +23,6 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .WithOne(sb => sb.ShiftBoard)
                 .HasForeignKey(ss => ss.ShiftBoardID)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            entity.HasMany(sr => sr.SpecialResponsibilities)
-                .WithOne(sb => sb.ShiftBoard)
-                .HasForeignKey(sr => sr.ShiftBoardID)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

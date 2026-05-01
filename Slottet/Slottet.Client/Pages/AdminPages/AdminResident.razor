@@ -1,4 +1,5 @@
 ﻿@page "/adminResident"
+@rendermode InteractiveWebAssembly
 
 <div class="view-box">
 	<h2>Rediger beboer</h2>
@@ -21,7 +22,9 @@
 			{
 				@foreach(var resident in residents)
 				{
-					<tr @onclick="() => SelectResident(resident)" class="@(selectedResident == resident ? "selected-row" : "")">
+					<tr @onclick="() => SelectResidentAsync(resident)" 
+						class="@(selectedResident == resident ? "selected-row" : "")"
+						style="cursor: pointer;">
 						<td>@resident.ResidentName</td>
 						<td>@GetGroceryDayName(resident.GroceryDayID)</td>
 					</tr>
@@ -79,9 +82,9 @@
 				}
 			</div>
 
-			<button type="button" class="column-button" @onclick="Create" disabled="@(string.IsNullOrWhiteSpace(residentNameInput) || selectedGroceryDayID is null || selectedResident is not null)">Opret</button>
-			<button type="button" class="column-button" @onclick="Update" disabled="@(selectedResident is null)">Opdater</button>
-			<button type="button" class="column-button" @onclick="Delete" disabled="@(selectedResident is null)">Slet</button>
+			<button type="button" class="column-button" @onclick="CreateAsync" disabled="@(!CanCreate)">Opret</button>
+			<button type="button" class="column-button" @onclick="UpdateAsync" disabled="@(!CanUpdate)">Opdater</button>
+			<button type="button" class="column-button" @onclick="DeleteAsync" disabled="@(!CanDelete)">Slet</button>
 		</div>
 	</div>
 </div>

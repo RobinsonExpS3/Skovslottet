@@ -1,0 +1,15 @@
+@if (IsVisible)
+{
+    @* Backdrop og panel som søskende — ingen event-propagation konflikt.
+       Klik på backdrop lukker. Klik på panelet rammer kun panelet. *@
+
+    @* Backdrop: klik lukker overlay *@
+    <div class="overlay-backdrop" @onclick="HandleClose"></div>
+
+    @* Panel: indhold renderes her *@
+    <div class="overlay-panel @SizeClass" id="@PanelId">
+        @* Luk-knap *@
+        <button class="overlay-close-btn" @onclick="HandleClose" title="Luk">✕</button>
+        @ChildContent
+    </div>
+}

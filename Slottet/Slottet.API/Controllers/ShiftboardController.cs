@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Slottet.Application.Interfaces;
 using Slottet.Domain.Entities;
-using Slottet.Infrastructure.Data;
+using Slottet.Shared;
 
 namespace Slottet.API.Controllers
 {
@@ -9,20 +9,43 @@ namespace Slottet.API.Controllers
     [Route("api/[controller]")]
     public class ShiftboardController : ControllerBase
     {
-        private readonly SlottetDBContext _context;
+        private readonly IShiftBoardDTOService _shiftBoardService;
 
-        public ShiftboardController(SlottetDBContext context)
+        public ShiftboardController(IShiftBoardDTOService shiftBoardService)
         {
-            _context = context;
+            _shiftBoardService = shiftBoardService;
+        }
+
+        [HttpGet("current")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetCurrent(CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetLatestAsync(ct);
+
+            if (dto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(dto);
+        }
+
+        [HttpGet("{id:guid}/dto")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetDto(Guid id, CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetByIdAsync(id, ct);
+
+            if (dto == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(dto);
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ShiftBoard>>> GetAll(CancellationToken ct)
         {
-            var shiftboards = await _context.ShiftBoards
-                .AsNoTracking()
-                .OrderBy(s => s.StartDateTime)
-                .ToListAsync(ct);
+            var shiftboards = await _shiftBoardService.GetAllShiftBoardsAsync(ct);
 
             return Ok(shiftboards);
         }
@@ -30,12 +53,12 @@ namespace Slottet.API.Controllers
         [HttpGet("{id:guid}")]
         public async Task<ActionResult<ShiftBoard>> GetById(Guid id, CancellationToken ct)
         {
-            var shiftboard = await _context.ShiftBoards
-                .AsNoTracking()
-                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
+            var shiftboard = await _shiftBoardService.GetShiftBoardByIdAsync(id, ct);
 
-            if (shiftboard is null)
+            if (shiftboard == null)
+            {
                 return NotFound();
+            }
 
             return Ok(shiftboard);
         }
@@ -44,31 +67,28 @@ namespace Slottet.API.Controllers
         public async Task<ActionResult<ShiftBoard>> Create([FromBody] ShiftBoard shiftboard, CancellationToken ct)
         {
             if (shiftboard == null)
+            {
                 return BadRequest();
+            }
 
-            _context.ShiftBoards.Add(shiftboard);
-            await _context.SaveChangesAsync(ct);
+            var createdShiftBoard = await _shiftBoardService.CreateShiftBoardAsync(shiftboard, ct);
 
-            return CreatedAtAction(nameof(GetById), new { id = shiftboard.ShiftBoardID }, shiftboard);
+            return CreatedAtAction(nameof(GetById), new { id = createdShiftBoard.ShiftBoardID }, createdShiftBoard);
         }
 
         [HttpPut("{id:guid}")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ShiftBoard shiftboard, CancellationToken ct)
         {
             if (id != shiftboard.ShiftBoardID)
+            {
                 return BadRequest("Id i URL matcher ikke objektets id.");
-
-            try
-            {
-                _context.Entry(shiftboard).State = EntityState.Modified;
-                await _context.SaveChangesAsync(ct);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _context.ShiftBoards.AnyAsync(sb => sb.ShiftBoardID == id, ct))
-                    return NotFound();
 
-                throw;
+            var updated = await _shiftBoardService.UpdateShiftBoardAsync(id, shiftboard, ct);
+
+            if (!updated)
+            {
+                return NotFound();
             }
 
             return NoContent();
@@ -77,14 +97,12 @@ namespace Slottet.API.Controllers
         [HttpDelete("{id:guid}")]
         public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
         {
-            var shiftboard = await _context.ShiftBoards
-                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
+            var deleted = await _shiftBoardService.DeleteShiftBoardAsync(id, ct);
 
-            if (shiftboard == null)
+            if (!deleted)
+            {
                 return NotFound();
-
-            _context.ShiftBoards.Remove(shiftboard);
-            await _context.SaveChangesAsync(ct);
+            }
 
             return NoContent();
         }

@@ -322,9 +322,6 @@ namespace Slottet.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ShiftBoardID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -332,9 +329,30 @@ namespace Slottet.Infrastructure.Migrations
 
                     b.HasKey("SpecialResponsibilityID");
 
-                    b.HasIndex("ShiftBoardID");
-
                     b.ToTable("SpecialResponsibilities");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibilityStaff", b =>
+                {
+                    b.Property<Guid>("SpecialResponsibilityID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DepartmentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("SpecialResponsibilityID", "StaffID", "AssignedAt");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.HasIndex("StaffID");
+
+                    b.ToTable("SpecialResponsibilityStaff");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
@@ -366,6 +384,21 @@ namespace Slottet.Infrastructure.Migrations
                     b.HasIndex("DepartmentID");
 
                     b.ToTable("Staffs");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.StaffPN", b =>
+                {
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PNID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("StaffID", "PNID");
+
+                    b.HasIndex("PNID");
+
+                    b.ToTable("StaffPNs");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffPhone", b =>
@@ -513,15 +546,31 @@ namespace Slottet.Infrastructure.Migrations
                     b.Navigation("RiskLevel");
                 });
 
-            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibility", b =>
+            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibilityStaff", b =>
                 {
-                    b.HasOne("Slottet.Domain.Entities.ShiftBoard", "ShiftBoard")
-                        .WithMany("SpecialResponsibilities")
-                        .HasForeignKey("ShiftBoardID")
+                    b.HasOne("Slottet.Domain.Entities.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ShiftBoard");
+                    b.HasOne("Slottet.Domain.Entities.SpecialResponsibility", "SpecialResponsibility")
+                        .WithMany("SpecialResponsibilityStaffs")
+                        .HasForeignKey("SpecialResponsibilityID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("SpecialResponsibility");
+
+                    b.Navigation("Staff");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
@@ -533,6 +582,25 @@ namespace Slottet.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.StaffPN", b =>
+                {
+                    b.HasOne("Slottet.Domain.Entities.PN", "PN")
+                        .WithMany("StaffPNs")
+                        .HasForeignKey("PNID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
+                        .WithMany("StaffPNs")
+                        .HasForeignKey("StaffID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("PN");
+
+                    b.Navigation("Staff");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffPhone", b =>
@@ -606,6 +674,11 @@ namespace Slottet.Infrastructure.Migrations
                     b.Navigation("Residents");
                 });
 
+            modelBuilder.Entity("Slottet.Domain.Entities.PN", b =>
+                {
+                    b.Navigation("StaffPNs");
+                });
+
             modelBuilder.Entity("Slottet.Domain.Entities.PaymentMethod", b =>
                 {
                     b.Navigation("ResidentPaymentMethods");
@@ -641,13 +714,18 @@ namespace Slottet.Infrastructure.Migrations
 
             modelBuilder.Entity("Slottet.Domain.Entities.ShiftBoard", b =>
                 {
-                    b.Navigation("SpecialResponsibilities");
-
                     b.Navigation("StaffShifts");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibility", b =>
+                {
+                    b.Navigation("SpecialResponsibilityStaffs");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
                 {
+                    b.Navigation("StaffPNs");
+
                     b.Navigation("StaffPhones");
 
                     b.Navigation("StaffResidentStatuses");

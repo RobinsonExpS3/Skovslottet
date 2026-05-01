@@ -1,250 +1,472 @@
-﻿.background-test {
-    background-color: #EDEDE8; /*Den fine lyse-grønne farve*/
+/* ─────────────────────────────────────
+   SIDE — fylder 100vh, intet scroll
+   ───────────────────────────────────── */
+.background-test {
+    height: 100vh;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: var(--color-bg-page);
+    background-image: url('/images/forest-bg.svg');
+    background-size: cover;
+    background-position: bottom center;
+    background-attachment: fixed;
 }
 
+/* ─────────────────────────────────────
+   VAGT-HEADER
+   ───────────────────────────────────── */
 .shiftboard-header {
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background-color: #36382E;
-    border-radius: 6px;
+    flex-shrink: 0;
+    padding: 6px 16px;
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary-mid));
+    border-radius: var(--radius-header);
     color: white;
+    box-shadow: var(--shadow-header);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
+.shiftboard-header h1 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.shiftboard-header p  { margin: 0; font-size: 0.78rem; opacity: 0.9; }
+
+/* ─────────────────────────────────────
+   LAYOUT: kort-grid | sidebar
+   ───────────────────────────────────── */
 .shiftboard-layout {
+    flex: 1;
+    min-height: 0;
     display: grid;
-    grid-template-columns: 1fr 330px;
-    gap: 1rem;
-    align-items: start;
+    grid-template-columns: 1fr 300px;
+    gap: 8px;
 }
 
-.left-panel {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 98%;
-    
-}
+.left-panel  { min-height: 0; height: 100%; overflow: hidden; }
+.right-panel { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
 
-.right-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.info-box {
-    background-color: white;
-    border: 1px solid #dcdcdc;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    padding: 1rem;
-}
-
+/* ─────────────────────────────────────
+   4 × 3 KORT-GRID
+   ───────────────────────────────────── */
 .resident-card-grid {
+    height: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    grid-auto-rows: 0;
+    gap: 8px;
+    overflow: hidden;
 }
 
+/* ─────────────────────────────────────
+   RESIDENT CARD
+   ───────────────────────────────────── */
 .resident-card {
-    background-color: #f3f3f3;
-    border: 2px solid #222;
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    min-width: 0;
-    display: grid;
-    gap: 0.5rem;
+    background-color: var(--color-bg-card);
+    border: var(--border-outer);
+    border-radius: var(--radius-card);
+    padding: 5px;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-/* Sektioner inde i resident card */
-.resident-header,
-.resident-status,
-.pn-status,
-.assigned-staff,
-.grocery-day,
-.payment-method {
-    background-color: #f8f8f8;
-    border: 2px solid #222;
-    border-radius: 8px;
-    padding: 0.5rem;    
-}
+.resident-card:hover { box-shadow: var(--shadow-card-hover); }
 
+.resident-card--clickable { cursor: pointer; }
+.resident-card--clickable:hover { box-shadow: var(--shadow-card-hover); outline: 2px solid var(--color-primary-light); }
+
+.info-box--clickable { cursor: pointer; transition: box-shadow 0.15s, outline 0.15s; }
+.info-box--clickable:hover { box-shadow: var(--shadow-info), 0 0 0 2px var(--color-primary-light); }
+
+/* Navn */
 .resident-header {
+    flex-shrink: 0;
     text-align: center;
+    border: var(--border-inner);
+    border-radius: var(--radius-section);
+    padding: 3px 6px;
+    background-color: var(--color-bg-section-header);
 }
 
-    .resident-header h3 {
-        margin: 0;
-        font-size: 1.8rem;
-    }
+.resident-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-heading);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Status — fast ~10% kortere end før; resten af pladsen gives til body-grid */
+.resident-status {
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: 72px;
+    background-color: var(--color-bg-section);
+    border: var(--border-inner);
+    border-radius: var(--radius-section);
+    padding: 4px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
 
 .resident-status h4 {
-    margin: 0 0 0.5rem 0;
-    text-align: center;
+    margin: 0 0 1px 0;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--color-text-label);
 }
 
 .resident-status p {
     margin: 0;
-    text-align: center;
-    font-size: 1.1rem;
-}
-
-.medicine-section {
-    overflow-x: auto;
-}
-
-.medicine-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-    background-color: black;
-    border: 2px solid #222;
-    border-radius: 8px;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    line-height: 1.35;
+    white-space: pre-wrap;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-    .medicine-table th,
-    .medicine-table td {
-        border: 2px solid #222;
-        text-align: center;
-        vertical-align: middle;
-        padding: 0.5rem 0.25rem;
-        background-color: #fafafa;
-        word-wrap: break-word;
-    }
-
-    .medicine-table thead th {
-        background-color: #efefef;
-        font-weight: 600;
-    }
-
-    .medicine-table th:first-child,
-    .medicine-table td:first-child {
-        width: 100px;
-        font-weight: 600;
-        background-color: #f4f4f4;
-    }
-
-.dose-box {
-    min-height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-    background-color: white;
-}
-
-    .dose-box.given {
-        background-color: #e6f2ff;
-        border: 2px solid #004080;
-        font-weight: bold;
-        color: #e6f2ff;
-    }
-  
-    .dose-box.not-given {
-        background-color: #fff;
-        border: 1px dashed #aaa;
-        color: #999;
-    }
-
-.resident-bottom-grid {
+/* ─────────────────────────────────────
+   HOVED-GRID INDE I KORTET
+   ───────────────────────────────────── */
+/* Body-grid: vokser og fylder al resterende plads i kortet efter header + status */
+.card-body-grid {
+    flex: 1 1 0;
+    min-height: 0;
     display: grid;
-    grid-template-columns: 2fr 1.2fr;
-    gap: 5px;
+    grid-template-columns: 1fr 110px;
+    grid-template-rows: 1fr auto auto;
+    gap: 4px;
 }
 
+.medicine-section { grid-column: 1; grid-row: 1; overflow: hidden; border: var(--border-inner); border-radius: var(--radius-section); }
+.assigned-staff   { grid-column: 2; grid-row: 1; }
+.payment-grocery  { grid-column: 1 / -1; grid-row: 2; display: flex; flex-direction: row; gap: 4px; }
+.payment-grocery .payment-method { flex: 1; }
+.payment-grocery .grocery-day    { flex: 1; margin-top: 0; }
+.pn-section       { grid-column: 1 / -1; grid-row: 3; overflow-x: auto; overflow-y: hidden; border: var(--border-inner); border-radius: var(--radius-section); background-color: var(--color-bg-section); }
+
+/* Sektion-labels */
 .assigned-staff h4,
-.pn-status h4 {
-    margin: 0 0 0.5rem 0;
+.payment-method h4,
+.grocery-day h4 {
+    margin: 0 0 2px 0;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--color-text-label);
 }
 
-.pn-status {
-    padding: 0.5rem 0.5rem;
-    text-align: center;
+/* Ansvarlig personale */
+.assigned-staff {
+    background-color: var(--color-bg-section);
+    border: var(--border-inner);
+    border-radius: var(--radius-section);
+    padding: 4px;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    min-height: 130px;
     align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-/* Ansvarlige personale */
-.staff-list {
+.staff-initials-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 4px;
+    align-items: center;
     justify-content: center;
 }
 
-.staff-pill {
-    padding: 0.45rem 0.8rem;
-    border: 1px solid #444;
+.staff-initial-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 7px;
+    border: 1.5px solid #888;
     border-radius: 999px;
+    background-color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    white-space: nowrap;
+}
+
+/* Betaling */
+.payment-method {
+    background-color: var(--color-bg-section);
+    border: var(--border-inner);
+    border-radius: var(--radius-section);
+    padding: 4px;
+    text-align: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.payment-method p {
+    margin: 0;
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Handledag */
+.grocery-day {
+    background-color: var(--color-bg-section);
+    border: var(--border-inner);
+    border-radius: var(--radius-section);
+    padding: 4px;
+    text-align: center;
+}
+
+
+.grocery-text {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+}
+
+.grocery-day--today .grocery-text {
+    color: #1e40af;
+}
+
+/* Ingen medicin */
+.medicine-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 36px;
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* ─────────────────────────────────────
+   MEDICIN-TABEL
+   ───────────────────────────────────── */
+.medicine-table {
+    width: 100%;
+    min-width: 200px;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.medicine-table th,
+.medicine-table td {
+    border: var(--border-table);
+    text-align: center;
+    vertical-align: middle;
+    padding: 2px 1px;
+    background-color: #fafafa;
+    font-size: 0.68rem;
+}
+
+.medicine-table thead th {
+    background-color: var(--color-bg-medicine-header);
+    font-weight: 700;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--color-primary-dark);
+    white-space: nowrap;
+}
+
+.medicine-table th:first-child,
+.medicine-table td:first-child {
+    width: 46px;
+    font-weight: 700;
+    background-color: var(--color-bg-section-header);
+    color: var(--color-primary-dark);
+}
+
+.medicine-table th:not(:first-child),
+.medicine-table td:not(:first-child) { width: 28px; }
+
+.dose-box {
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    font-size: 0.72rem;
+}
+
+.dose-box.given {
+    background-color: var(--color-dose-given-bg);
+    border: 1.5px solid var(--color-dose-given-border);
+}
+
+.dose-box.not-given {
+    background-color: #fff;
+    border: none;
+}
+
+th.placeholder-col {
+    background-color: var(--color-bg-section) !important;
+    border-color: transparent !important;
+}
+
+.pn-table th.placeholder-col,
+.pn-table td {
+    border-color: var(--color-primary-lighter) !important;
+}
+
+/* No dashed lines anywhere in the PN table */
+.pn-table th,
+.pn-table td { border-style: solid; }
+
+/* ─────────────────────────────────────
+   PN-TABEL
+   ───────────────────────────────────── */
+.pn-table {
+    width: auto;
+    height: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.pn-table th,
+.pn-table td {
+    border: var(--border-table);
+    text-align: center;
+    vertical-align: middle;
+    padding: 2px 2px;
+    background-color: #fafafa;
+    font-size: 0.66rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.pn-table thead th {
+    background-color: var(--color-bg-medicine-header);
+    font-weight: 700;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--color-primary-dark);
+    white-space: nowrap;
+}
+
+.pn-table td.pn-medication {
+    white-space: nowrap;
+}
+
+.pn-table td.pn-row-label {
+    font-weight: 700;
+    background-color: var(--color-bg-section-header);
+    color: var(--color-primary-dark);
+    text-align: left;
+    padding-left: 4px;
+    white-space: nowrap;
+    font-size: 0.60rem;
+}
+
+/* ─────────────────────────────────────
+   SIDEBAR
+   ───────────────────────────────────── */
+.info-box {
     background-color: white;
+    border: var(--border-outer);
+    border-radius: var(--radius-info);
+    box-shadow: var(--shadow-info);
+    padding: 10px 14px;
+    overflow: hidden;
+}
+
+.info-box h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--color-primary-dark);
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--color-primary-lighter);
+}
+
+.info-box ul { margin: 0; padding: 0; list-style: none; }
+
+/* Two-column table for Telefonnumre + Særligt ansvar */
+.sidebar-list--two-col {
+    display: table;
+    width: 100%;
+    border-spacing: 0;
+}
+
+.sidebar-list--two-col li {
+    display: table-row;
+}
+
+.sidebar-list--two-col li > span {
+    display: table-cell;
+    padding: 4px 8px;
+}
+
+.sidebar-list--two-col li > span:first-child {
+    width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 16px;
+}
+
+.sidebar-list--two-col li:nth-child(even) > span {
+    background-color: rgba(0, 0, 0, 0.09);
+}
+.info-box li {
     font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    padding: 4px 8px;
+    border-radius: 4px;
 }
+.info-box li:nth-child(even) { background-color: rgba(0, 0, 0, 0.09); }
 
-.resident-footer-grid {
-    display: grid;
-    grid-template-columns: 2fr 1.2fr;
-    gap: 5px;
-}
-
-.grocery-day h4,
-.payment-method h4 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
-}
-
-
-.icon-button {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 2px solid #222;
-    background-color: white;
-    font-size: 1.4rem;
+.new-shiftboard-button {
+    margin-top: auto;
+    width: 100%;
+    padding: 10px;
+    background-color: var(--color-primary-dark);
+    color: white;
+    border: none;
+    border-radius: var(--radius-info);
+    font-size: 1rem;
+    font-weight: 700;
     cursor: pointer;
+    transition: background-color 0.15s;
 }
 
-    .icon-button.danger {
-        background-color: #e53935;
-        color: white;
-    }
+.new-shiftboard-button:hover { background-color: var(--color-primary-mid); }
 
-/* Lidt bedre responsiv adfærd */
-@media (max-width: 1100px) {
-    .shiftboard-layout {
-        grid-template-columns: 1fr;
-    }
+/* ── Sidebar: nummer + navn ── */
+.sidebar-nummer { font-size: 1rem; font-weight: 700; color: var(--color-text-dark); }
+.sidebar-navn   { font-size: 0.92rem; color: var(--color-text-label); margin-left: 6px; }
+.sidebar-ansvar { font-size: 0.92rem; color: var(--color-text-muted); }
 
-    .resident-card-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Default */
-.risk-default {
-    background-color: white;
-}
-
-/* Grøn */
-.risk-green {
-    background-color: #c8e6c9;
-    border-color: #2e7d32;
-}
-
-/* Gul */
-.risk-yellow {
-    background-color: #fff9c4;
-    border-color: #f9a825;
-}
-
-/* Rød */
-.risk-red {
-    background-color: #ffcdd2;
-    border-color: #c62828;
-}
+/* ─────────────────────────────────────
+   RISK-FARVER
+   ───────────────────────────────────── */
+.risk-default { background-color: var(--color-bg-section-header); }
+.risk-green   { background-color: var(--color-risk-green-bg)  !important; border-color: var(--color-risk-green-border)  !important; }
+.risk-yellow  { background-color: var(--color-risk-yellow-bg) !important; border-color: var(--color-risk-yellow-border) !important; }
+.risk-red     { background-color: var(--color-risk-red-bg)    !important; border-color: var(--color-risk-red-border)    !important; }

@@ -52,15 +52,9 @@ namespace Slottet.API.Controllers
                 return BadRequest("StaffName, Initials, Role, and Department are required.");
             }
 
-            try
-            {
-                var created = await _staffService.CreateAsync(dto);
-                return CreatedAtRoute("GetStaffById", new { id = created.StaffID }, created);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var result = await _staffService.CreateAsync(dto);
+
+            return CreatedAtAction("GetById", new { id = result.StaffID }, result);
         }
 
         //Put: Staff by id

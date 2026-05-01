@@ -1,0 +1,53 @@
+<div class="liste-editor">
+
+    @* ── HEADER ── *@
+    <header class="liste-header">
+        <h2>🔏 Særligt ansvar</h2>
+    </header>
+
+    <div class="liste-body">
+
+        @* ── ANSVAR-RÆKKER ── *@
+        @for (int i = 0; i < _editItems.Count; i++)
+        {
+            var index = i;
+            <div class="liste-row">
+                @* Ansvarsområde *@
+                <input class="liste-input"
+                       type="text"
+                       value="@_editItems[index].Description"
+                       @onchange="e => _editItems[index].Description = e.Value?.ToString() ?? string.Empty"
+                       placeholder="Ansvarsområde…" />
+
+                @* Medarbejder *@
+                <select class="liste-select"
+                        value="@_editItems[index].StaffName"
+                        @onchange="e => _editItems[index].StaffName = e.Value?.ToString() ?? string.Empty">
+                    <option value="">– Medarbejder –</option>
+                    @foreach (var staffMember in AllStaff)
+                    {
+                        <option value="@staffMember" selected="@(_editItems[index].StaffName == staffMember)">@staffMember</option>
+                    }
+                </select>
+
+                @* Fjern-knap *@
+                <button class="btn-fjern" @onclick="() => RemoveItem(index)" title="Fjern">✕</button>
+            </div>
+        }
+
+        @* Tilføj ansvar *@
+        <button class="btn-tilføj" @onclick="AddItem">+ Tilføj ansvar</button>
+
+        @* ── GEM ── *@
+        <div class="liste-actions">
+            @* Gem-knap *@
+            <button class="btn-gem" @onclick="Save">Gem ændringer</button>
+            @if (_saved)
+            {
+                @* Gemt-bekræftelse *@
+                <span class="gem-bekræftelse">✓ Gemt</span>
+            }
+        </div>
+
+    </div>
+</div>

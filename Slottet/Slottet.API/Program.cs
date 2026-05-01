@@ -19,13 +19,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient<ShiftboardController>();
+builder.Services.AddScoped<ISpecialResponsibilityDTOService, SpecialResponsibilityDTOService>();
 builder.Services.AddScoped<IResidentDTOService, ResidentDTOService>();
 builder.Services.AddScoped<IStaffDTOService, StaffDTOService>();
-builder.Services.AddScoped<IMedicineDTOService, MedicineDTOService>();
 builder.Services.AddScoped<ISwapPhoneDTOService, SwapPhoneDTOService>();
+builder.Services.AddScoped<IShiftBoardDTOService, ShiftBoardDTOService>();
+builder.Services.AddScoped<IGroceryDayDTOService, GroceryDayDTOService>();
+builder.Services.AddScoped<IPaymentMethodDTOService, PaymentMethodDTOService>();
+builder.Services.AddScoped<IPhoneDTOService, PhoneDTOService>();
 builder.Services.AddScoped<IAuditScope, AuditScope>();
 builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();
+builder.Services.AddScoped<IStaffPNDTOService, StaffPNDTOService>();
+builder.Services.AddScoped<IDepartmentTaskDTOService, DepartmentTaskDTOService>();
 
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
@@ -51,6 +57,17 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+//builder.Services.AddAuthentication("Bearer")
+//    .AddJwtBearer("Bearer", options =>
+//    {
+//        options.Authority = "https://localhost:5001";
+//        options.RequireHttpsMetadata = true;
+//        options.Audience = "slottet-api";
+//    });
+
+//builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -67,12 +84,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseMiddleware<AuditScopeMiddleware>();
+app.UseCors("blazorApp");
+app.UseCors("blazorApp2");
 
+app.UseMiddleware<AuditScopeMiddleware>();
+//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseCors("blazorApp");
 
 app.Run();

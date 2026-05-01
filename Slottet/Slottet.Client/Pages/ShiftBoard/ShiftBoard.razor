@@ -1,133 +1,262 @@
-﻿@* @page "/shiftboard_viewonly"
+@page "/shiftboard_viewonly"
+@rendermode InteractiveWebAssembly
 
 <div class="background-test">
-@if (Model is null)
+@if (IsLoading)
 {
-	<p> Der er sket en fejl i indlæsningen af data </p>
+    <p>Indlæser vagttavle…</p>
+}
+else if (LoadError is not null)
+{
+    <p>Der er sket en fejl: @LoadError</p>
+}
+else if (Model is null)
+{
+    <p>Ingen vagttavle fundet.</p>
 }
 else
-{	
-	<section class="shiftboard-header">
-		<h1>@Model.DepartmentName</h1>
-		<p>
-			<strong>Vagttype: </strong>@Model.ShiftType 
-			<strong>Start: </strong>@Model.StartDate.ToString("dd-MM-yyyy HH:mm")
-			<strong>Slut: </strong>@Model.EndDate.ToString("dd-MM-yyyy HH:mm")			
-		</p>
-	</section>
-	
-	<section class="shiftboard-layout">
-	
-		<main class="left-panel">
+{
+    <section class="shiftboard-header">
+        <h1>@Model.DepartmentName</h1>
+        <p>
+            <strong>Vagttype: </strong>@Model.ShiftType
+            <strong>Start: </strong>@Model.StartDate.ToString("dd-MM-yyyy HH:mm")
+            <strong>Slut: </strong>@Model.EndDate.ToString("dd-MM-yyyy HH:mm")
+        </p>
+    </section>
 
-		<div class="resident-card-grid">			
-				@foreach (var resident in Model.ResidentCards)
-				{
-					<article class="resident-card">
-						<section class="resident-header @resident.RiskCssClass">
-							<h3>@resident.ResidentName</h3>
-						</section>
+    <section class="shiftboard-layout">
 
-						<section class="resident-status">
-							<h4>Seneste status</h4>
-							<p>@resident.LatestStatusNote</p>
-						</section>
+        <main class="left-panel">
+        <div class="resident-card-grid">
+            @foreach (var resident in Model.ResidentCards.Take(12))
+            {
+                var displayedMeds = resident.MedicineSchedule.Take(6).ToList();
+                var cardId        = "kort-" + resident.ResidentStatusID;
+                var todayDanish   = DateTime.Today.DayOfWeek switch
+                {
+                    DayOfWeek.Monday    => "Mandag",
+                    DayOfWeek.Tuesday   => "Tirsdag",
+                    DayOfWeek.Wednesday => "Onsdag",
+                    DayOfWeek.Thursday  => "Torsdag",
+                    DayOfWeek.Friday    => "Fredag",
+                    DayOfWeek.Saturday  => "Lørdag",
+                    DayOfWeek.Sunday    => "Søndag",
+                    _                   => string.Empty
+                };
+                var isGroceryToday = resident.GroceryDay == todayDanish;
 
-						<section class="medicine-section">
-							<table class="medicine-table">
-								<thead>
-									<tr>
-										<th>Medicin</th>
-										@foreach (var medicine in resident.MedicineSchedule)
-										{
-											<th>@medicine.Label</th>
-										}
-									</tr>
-								</thead>
+                <article class="resident-card resident-card--clickable"
+                         id="@cardId"
+                         @onclick="() => OpenResident(resident, cardId)"
+                         title="Klik for at se detaljer">
 
-								<tbody>
-									<tr>
-										<td>Givet</td>
-										@foreach (var medicine in resident.MedicineSchedule)
-										{
-											<td>
-												<div class="dose-box @(medicine.IsGiven ? "given" : "not-given")">
-													@(medicine.IsGiven ? "💊" : " ")
-												</div>
+                    @* ── Navn ── *@
+                    <section class="resident-header @resident.RiskCssClass">
+                        <h3>@resident.ResidentName</h3>
+                    </section>
 
-											</td>
-										}
-									</tr>
-								</tbody>
-							</table>
-						</section>
+                    @* ── Seneste status ── *@
+                    <section class="resident-status">
+                        <h4>Seneste status</h4>
+                        <p>@resident.LatestStatusNote</p>
+                    </section>
 
-						<section class="resident-bottom-grid">
-						<section class="pn-status">
-							<h4>PN</h4>
-							<p>@resident.PNStatus</p>
-						</section>
+                    @* ── Hoved-grid: 2×2 så sektioner liner up på tværs af kolonner ── *@
+                    <div class="card-body-grid">
 
-						<section class="assigned-staff">
-							<h4>Ansvarlig personale</h4>
-							<div class="staff-list">
-								@foreach (var staff in resident.AssignedStaff)
-								{
-									<span class="staff-pill">@staff</span>
-								}
-							</div>
-						</section>
-						</section>
+                        @* Række 1, kolonne 1: Medicin *@
+                        <section class="medicine-section">
+                            @if (displayedMeds.Count == 0)
+                            {
+                                <div class="medicine-empty">Ingen Medicin</div>
+                            }
+                            else
+                            {
+                                <table class="medicine-table">
+                                    <tbody>
+                                        <tr>
+                                            <th rowspan="2">Medicin</th>
+                                            @foreach (var med in displayedMeds)
+                                            {
+                                                <th>@med.Label</th>
+                                            }
+                                        </tr>
+                                        <tr>
+                                            @foreach (var med in displayedMeds)
+                                            {
+                                                <td>
+                                                    <div class="dose-box @(med.IsGiven ? "given" : "not-given")">
+                                                        @(med.IsGiven ? "💊" : " ")
+                                                    </div>
+                                                </td>
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            }
+                        </section>
 
-						<section class="resident-footer-grid">
-						<div class="payment-method">
-							<h4>Betaling</h4>
-							<p>@resident.PaymentMethod</p>
-						</div>
+                        @* Række 1, kolonne 2: Ansvarlig personale (initialer, maks 2) *@
+                        <section class="assigned-staff">
+                            <h4>Ansvarlig personale</h4>
+                            <div class="staff-initials-row">
+                                @foreach (var staff in resident.AssignedStaff.Take(2))
+                                {
+                                    var initials = string.Join(".", staff.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => char.ToUpper(w[0])));
+                                    <span class="staff-initial-pill">@initials</span>
+                                }
+                            </div>
+                        </section>
 
-						<div class="grocery-day">
-							<h4>Handledag</h4>
-							<p>@resident.GroceryDay</p>
-						</div>
-						</section>
+                        @* Række 2, kolonne 1: PN *@
+                        @{
+                            var pnSorted = resident.PNEntries
+                                .OrderBy(p => TimeOnly.TryParse(p.TimeOfAdministration, out var pt) ? pt : TimeOnly.MaxValue)
+                                .Take(3)
+                                .ToList();
+                        }
+                        <section class="pn-section">
+                            @if (pnSorted.Count == 0)
+                            {
+                                <div class="medicine-empty">Ingen PN registreret</div>
+                            }
+                            else
+                            {
+                                <table class="pn-table">
+                                    <thead>
+                                        <tr>
+                                            <th>PN</th>
+                                            @foreach (var pn in pnSorted)
+                                            {
+                                                <th>@pn.TimeOfAdministration</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="pn-row-label">Præparat</td>
+                                            @foreach (var pn in pnSorted) { <td class="pn-medication">@pn.Medication</td> }
+                                        </tr>
+                                        <tr>
+                                            <td class="pn-row-label">Årsag</td>
+                                            @foreach (var pn in pnSorted) { <td>@pn.Reason</td> }
+                                        </tr>
+                                        <tr>
+                                            <td class="pn-row-label">Udstedt af</td>
+                                            @foreach (var pn in pnSorted) { <td>@pn.IssuedBy</td> }
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            }
+                        </section>
 
-					</article>
-				}
-		</div>
-		</main>
-			<aside class="right-panel">
-				<div class="info-box">
-					<h3>Telefonnumre ☎️</h3>
-					<p>
-						<ul>
-							@foreach (var phone in Model.PhoneNumbers)
-							{
-								<li>@phone</li>
-							}
-						</ul>
-					</p>
-				</div>
+                        @* Række 2, kolonne 2: Betaling (top) + Handledag (bund) *@
+                        <div class="payment-grocery">
+                            <section class="payment-method">
+                                <h4>Betaling</h4>
+                                <p>@resident.PaymentMethod</p>
+                            </section>
+                            <section class="grocery-day @(isGroceryToday ? "grocery-day--today" : string.Empty)">
+                                <h4>Handledag</h4>
+                                <span class="grocery-text">@resident.GroceryDay</span>
+                            </section>
+                        </div>
 
-				<div class="info-box">
-					<h3>Afdelingens opgaver📝</h3>
-					<ul>
-						@foreach (var task in Model.DepartmentTasks)
-						{
-							<li>@task</li>
-						}
-					</ul>
-				</div>
+                    </div>
 
-				<div class="info-box">
-					<h3>Særligt ansvar 🔏</h3>
-					<ul>
-						@foreach (var responsibility in Model.SpecialResponsibilities)
-						{
-							<li>@responsibility</li>
-						}
-					</ul>
-				</div>
-			</aside>
-	</section>
+                </article>
+            }
+        </div>
+        </main>
+
+        <aside class="right-panel">
+            <div class="info-box info-box--clickable" @onclick="() => OpenSidebarPanel(OverlayPanel.PhoneList)">
+                <h3>Telefonnumre ☎️</h3>
+                <ul class="sidebar-list--two-col">
+                    @foreach (var phone in Model.PhoneNumbers)
+                    {
+                        <li><span class="sidebar-nummer">@phone.Number</span><span class="sidebar-navn">@phone.StaffName</span></li>
+                    }
+                </ul>
+            </div>
+
+            <div class="info-box info-box--clickable" @onclick="() => OpenSidebarPanel(OverlayPanel.SpecialResponsibilities)">
+                <h3>Særligt ansvar 🔏</h3>
+                <ul class="sidebar-list--two-col">
+                    @foreach (var responsibility in Model.SpecialResponsibilities)
+                    {
+                        <li><span class="sidebar-ansvar">@responsibility.Description</span><span class="sidebar-navn">@responsibility.StaffName</span></li>
+                    }
+                </ul>
+            </div>
+
+            <div class="info-box info-box--clickable" @onclick="() => OpenSidebarPanel(OverlayPanel.DepartmentTasks)">
+                <h3>Afdelingens opgaver📝</h3>
+                <ul>
+                    @foreach (var task in Model.DepartmentTasks)
+                    {
+                        <li>@task</li>
+                    }
+                </ul>
+            </div>
+
+            <button class="new-shiftboard-button" @onclick="NavigateToNewShiftBoard">
+                Ny vagt-tavle
+            </button>
+        </aside>
+
+    </section>
 }
-</div> *@
+</div>
+
+@* ── OVERLAYS — uden for background-test for at undgå overflow/stacking-context konflikt ── *@
+@if (Model is not null)
+{
+    @* Borgerkort — FLIP-animation fra kortets grid-position *@
+    <Overlay IsVisible="SelectedResident is not null"
+             OnClose="CloseOverlay"
+             Size="lg"
+             PanelId="overlay-panel-borger">
+        @if (SelectedResident is not null)
+        {
+            <ResidentCard Resident="SelectedResident" AllStaff="Model.AllStaff" OnSaved="OnResidentSaved" />
+        }
+    </Overlay>
+
+    @* Sidebar-paneler — simpel fade+scale animation *@
+    <Overlay IsVisible="ActivePanel == OverlayPanel.PhoneList"
+             OnClose="CloseOverlay"
+             Size="sm"
+             PanelId="overlay-panel-phonelist">
+        @if (ActivePanel == OverlayPanel.PhoneList)
+        {
+            <PhoneList Items="Model.PhoneNumbers"
+                       AllStaff="Model.AllStaff"
+                       OnSave="_ => CloseOverlay()" />
+        }
+    </Overlay>
+
+    <Overlay IsVisible="ActivePanel == OverlayPanel.DepartmentTasks"
+             OnClose="CloseOverlay"
+             Size="sm"
+             PanelId="overlay-panel-departmenttasks">
+        @if (ActivePanel == OverlayPanel.DepartmentTasks)
+        {
+            <DepartmentTask Items="Model.DepartmentTasks"
+                            OnSave="_ => CloseOverlay()" />
+        }
+    </Overlay>
+
+    <Overlay IsVisible="ActivePanel == OverlayPanel.SpecialResponsibilities"
+             OnClose="CloseOverlay"
+             Size="sm"
+             PanelId="overlay-panel-specialresponsibilities">
+        @if (ActivePanel == OverlayPanel.SpecialResponsibilities)
+        {
+            <SpecialResponsibility Items="Model.SpecialResponsibilities"
+                                   AllStaff="Model.AllStaff"
+                                   OnSave="_ => CloseOverlay()" />
+        }
+    </Overlay>
+}

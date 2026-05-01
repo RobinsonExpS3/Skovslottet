@@ -5,6 +5,7 @@ using Slottet.Infrastructure.Data;
 using Slottet.Shared;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Slottet.Infrastructure.Services
@@ -93,7 +94,7 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
-        private static System.Linq.Expressions.Expression<Func<Staff, EditStaffDTO>> MapToDtoExpression()
+        private static Expression<Func<Staff, EditStaffDTO>> MapToDtoExpression()
         {
             return staff => new EditStaffDTO
             {
