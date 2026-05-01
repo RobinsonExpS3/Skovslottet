@@ -45,7 +45,9 @@ namespace Slottet.Client.Pages.AdminPages
                 }
 
                 var url = $"api/AuditLog?{string.Join("&", query)}";
-                AuditRows = await httpClient.GetFromJsonAsync<List<AuditLogDTO>>(url) ?? new();
+                AuditRows = (await httpClient.GetFromJsonAsync<List<AuditLogDTO>>(url) ?? new())
+                    .OrderByDescending(r => r.PerformedAtTime)
+                    .ToList();
             } catch (Exception ex) {
                 ErrorMessage = $"Kunne ikke hente audit logs: {ex.Message}";
                 AuditRows = new();
