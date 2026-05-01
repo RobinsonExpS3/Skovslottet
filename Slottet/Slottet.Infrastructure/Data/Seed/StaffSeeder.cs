@@ -27,7 +27,7 @@ namespace Slottet.Infrastructure.Data.Seed
             {
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Hestemand Hestesen", DepartmentID = skovenDepartmentId, Initials = "HH", Role = "Pædagog" },
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Søren Skovfis", DepartmentID = skovenDepartmentId, Initials = "SS", Role = "Pædagog" },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Lise Lægemand", DepartmentID = slottetDepartmentId, Initials = "LL", Role = "Sygeplejerske" },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Lise Lægemand", DepartmentID = slottetDepartmentId, Initials = "LL", Role = "Administrator " },
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Peter Pedalskid", DepartmentID = slottetDepartmentId, Initials = "PP", Role = "Pædagog" },
             };
 

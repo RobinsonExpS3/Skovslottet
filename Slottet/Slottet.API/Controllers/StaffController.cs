@@ -2,6 +2,7 @@
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
+
 namespace Slottet.API.Controllers
 {
     [ApiController]
@@ -25,7 +26,7 @@ namespace Slottet.API.Controllers
         }
 
         //Get: Staff by id
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetStaffById")]
         public async Task<ActionResult<EditStaffDTO>> GetByIdAsync(Guid id)
         {
             var staff = await _staffService.GetByIdAsync(id);
@@ -45,9 +46,10 @@ namespace Slottet.API.Controllers
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||
                 string.IsNullOrWhiteSpace(dto.Initials) ||
-                string.IsNullOrWhiteSpace(dto.Role))
+                string.IsNullOrWhiteSpace(dto.Role) ||
+                dto.DepartmentID == Guid.Empty)
             {
-                return BadRequest();
+                return BadRequest("StaffName, Initials, Role, and Department are required.");
             }
 
             var result = await _staffService.CreateAsync(dto);
@@ -62,7 +64,8 @@ namespace Slottet.API.Controllers
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||
                 string.IsNullOrWhiteSpace(dto.Initials) ||
-                string.IsNullOrWhiteSpace(dto.Role))
+                string.IsNullOrWhiteSpace(dto.Role) ||
+               dto.DepartmentID == Guid.Empty)
             {
                 return BadRequest();
             }
