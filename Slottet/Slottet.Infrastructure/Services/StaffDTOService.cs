@@ -39,6 +39,12 @@ namespace Slottet.Infrastructure.Services
 
         public async Task<EditStaffDTO> CreateAsync(EditStaffDTO dto)
         {
+            var departmentExists = await _context.Departments
+                .AnyAsync(d => d.DepartmentID == dto.DepartmentID);
+
+            if (!departmentExists)
+                throw new ArgumentException("DepartmentID does not exist.");
+
             var staff = new Staff
             {
                 StaffID = dto.StaffID,

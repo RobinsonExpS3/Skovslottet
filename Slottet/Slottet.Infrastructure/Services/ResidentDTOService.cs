@@ -23,6 +23,7 @@ namespace Slottet.Infrastructure.Services
         {
             var residents = await _context.Residents
                 .AsNoTracking()
+                .Where(r => r.IsActive)
                 .OrderBy(r => r.ResidentID)
                 .Select(MapToDtoExpression())
                 .ToListAsync();
