@@ -6,18 +6,26 @@ using Slottet.Infrastructure;
 using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
 using Slottet.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddControllersWithViews()
+                .AddMicrosoftIdentityUI();
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
 //builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Dependency Injection for Services and Controllers
 builder.Services.AddHttpClient<ShiftboardController>();
 builder.Services.AddScoped<ISpecialResponsibilityDTOService, SpecialResponsibilityDTOService>();
 builder.Services.AddScoped<IResidentDTOService, ResidentDTOService>();
@@ -58,15 +66,10 @@ builder.Services.AddCors(options =>
 });
 
 
-//builder.Services.AddAuthentication("Bearer")
-//    .AddJwtBearer("Bearer", options =>
-//    {
-//        options.Authority = "https://localhost:5001";
-//        options.RequireHttpsMetadata = true;
-//        options.Audience = "slottet-api";
-//    });
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
 
-//builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -88,7 +91,8 @@ app.UseCors("blazorApp");
 app.UseCors("blazorApp2");
 
 app.UseMiddleware<AuditScopeMiddleware>();
-//app.UseAuthentication();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
