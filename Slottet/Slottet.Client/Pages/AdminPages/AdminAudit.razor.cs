@@ -45,11 +45,18 @@ namespace Slottet.Client.Pages.AdminPages
                 }
 
                 var url = $"api/AuditLog?{string.Join("&", query)}";
-                AuditRows = (await httpClient.GetFromJsonAsync<List<AuditLogDTO>>(url) ?? new())
+                var result = await AdminHttp.GetJsonAsync<List<AuditLogDTO>>(httpClient, url);
+                if (result.Failed) {
+                    ErrorMessage = result.ErrorMessage;
+                    AuditRows = new();
+                    return;
+                }
+
+                AuditRows = (result.Value ?? new())
                     .OrderByDescending(r => r.PerformedAtTime)
                     .ToList();
-            } catch (Exception ex) {
-                ErrorMessage = $"Kunne ikke hente audit logs: {ex.Message}";
+            } catch {
+                ErrorMessage = "Kunne ikke hente audit logs.";
                 AuditRows = new();
             }
             finally {
@@ -62,10 +69,17 @@ namespace Slottet.Client.Pages.AdminPages
             ResidentErrorMessage = null;
 
             try {
-                var dto = await httpClient.GetFromJsonAsync<ShiftBoardDTO>("api/shiftboard/current");
+                var result = await AdminHttp.GetJsonAsync<ShiftBoardDTO>(httpClient, "api/shiftboard/current");
+                if (result.Failed) {
+                    ResidentErrorMessage = result.ErrorMessage;
+                    ResidentCards = new();
+                    return;
+                }
+
+                var dto = result.Value;
                 ResidentCards = dto?.ResidentCards ?? new();
-            } catch(Exception ex) {
-                ResidentErrorMessage = $"Kunne ikke hente beboere: {ex.Message}";
+            } catch {
+                ResidentErrorMessage = "Kunne ikke hente beboere.";
             } finally {
                 IsResidentLoading = false;
             }

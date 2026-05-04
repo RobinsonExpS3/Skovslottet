@@ -8,23 +8,32 @@ namespace Slottet.Client.Pages.AdminPages
     public partial class AdminSpecialResponsibility
     {
         [Inject]
-        public HttpClient httpClient { get; set; }
+        public HttpClient httpClient { get; set; } = default!;
 
         private List<SpecialResponsibilityEntryDto>? specialResponsibilities;
         private string? taskNameInput;
         private SpecialResponsibilityEntryDto? selectedItem;
         private bool loadFailed = false;
+        private string? loadErrorMessage;
         private bool _isBusy;
 
         private async Task LoadData() {
-            try {
-                specialResponsibilities = await httpClient.GetFromJsonAsync<List<SpecialResponsibilityEntryDto>>(
-                    "api/SpecialResponsibility/SpecialResponsibilities"
-                );
-            } catch {
+            loadFailed = false;
+            loadErrorMessage = null;
+
+            var result = await AdminHttp.GetJsonAsync<List<SpecialResponsibilityEntryDto>>(
+                httpClient,
+                "api/SpecialResponsibility/SpecialResponsibilities"
+            );
+
+            if (result.Failed) {
                 specialResponsibilities = new List<SpecialResponsibilityEntryDto>();
                 loadFailed = true;
+                loadErrorMessage = result.ErrorMessage;
+                return;
             }
+
+            specialResponsibilities = result.Value ?? new List<SpecialResponsibilityEntryDto>();
         }
 
         protected override async Task OnInitializedAsync() {
@@ -35,9 +44,9 @@ namespace Slottet.Client.Pages.AdminPages
             !string.IsNullOrWhiteSpace(taskNameInput)
             && selectedItem == null;
 
-        private bool CanCreate => !_isBusy && HasValidInput;
-        private bool CanUpdate => !_isBusy && selectedItem != null;
-        private bool CanDelete => !_isBusy && selectedItem != null;
+        private bool CanCreate => !loadFailed && !_isBusy && HasValidInput;
+        private bool CanUpdate => !loadFailed && !_isBusy && selectedItem != null;
+        private bool CanDelete => !loadFailed && !_isBusy && selectedItem != null;
 
         private void SelectItem(SpecialResponsibilityEntryDto item) {
             selectedItem = item;
@@ -51,7 +60,7 @@ namespace Slottet.Client.Pages.AdminPages
             try {
                 var newItem = new SpecialResponsibilityEntryDto {
                     SpecialResponsibilityID = Guid.NewGuid(),
-                    Description = taskNameInput
+                    Description = taskNameInput ?? string.Empty
                 };
 
                 var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
@@ -74,7 +83,7 @@ namespace Slottet.Client.Pages.AdminPages
             _isBusy = true;
 
             try {
-                selectedItem.Description = taskNameInput;
+                selectedItem.Description = taskNameInput ?? string.Empty;
 
                 var response = await httpClient.PutAsJsonAsync($"api/SpecialResponsibility/{selectedItem.SpecialResponsibilityID}", selectedItem);
 

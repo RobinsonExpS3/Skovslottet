@@ -21,7 +21,7 @@ public class DevAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
         {
             new Claim(ClaimTypes.NameIdentifier, "dev-user"),
             new Claim(ClaimTypes.Name, "Dev User"),
-            new Claim(ClaimTypes.Role, "Admin"),
+            new Claim(ClaimTypes.Role, "Storskaerm"),
             new Claim("StaffName", "Dev User")
         };
 

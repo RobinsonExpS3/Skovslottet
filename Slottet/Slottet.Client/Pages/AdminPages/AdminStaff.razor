@@ -17,14 +17,23 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in staffMembers)
+                @if (loadFailed)
                 {
-                    <tr @onclick="() => SelectItem(item)" class="@(selectedItem == item ? "selected-row" : "")">
-                        <td>@item.StaffName</td>
-                        <td>@item.Initials</td>
-                        <td>@(item.Role == "staff" ? "Pædagog" : item.Role == "admin" ? "Administrator" : item.Role)</td>
-                        <td>@GetDepartmentName(item.DepartmentID)</td>
+                    <tr>
+                        <td colspan="4">@loadErrorMessage</td>
                     </tr>
+                }
+                else
+                {
+                    @foreach (var item in staffMembers)
+                    {
+                        <tr @onclick="() => SelectItem(item)" class="@(selectedItem == item ? "selected-row" : "")">
+                            <td>@item.StaffName</td>
+                            <td>@item.Initials</td>
+                            <td>@(item.Role == "staff" ? "Pædagog" : item.Role == "admin" ? "Administrator" : item.Role)</td>
+                            <td>@GetDepartmentName(item.DepartmentID)</td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>

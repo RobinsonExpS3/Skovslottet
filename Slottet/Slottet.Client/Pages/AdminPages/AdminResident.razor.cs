@@ -7,11 +7,12 @@ namespace Slottet.Client.Pages.AdminPages
     public partial class AdminResident
     {
         [Inject]
-        public HttpClient? httpClient { get; set; } = default;
+        public HttpClient httpClient { get; set; } = default!;
 
         private List<EditResidentDTO>? residents;
         private EditResidentDTO? selectedResident;
         private bool loadFailed = false;
+        private string? loadErrorMessage;
         private Guid? selectedGroceryDayID;
         private List<Guid> selectedPaymentMethodIDs = new();
         private List<ResidentLookupDTO> paymentMethods = new();
@@ -31,18 +32,35 @@ namespace Slottet.Client.Pages.AdminPages
         private async Task LoadDataAsync()
         {
             loadFailed = false;
+            loadErrorMessage = null;
 
-            try
+            var residentResult = await AdminHttp.GetJsonAsync<List<EditResidentDTO>>(httpClient, "api/Resident/Residents");
+            if (residentResult.Failed)
             {
-                residents = await httpClient!.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
-                groceryDays = await httpClient!.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
-                paymentMethods = await httpClient!.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
-            } catch {
                 residents = new();
                 groceryDays = new();
                 paymentMethods = new();
                 loadFailed = true;
+                loadErrorMessage = residentResult.ErrorMessage;
+                return;
             }
+
+            var groceryDayResult = await AdminHttp.GetJsonAsync<List<ResidentLookupDTO>>(httpClient, "api/Resident/groceryDays");
+            var paymentMethodResult = await AdminHttp.GetJsonAsync<List<ResidentLookupDTO>>(httpClient, "api/Resident/paymentMethods");
+
+            if (groceryDayResult.Failed || paymentMethodResult.Failed)
+            {
+                residents = new();
+                groceryDays = new();
+                paymentMethods = new();
+                loadFailed = true;
+                loadErrorMessage = groceryDayResult.ErrorMessage ?? paymentMethodResult.ErrorMessage;
+                return;
+            }
+
+            residents = residentResult.Value ?? new();
+            groceryDays = groceryDayResult.Value ?? new();
+            paymentMethods = paymentMethodResult.Value ?? new();
         }
 
         private bool HasValidInput =>
@@ -61,7 +79,17 @@ namespace Slottet.Client.Pages.AdminPages
             selectedGroceryDayID = resident.GroceryDayID;
             isActiveInput = resident.IsActive;
 
-            var dto = await httpClient!.GetFromJsonAsync<EditResidentDTO>($"api/Resident/{resident.ResidentID}");
+            var result = await AdminHttp.GetJsonAsync<EditResidentDTO>(httpClient, $"api/Resident/{resident.ResidentID}");
+            if (result.Failed)
+            {
+                loadFailed = true;
+                loadErrorMessage = result.ErrorMessage;
+                selectedPaymentMethodIDs = new();
+                medicineTimes = new();
+                return;
+            }
+
+            var dto = result.Value;
             selectedPaymentMethodIDs = dto?.PaymentMethodIDs ?? new();
             medicineTimes = dto?.MedicineTimes
                 .Select(t => new TimeInput { Time = TimeOnly.FromDateTime(t) })
@@ -120,7 +148,7 @@ namespace Slottet.Client.Pages.AdminPages
                     IsActive = isActiveInput
                 };
 
-                var response = await httpClient!.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
+                var response = await httpClient.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -146,7 +174,7 @@ namespace Slottet.Client.Pages.AdminPages
             isActiveInput = true;
 
             try {
-                var response = await httpClient!.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
+                var response = await httpClient.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
 
                 if (!response.IsSuccessStatusCode)
                 {

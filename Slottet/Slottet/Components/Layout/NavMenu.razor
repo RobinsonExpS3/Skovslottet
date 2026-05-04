@@ -18,28 +18,31 @@
             <i class="bi bi-card-text"></i>
         </NavLink>
 
-        @* Admin (collapsible) *@
-        <button class="nav-icon-btn" @onclick="ToggleAdminMenu" title="Admin">
-            <i class="bi bi-gear-fill"></i>
-        </button>
-
-        @if (isAdminOpen)
+        @if (canSeeAdminMenu)
         {
-            @* Admin-undermenu *@
-            <div class="admin-submenu">
-                <NavLink class="nav-icon-btn" href="adminResident" title="Beboere">
-                    <i class="bi bi-person-plus"></i>
-                </NavLink>
-                <NavLink class="nav-icon-btn" href="adminStaff" title="Personale">
-                    <i class="bi bi-people-fill"></i>
-                </NavLink>
-                <NavLink class="nav-icon-btn" href="adminSpecialResponsibility" title="Særlige ansvar">
-                    <i class="bi bi-lock-fill"></i>
-                </NavLink>
-                <NavLink class="nav-icon-btn" href="adminAudit" title="Logs">
-                    <i class="bi bi-journal-text"></i>
-                </NavLink>
-            </div>
+            @* Admin (collapsible) *@
+            <button class="nav-icon-btn" @onclick="ToggleAdminMenu" title="Admin">
+                <i class="bi bi-gear-fill"></i>
+            </button>
+
+            @if (isAdminOpen)
+            {
+                @* Admin-undermenu *@
+                <div class="admin-submenu">
+                    <NavLink class="nav-icon-btn" href="adminResident" title="Beboere">
+                        <i class="bi bi-person-plus"></i>
+                    </NavLink>
+                    <NavLink class="nav-icon-btn" href="adminStaff" title="Personale">
+                        <i class="bi bi-people-fill"></i>
+                    </NavLink>
+                    <NavLink class="nav-icon-btn" href="adminSpecialResponsibility" title="Særlige ansvar">
+                        <i class="bi bi-lock-fill"></i>
+                    </NavLink>
+                    <NavLink class="nav-icon-btn" href="adminAudit" title="Logs">
+                        <i class="bi bi-journal-text"></i>
+                    </NavLink>
+                </div>
+            }
         }
 
     </div>

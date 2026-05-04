@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Net;
 using System.Net.Http.Json;
 using Slottet.Shared;
 
@@ -31,11 +32,25 @@ namespace Slottet.Client.Pages.ShiftBoard
         {
             try
             {
-                Model = await Http.GetFromJsonAsync<ShiftBoardDTO>("api/shiftboard/current");
+                using var response = await Http.GetAsync("api/shiftboard/current");
+
+                if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized)
+                {
+                    LoadError = "Du har ikke adgang til denne side.";
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    LoadError = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                    return;
+                }
+
+                Model = await response.Content.ReadFromJsonAsync<ShiftBoardDTO>();
             }
-            catch (Exception ex)
+            catch
             {
-                LoadError = ex.Message;
+                LoadError = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
             }
             finally
             {

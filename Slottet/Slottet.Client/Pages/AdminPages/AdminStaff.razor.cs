@@ -7,7 +7,7 @@ namespace Slottet.Client.Pages.AdminPages
     public partial class AdminStaff
     {
         [Inject]
-        public HttpClient httpClient { get; set; }
+        public HttpClient httpClient { get; set; } = default!;
 
         private List<EditStaffDTO> staffMembers = new();
         private List<DepartmentLookupDTO> departments = new();
@@ -17,6 +17,8 @@ namespace Slottet.Client.Pages.AdminPages
         private Guid departmentIdInput;
         private EditStaffDTO? selectedItem;
         private bool isBusy;
+        private bool loadFailed;
+        private string? loadErrorMessage;
 
         protected override async Task OnInitializedAsync()
         {
@@ -26,8 +28,16 @@ namespace Slottet.Client.Pages.AdminPages
 
         private async Task LoadDepartments()
         {
-            departments = await httpClient.GetFromJsonAsync<List<DepartmentLookupDTO>>("api/Department")
-                ?? new List<DepartmentLookupDTO>();
+            var result = await AdminHttp.GetJsonAsync<List<DepartmentLookupDTO>>(httpClient, "api/Department");
+            if (result.Failed)
+            {
+                departments = new();
+                loadFailed = true;
+                loadErrorMessage = result.ErrorMessage;
+                return;
+            }
+
+            departments = result.Value ?? new();
         }
 
         private bool HasValidInput =>
@@ -36,14 +46,24 @@ namespace Slottet.Client.Pages.AdminPages
             !string.IsNullOrWhiteSpace(roleInput) &&
             departmentIdInput != Guid.Empty;
 
-        private bool CanCreate => !isBusy && HasValidInput;
-        private bool CanUpdate => !isBusy && selectedItem is not null;
-        private bool CanDelete => !isBusy && selectedItem is not null;
+        private bool CanCreate => !loadFailed && !isBusy && HasValidInput;
+        private bool CanUpdate => !loadFailed && !isBusy && selectedItem is not null;
+        private bool CanDelete => !loadFailed && !isBusy && selectedItem is not null;
 
         private async Task LoadData()
         {
-            staffMembers = await httpClient.GetFromJsonAsync<List<EditStaffDTO>>("api/Staff/Staffs")
-                ?? new List<EditStaffDTO>();
+            if (loadFailed) return;
+
+            var result = await AdminHttp.GetJsonAsync<List<EditStaffDTO>>(httpClient, "api/Staff/Staffs");
+            if (result.Failed)
+            {
+                staffMembers = new();
+                loadFailed = true;
+                loadErrorMessage = result.ErrorMessage;
+                return;
+            }
+
+            staffMembers = result.Value ?? new();
         }
 
         private void SelectItem(EditStaffDTO item)
