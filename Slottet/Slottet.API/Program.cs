@@ -1,15 +1,12 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Slottet.API.Controllers;
 using Slottet.API.Middlewares;
 using Slottet.Application.Interfaces;
-using Slottet.Domain.Entities;
 using Slottet.Infrastructure;
 using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
 using Slottet.Infrastructure.Services;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 
 
