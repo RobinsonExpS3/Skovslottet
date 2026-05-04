@@ -1,0 +1,34 @@
+﻿@page "/login"
+@rendermode InteractiveWebAssembly
+
+<h2>Login</h2>
+<form action="login" method="post">
+<div class="view-box">
+	<div class="table-layout">
+		<table class="table-form">
+			<tr>
+				<td>Brugernavn:</td>
+				<td><input class="r-table-input" placeholder="Indtast brugernavn..." /></td>
+			</tr>
+			<tr>
+				<td>Password:</td>
+				<td><input type="password" class="r-table-input" placeholder="Indtast password..." /></td>
+			</tr>
+		</table>
+		
+		<div class="button-column">
+			<button class="r-button" >Login</button>
+		</div>
+		
+		<div> 
+			<p>Afdelinger: <input type="text" list="departments" name="departments"></p>
+			
+			<datalist id="departments">
+			<option value="Slottet"></option>
+			<option value="Skoven"></option>
+			</datalist>
+		</div>
+
+	</div>
+</div>
+</form>
