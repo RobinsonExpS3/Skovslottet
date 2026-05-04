@@ -9,6 +9,10 @@ using Slottet.Infrastructure;
 using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
 using Slottet.Infrastructure.Services;
+using Microsoft.AspNet.Identity.EntityFramework;
+
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +44,13 @@ builder.Services.AddScoped<IDepartmentTaskDTOService, DepartmentTaskDTOService>(
 builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
         .AddInterceptors(ai.GetRequiredService<AuditInterceptor>()));
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+    options.AddPolicy("EmployeeOrAdmin", p => p.RequireRole("Employee", "Admin"));
+    options.AddPolicy("ShiftboardDisplay", p => p.RequireRole("Storskaerm", "Employee", "Admin"));
+});
 
 builder.Services.AddCors(options =>
 {
@@ -141,8 +152,8 @@ app.UseHttpsRedirection();
 app.UseCors("blazorApp");
 app.UseCors("blazorApp2");
 
+app.UseAuthentication();
 app.UseMiddleware<AuditScopeMiddleware>();
-//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
