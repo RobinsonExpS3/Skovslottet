@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class SpecialResponsibilityController : Controller
     {
         private readonly ISpecialResponsibilityDTOService _specialResponsibilityService;
@@ -20,6 +22,7 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all special responsibilities.</returns>
         [HttpGet("SpecialResponsibilities")]
+        [Authorize(Policy = "ShiftboardDisplay")]
         public async Task<ActionResult<IEnumerable<SpecialResponsibilityEntryDto>>> GetAllSpecialResponsibilitiesAsync()
         {
             var specialResponsibilities = await _specialResponsibilityService.GetAllSpecialResponsibilitiesAsync();
@@ -33,6 +36,7 @@ namespace Slottet.API.Controllers
         /// <param name="id">The ID of the special responsibility to retrieve.</param>
         /// <returns>Returns the special responsibility if found, otherwise NotFound.</returns>
         [HttpGet("{id}")]
+        [Authorize(Policy = "EmployeeOrAdmin")]
         public async Task<ActionResult<SpecialResponsibilityEntryDto>> GetSpecialResponsibilityByIdAsync(Guid id)
         {
             var specialResponsibility = await _specialResponsibilityService.GetSpecialResponsibilityByIdAsync(id);
@@ -74,6 +78,7 @@ namespace Slottet.API.Controllers
         /// <param name="dto">DTO object containing updated special responsibility information.</param>
         /// <returns>Returns NoContent if the update succeeds, otherwise BadRequest or NotFound.</returns>
         [HttpPut("{id}")]
+        [Authorize(Policy = "EmployeeOrAdmin")]
         public async Task<ActionResult> PutSpecialResponsibilityAsync(Guid id, [FromBody] SpecialResponsibilityEntryDto dto)
         {
             if (dto == null || id != dto.SpecialResponsibilityID || string.IsNullOrWhiteSpace(dto.Description))

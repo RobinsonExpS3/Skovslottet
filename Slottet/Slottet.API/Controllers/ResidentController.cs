@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class ResidentController : Controller
     {
         private readonly IResidentDTOService _residentService;
@@ -19,7 +21,7 @@ namespace Slottet.API.Controllers
         /// Gets all active residents as DTO objects.
         /// </summary>
         /// <returns>Returns all active residents.</returns>
-        [HttpGet("Residents")]
+        [HttpGet("Residents")]        
         public async Task<ActionResult<IEnumerable<EditResidentDTO>>> GetAllResidentsAsync()
         {
             var residents = await _residentService.GetAllResidentsAsync();
