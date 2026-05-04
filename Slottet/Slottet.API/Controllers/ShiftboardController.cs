@@ -7,7 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Policy = "EmployeeOrAdmin")]
+    [Authorize(Policy = "ShiftboardDisplay")]
     public class ShiftboardController : ControllerBase
     {
         private readonly IShiftBoardDTOService _shiftBoardService;

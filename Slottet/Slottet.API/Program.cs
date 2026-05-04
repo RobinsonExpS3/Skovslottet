@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Slottet.API.Auth;
 using Slottet.API.Controllers;
 using Slottet.API.Middlewares;
 using Slottet.Application.Interfaces;
@@ -41,6 +43,22 @@ builder.Services.AddScoped<IDepartmentTaskDTOService, DepartmentTaskDTOService>(
 builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
         .AddInterceptors(ai.GetRequiredService<AuditInterceptor>()));
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddAuthentication("Dev")
+        .AddScheme<AuthenticationSchemeOptions, DevAuthHandler>("Dev", options => { });
+}
+else
+{
+    builder.Services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+            options.Authority = "https://localhost:5001";
+            options.RequireHttpsMetadata = true;
+            options.Audience = "slottet-api";
+        });
+}
 
 builder.Services.AddAuthorization(options =>
 {
@@ -87,15 +105,15 @@ builder.Services.AddCors(options =>
 //.AddEntityFrameworkStores<SlottetDBContext>()
 //.AddDefaultTokenProviders();
 
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
-    {
-        options.Authority = "https://localhost:5001";
-        options.RequireHttpsMetadata = true;
-        options.Audience = "slottet-api";
-    });
+//builder.Services.AddAuthentication("Bearer")
+//    .AddJwtBearer("Bearer", options =>
+//    {
+//        options.Authority = "https://localhost:5001";
+//        options.RequireHttpsMetadata = true;
+//        options.Audience = "slottet-api";
+//    });
 
-builder.Services.AddAuthorization();
+//builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

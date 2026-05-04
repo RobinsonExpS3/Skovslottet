@@ -22,7 +22,7 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all special responsibilities.</returns>
         [HttpGet("SpecialResponsibilities")]
-        [Authorize(Policy = "ShiftboardDisplay")]
+        //[Authorize(Policy = "ShiftboardDisplay")]
         public async Task<ActionResult<IEnumerable<SpecialResponsibilityEntryDto>>> GetAllSpecialResponsibilitiesAsync()
         {
             var specialResponsibilities = await _specialResponsibilityService.GetAllSpecialResponsibilitiesAsync();
@@ -36,7 +36,7 @@ namespace Slottet.API.Controllers
         /// <param name="id">The ID of the special responsibility to retrieve.</param>
         /// <returns>Returns the special responsibility if found, otherwise NotFound.</returns>
         [HttpGet("{id}")]
-        [Authorize(Policy = "EmployeeOrAdmin")]
+        //[Authorize(Policy = "EmployeeOrAdmin")]
         public async Task<ActionResult<SpecialResponsibilityEntryDto>> GetSpecialResponsibilityByIdAsync(Guid id)
         {
             var specialResponsibility = await _specialResponsibilityService.GetSpecialResponsibilityByIdAsync(id);
