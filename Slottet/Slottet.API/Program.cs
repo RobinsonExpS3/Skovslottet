@@ -59,34 +59,34 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    // Password-krav 
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequiredLength = 8;
+//builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+//{
+//    // Password-krav 
+//    options.Password.RequireDigit = true;
+//    options.Password.RequireLowercase = true;
+//    options.Password.RequireUppercase = true;
+//    options.Password.RequireNonAlphanumeric = true;
+//    options.Password.RequiredLength = 8;
 
-    // Lockout-indstillinger 
-    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-    options.Lockout.MaxFailedAccessAttempts = 5;
+//    // Lockout-indstillinger 
+//    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+//    options.Lockout.MaxFailedAccessAttempts = 5;
 
-    // Bruger-indstillinger 
-    options.User.RequireUniqueEmail = true;
-})
-.AddEntityFrameworkStores<ApplicationDbContext>()
-.AddDefaultTokenProviders();
+//    // Bruger-indstillinger 
+//    options.User.RequireUniqueEmail = true;
+//})
+//.AddEntityFrameworkStores<ApplicationDbContext>()
+//.AddDefaultTokenProviders();
 
-//builder.Services.AddAuthentication("Bearer")
-//    .AddJwtBearer("Bearer", options =>
-//    {
-//        options.Authority = "https://localhost:5001";
-//        options.RequireHttpsMetadata = true;
-//        options.Audience = "slottet-api";
-//    });
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Bearer", options =>
+    {
+        options.Authority = "https://localhost:5001";
+        options.RequireHttpsMetadata = true;
+        options.Audience = "slottet-api";
+    });
 
-//builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
