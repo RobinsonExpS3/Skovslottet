@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "EmployeeOrAdmin")]
     public class ShiftboardController : ControllerBase
     {
         private readonly IShiftBoardDTOService _shiftBoardService;
