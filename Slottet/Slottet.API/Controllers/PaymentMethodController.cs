@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class PaymentMethodController : Controller
     {
         private readonly IPaymentMethodDTOService _paymentMethodService;
