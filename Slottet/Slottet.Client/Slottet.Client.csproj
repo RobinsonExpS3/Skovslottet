@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Slottet.Domain\Slottet.Domain.csproj" />
     <ProjectReference Include="..\Slottet.Shared\Slottet.Shared.csproj" />
   </ItemGroup>
 
