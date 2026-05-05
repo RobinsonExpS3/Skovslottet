@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Slottet.Shared;
@@ -12,6 +13,9 @@ namespace Slottet.Client.Pages.AdminPages
         private HttpClient httpClient { get; set; } = default!;
 
         protected List<AuditLogDTO> AuditRows { get; set; } = new();
+        protected IReadOnlyList<AuditDisplayRow> AuditDisplayRows => AuditRows
+            .SelectMany(CreateAuditDisplayRows)
+            .ToList();
         protected List<ResidentCardDto> ResidentCards { get; set; } = new();
         protected DateOnly SelectedDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
         protected string SelectedShift { get; set; } = string.Empty;
@@ -94,5 +98,150 @@ namespace Slottet.Client.Pages.AdminPages
             SelectedShift = args.Value?.ToString() ?? string.Empty;
             await LoadAuditLogsAsync();
         }
+
+        private static IEnumerable<AuditDisplayRow> CreateAuditDisplayRows(AuditLogDTO row)
+        {
+            var keyValues = GetAuditValues(row.KeyValues);
+            var oldValues = GetAuditValues(row.OldValuesJson);
+            var newValues = GetAuditValues(row.NewValuesJson);
+            var changedFields = oldValues.Keys
+                .Union(newValues.Keys)
+                .Where(field => !string.IsNullOrWhiteSpace(field))
+                .ToList();
+
+            if (changedFields.Count == 0)
+            {
+                changedFields.Add(string.Empty);
+            }
+
+            foreach (var field in changedFields)
+            {
+                yield return new AuditDisplayRow(
+                    row.PerformedAtTime,
+                    row.PerformedByStaffName,
+                    FormatAction(row.Action),
+                    row.TableName,
+                    GetSubject(row.TableName, keyValues, oldValues, newValues),
+                    oldValues.GetValueOrDefault(field, "Ikke givet"),
+                    newValues.GetValueOrDefault(field, "Ikke givet"));
+            }
+        }
+
+        protected static IReadOnlyDictionary<string, string> GetAuditValues(string? json)
+        {
+            var values = new Dictionary<string, string>();
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                return values;
+            }
+
+            try
+            {
+                using var document = JsonDocument.Parse(json);
+
+                if (document.RootElement.ValueKind != JsonValueKind.Object)
+                {
+                    values[string.Empty] = FormatJsonValue(document.RootElement);
+                    return values;
+                }
+
+                foreach (var property in document.RootElement.EnumerateObject())
+                {
+                    values[property.Name] = FormatJsonValue(property.Value);
+                }
+
+                return values;
+            }
+            catch (JsonException)
+            {
+                values[string.Empty] = json;
+                return values;
+            }
+        }
+
+        private static string FormatAction(string action)
+        {
+            return action switch
+            {
+                "Added" => "Oprettede",
+                "Modified" => "Ændrede",
+                "Deleted" => "Arkiverede",
+                _ => action
+            };
+        }
+
+        private static string GetSubject(
+            string tableName,
+            IReadOnlyDictionary<string, string> keyValues,
+            IReadOnlyDictionary<string, string> oldValues,
+            IReadOnlyDictionary<string, string> newValues)
+        {
+            var subjectName = FindSubjectName(newValues)
+                ?? FindSubjectName(oldValues);
+
+            if (!string.IsNullOrWhiteSpace(subjectName))
+            {
+                return subjectName;
+            }
+
+            var keyValue = keyValues.FirstOrDefault();
+
+            return string.IsNullOrWhiteSpace(keyValue.Value)
+                ? "Ikke givet"
+                : $"{FormatPropertyName(keyValue.Key)}: {keyValue.Value}";
+        }
+
+        private static string? FindSubjectName(IReadOnlyDictionary<string, string> values)
+        {
+            var nameValue = values.FirstOrDefault(value =>
+                value.Key.EndsWith("Name", StringComparison.OrdinalIgnoreCase) ||
+                value.Key.EndsWith("Medication", StringComparison.OrdinalIgnoreCase) ||
+                value.Key.EndsWith("TaskName", StringComparison.OrdinalIgnoreCase) ||
+                value.Key.EndsWith("Status", StringComparison.OrdinalIgnoreCase));
+
+            return string.IsNullOrWhiteSpace(nameValue.Value)
+                ? null
+                : nameValue.Value;
+        }
+
+        private static string FormatPropertyName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return string.Empty;
+            }
+
+            var cleanedName = name.EndsWith("ID", StringComparison.Ordinal)
+                ? name[..^2]
+                : name;
+
+            return string.Concat(cleanedName.Select((character, index) =>
+                index > 0 && char.IsUpper(character) && !char.IsUpper(cleanedName[index - 1])
+                    ? $" {character}"
+                    : character.ToString()));
+        }
+
+        private static string FormatJsonValue(JsonElement value)
+        {
+            return value.ValueKind switch
+            {
+                JsonValueKind.Null => "Ikke givet",
+                JsonValueKind.String => value.GetString() ?? "Ikke givet",
+                JsonValueKind.True => "Ja",
+                JsonValueKind.False => "Nej",
+                JsonValueKind.Number => value.GetRawText(),
+                _ => value.GetRawText()
+            };
+        }
+
+        protected sealed record AuditDisplayRow(
+            DateTime Time,
+            string PerformedBy,
+            string Action,
+            string TableName,
+            string Subject,
+            string OldValue,
+            string NewValue);
     }
 }

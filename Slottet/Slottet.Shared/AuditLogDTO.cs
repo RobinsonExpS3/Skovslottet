@@ -8,6 +8,7 @@ namespace Slottet.Shared {
         public DateTime PerformedAtTime { get; set; }
 
         public string Action { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
         public string TableName { get; set; } = string.Empty;
         public string KeyValues { get; set; } = string.Empty;
 

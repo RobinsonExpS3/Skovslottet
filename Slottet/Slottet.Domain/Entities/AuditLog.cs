@@ -7,9 +7,9 @@ namespace Slottet.Domain.Entities {
         public Guid AuditLogID { get; set; }
         public DateTime TimeStamp { get; set; }
 
-        public string Action { get; set; }
-        public string TableName { get; set; }
-        public string KeyValues { get; set; }
+        public string? Action { get; set; }
+        public string? TableName { get; set; }
+        public string? KeyValues { get; set; }
         public string? OldValuesJson { get; set; }
         public string? NewValuesJson { get; set; }
 
