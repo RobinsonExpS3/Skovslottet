@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Slottet.Domain.Entities;
 
-namespace Slottet.Infrastructure
+namespace Slottet.Domain.Entities
 {
     public class ApplicationUser : IdentityUser<Guid>
     {

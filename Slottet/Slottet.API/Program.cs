@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Slottet.API.Auth;
 using Slottet.API.Controllers;
 using Slottet.API.Middlewares;
 using Slottet.Application.Interfaces;
+using Slottet.Domain.Entities;
 using Slottet.Infrastructure;
 using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
@@ -38,6 +40,7 @@ builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();
 builder.Services.AddScoped<IStaffPNDTOService, StaffPNDTOService>();
 builder.Services.AddScoped<IDepartmentTaskDTOService, DepartmentTaskDTOService>();
+builder.Services.AddScoped<IAuthDTOService, AuthDTOService>();
 
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
@@ -86,24 +89,19 @@ builder.Services.AddCors(options =>
     });
 });
 
-//builder.Services.AddIdentity<Staff, IdentityRole>(options =>
-//{
-//    // Password-krav 
-//    options.Password.RequireDigit = true;
-//    options.Password.RequireLowercase = true;
-//    options.Password.RequireUppercase = true;
-//    options.Password.RequireNonAlphanumeric = true;
-//    options.Password.RequiredLength = 8;
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+    {
+        options.User.RequireUniqueEmail = false;
 
-//    // Lockout-indstillinger 
-//    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-//    options.Lockout.MaxFailedAccessAttempts = 5;
-
-//    // Bruger-indstillinger 
-//    options.User.RequireUniqueEmail = true;
-//})
-//.AddEntityFrameworkStores<SlottetDBContext>()
-//.AddDefaultTokenProviders();
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequiredLength = 8;
+    })
+    .AddEntityFrameworkStores<SlottetDBContext>()
+    .AddDefaultTokenProviders();
 
 //builder.Services.AddAuthentication("Bearer")
 //    .AddJwtBearer("Bearer", options =>
