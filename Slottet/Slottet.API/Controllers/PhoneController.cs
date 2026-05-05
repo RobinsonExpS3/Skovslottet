@@ -90,7 +90,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetPhoneByIdAsync), new { id = createdPhone.PhoneID }, createdPhone);
+            return CreatedAtAction("GetPhoneById", new { id = createdPhone.PhoneID }, createdPhone);
         }
 
         /// <summary>
