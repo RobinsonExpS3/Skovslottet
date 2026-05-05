@@ -73,6 +73,14 @@ else
                 <button class="column-button" @onclick="Update" disabled="@(!CanUpdate)">Opdater</button>
                 <button class="column-button" @onclick="Delete" disabled="@(!CanDelete)">Slet</button>
             </div>
+
+            <div class="password-column">
+                <p><strong id="formTitle">Opret kodeord</strong></p>
+
+                <input id="passwordInput" type="password" placeholder="Indtast kodeord" />
+
+                <button class="column-button" @onclick="CreatePassword">Opret</button>
+            </div>
         </div>
     </div>
 }

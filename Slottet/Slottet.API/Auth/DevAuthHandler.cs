@@ -25,6 +25,8 @@ public class DevAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
             new Claim("StaffName", "Dev User")
         };
 
+        // Admin, Employee, Storskaerm
+
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
