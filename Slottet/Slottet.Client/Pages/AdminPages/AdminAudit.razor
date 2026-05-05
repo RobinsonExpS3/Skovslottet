@@ -17,6 +17,17 @@
                 <option value="night">Nat</option>
             </select>
         </div>
+
+        <div class="audit-search">
+            <label for="audit-search">Søg</label>
+            <input
+                id="audit-search"
+                class="audit-search-input"
+                type="search"
+                placeholder="Søg i auditlog"
+                @bind="SearchText"
+				@bind:event="oninput" />
+        </div>
     </div>
 
     <div class="audit-panel">
@@ -43,15 +54,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var row in AuditDisplayRows) {
-                        <tr>
-                            <td>@row.Time.ToString("dd-MM-yyyy HH:mm")</td>
-                            <td>@row.PerformedBy</td>
-                            <td>@row.Action</td>
-                            <td>@row.TableName</td>
-                            <td>@row.Subject</td>
-                            <td>@row.OldValue</td>
-                            <td>@row.NewValue</td>
+                    @foreach (var row in FilteredAuditDisplayRows)
+                    {
+                        <tr class="audit-row">
+                            <td class="audit-cell audit-cell-time">@row.Time.ToString("dd-MM-yyyy HH:mm")</td>
+                            <td class="audit-cell audit-cell-person">@row.PerformedBy</td>
+                            <td class="audit-cell audit-cell-action">@row.Action</td>
+                            <td class="audit-cell audit-cell-table">@row.TableName</td>
+                            <td class="audit-cell audit-cell-subject">@row.Subject</td>
+                            <td class="audit-cell audit-cell-old-value">@row.OldValue</td>
+                            <td class="audit-cell audit-cell-new-value">@row.NewValue</td>
                         </tr>
                     }
                 </tbody>

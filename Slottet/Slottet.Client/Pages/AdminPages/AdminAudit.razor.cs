@@ -68,7 +68,7 @@ namespace Slottet.Client.Pages.AdminPages
             try {
                 var dto = await httpClient.GetFromJsonAsync<ShiftBoardDTO>("api/shiftboard/current");
                 ResidentCards = dto?.ResidentCards ?? new();
-            } catch(Exception ex) {
+            } catch (Exception ex) {
                 ResidentErrorMessage = $"Kunne ikke hente beboere: {ex.Message}";
             } finally {
                 IsResidentLoading = false;
@@ -121,7 +121,7 @@ namespace Slottet.Client.Pages.AdminPages
                     row.PerformedByStaffName,
                     FormatAction(row.Action),
                     row.TableName,
-                    GetSubject(row.TableName, keyValues, oldValues, newValues),
+                    string.IsNullOrWhiteSpace(row.Subject) ? "Ikke givet" : row.Subject,
                     oldValues.GetValueOrDefault(field, "Ikke givet"),
                     newValues.GetValueOrDefault(field, "Ikke givet"));
             }
@@ -171,40 +171,6 @@ namespace Slottet.Client.Pages.AdminPages
             };
         }
 
-        private static string GetSubject(
-            string tableName,
-            IReadOnlyDictionary<string, string> keyValues,
-            IReadOnlyDictionary<string, string> oldValues,
-            IReadOnlyDictionary<string, string> newValues)
-        {
-            var subjectName = FindSubjectName(newValues)
-                ?? FindSubjectName(oldValues);
-
-            if (!string.IsNullOrWhiteSpace(subjectName))
-            {
-                return subjectName;
-            }
-
-            var keyValue = keyValues.FirstOrDefault();
-
-            return string.IsNullOrWhiteSpace(keyValue.Value)
-                ? "Ikke givet"
-                : $"{FormatPropertyName(keyValue.Key)}: {keyValue.Value}";
-        }
-
-        private static string? FindSubjectName(IReadOnlyDictionary<string, string> values)
-        {
-            var nameValue = values.FirstOrDefault(value =>
-                value.Key.EndsWith("Name", StringComparison.OrdinalIgnoreCase) ||
-                value.Key.EndsWith("Medication", StringComparison.OrdinalIgnoreCase) ||
-                value.Key.EndsWith("TaskName", StringComparison.OrdinalIgnoreCase) ||
-                value.Key.EndsWith("Status", StringComparison.OrdinalIgnoreCase));
-
-            return string.IsNullOrWhiteSpace(nameValue.Value)
-                ? null
-                : nameValue.Value;
-        }
-
         private static string FormatPropertyName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -243,5 +209,29 @@ namespace Slottet.Client.Pages.AdminPages
             string Subject,
             string OldValue,
             string NewValue);
-    }
+
+        protected string SearchText { get; set; } = string.Empty;
+
+        protected IReadOnlyList<AuditDisplayRow> FilteredAuditDisplayRows =>
+            AuditDisplayRows
+                .Where(row => MatchesSearch(row, SearchText))
+                .ToList();
+
+        private static bool MatchesSearch(AuditDisplayRow row, string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText)) return true;
+
+            return Contains(row.PerformedBy, searchText)
+                || Contains(row.Action, searchText)
+                || Contains(row.TableName, searchText)
+                || Contains(row.Subject, searchText)
+                || Contains(row.OldValue, searchText)
+                || Contains(row.NewValue, searchText);
+        }
+
+        private static bool Contains(string value, string searchText)
+        {
+            return value.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+        }
+    } 
 }
