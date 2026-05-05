@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.Components;
 using Slottet.Shared;
 
 namespace Slottet.Client.Pages.AdminPages
@@ -22,8 +23,35 @@ namespace Slottet.Client.Pages.AdminPages
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadDepartments();
-            await LoadData();
+            try
+            {
+                using var response = await httpClient.GetAsync("api/shiftboard/current");
+
+                if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized)
+                {
+                    loadErrorMessage = "Du har ikke adgang til denne side.";
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                    return;
+                }
+
+                //Model = await response.Content.ReadFromJsonAsync<ShiftBoardDTO>();
+            }
+            catch
+            {
+                loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+            }
+            finally
+            {
+                isBusy = false;
+                await LoadDepartments();
+                await LoadData();
+            }
+
         }
 
         private async Task LoadDepartments()

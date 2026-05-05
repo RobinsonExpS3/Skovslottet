@@ -1,7 +1,7 @@
+using System.Net;
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
 using Slottet.Shared;
-using System.Net.Http;
-using System.Net.Http.Json;
 
 namespace Slottet.Client.Pages.AdminPages
 {
@@ -17,7 +17,40 @@ namespace Slottet.Client.Pages.AdminPages
         private string? loadErrorMessage;
         private bool _isBusy;
 
-        private async Task LoadData() {
+
+        protected override async Task OnInitializedAsync()
+        {
+
+            try
+            {
+                using var response = await httpClient.GetAsync("api/shiftboard/current");
+
+                if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized)
+                {
+                    loadErrorMessage = "Du har ikke adgang til denne side.";
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                    return;
+                }
+
+                //Model = await response.Content.ReadFromJsonAsync<ShiftBoardDTO>();
+            }
+            catch
+            {
+                loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+            }
+            finally
+            {
+                _isBusy = false;
+                await LoadData();
+            }
+        }
+        private async Task LoadData()
+        {
             loadFailed = false;
             loadErrorMessage = null;
 
@@ -26,7 +59,8 @@ namespace Slottet.Client.Pages.AdminPages
                 "api/SpecialResponsibility/SpecialResponsibilities"
             );
 
-            if (result.Failed) {
+            if (result.Failed)
+            {
                 specialResponsibilities = new List<SpecialResponsibilityEntryDto>();
                 loadFailed = true;
                 loadErrorMessage = result.ErrorMessage;
@@ -36,11 +70,7 @@ namespace Slottet.Client.Pages.AdminPages
             specialResponsibilities = result.Value ?? new List<SpecialResponsibilityEntryDto>();
         }
 
-        protected override async Task OnInitializedAsync() {
-            await LoadData();
-        }
-
-        private bool HasValidInput => 
+        private bool HasValidInput =>
             !string.IsNullOrWhiteSpace(taskNameInput)
             && selectedItem == null;
 
@@ -48,73 +78,92 @@ namespace Slottet.Client.Pages.AdminPages
         private bool CanUpdate => !loadFailed && !_isBusy && selectedItem != null;
         private bool CanDelete => !loadFailed && !_isBusy && selectedItem != null;
 
-        private void SelectItem(SpecialResponsibilityEntryDto item) {
+        private void SelectItem(SpecialResponsibilityEntryDto item)
+        {
             selectedItem = item;
             taskNameInput = item.Description;
         }
 
-        private async Task CreateAsync() {
-            if(!CanCreate) return;
+        private async Task CreateAsync()
+        {
+            if (!CanCreate) return;
             _isBusy = true;
-            
-            try {
-                var newItem = new SpecialResponsibilityEntryDto {
+
+            try
+            {
+                var newItem = new SpecialResponsibilityEntryDto
+                {
                     SpecialResponsibilityID = Guid.NewGuid(),
                     Description = taskNameInput ?? string.Empty
                 };
 
                 var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
 
-                if (response.IsSuccessStatusCode) {
+                if (response.IsSuccessStatusCode)
+                {
                     await LoadData();
                     taskNameInput = string.Empty;
                 }
-            } finally {
+            }
+            finally
+            {
                 _isBusy = false;
             }
         }
 
-        private async Task UpdateAsync() {
-            if(selectedItem == null) {
+        private async Task UpdateAsync()
+        {
+            if (selectedItem == null)
+            {
                 return;
             }
 
-            if(!CanUpdate) return;
+            if (!CanUpdate) return;
             _isBusy = true;
 
-            try {
+            try
+            {
                 selectedItem.Description = taskNameInput ?? string.Empty;
 
                 var response = await httpClient.PutAsJsonAsync($"api/SpecialResponsibility/{selectedItem.SpecialResponsibilityID}", selectedItem);
 
-                if (response.IsSuccessStatusCode) {
+                if (response.IsSuccessStatusCode)
+                {
                     await LoadData();
                     selectedItem = null;
                     taskNameInput = string.Empty;
                 }
-            } finally {
-                _isBusy = false; 
+            }
+            finally
+            {
+                _isBusy = false;
             }
         }
 
-        private async Task DeleteAsync() {
-            if (selectedItem == null) {
+        private async Task DeleteAsync()
+        {
+            if (selectedItem == null)
+            {
                 return;
             }
 
-            if(!CanDelete) return;
+            if (!CanDelete) return;
             _isBusy = true;
 
-            try {
+            try
+            {
                 var response = await httpClient.DeleteAsync($"api/SpecialResponsibility/{selectedItem.SpecialResponsibilityID}");
 
-                if (response.IsSuccessStatusCode) {
+                if (response.IsSuccessStatusCode)
+                {
                     await LoadData();
                     selectedItem = null;
                     taskNameInput = string.Empty;
                 }
-            } finally {
-                _isBusy = false; 
+            }
+            finally
+            {
+                _isBusy = false;
             }
         }
     }

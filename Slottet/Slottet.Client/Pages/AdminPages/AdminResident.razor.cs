@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
 using Slottet.Shared;
@@ -20,13 +21,40 @@ namespace Slottet.Client.Pages.AdminPages
         private List<TimeInput> medicineTimes = new();
         private string? residentNameInput;
         private bool isActiveInput = true;
+        private bool IsLoading { get; set; } = true;
 
         private int selectedHour = 8;
         private int selectedMinute = 0;
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadDataAsync();
+            try
+            {
+                using var response = await httpClient.GetAsync("api/shiftboard/current");
+
+                if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized)
+                {
+                    loadErrorMessage = "Du har ikke adgang til denne side.";
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                    return;
+                }
+
+                //Model = await response.Content.ReadFromJsonAsync<ShiftBoardDTO>();
+            }
+            catch
+            {
+                loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+            }
+            finally
+            {
+                IsLoading = false;
+                await LoadDataAsync();
+            }
         }
 
         private async Task LoadDataAsync()
@@ -173,7 +201,8 @@ namespace Slottet.Client.Pages.AdminPages
             if (!CanDelete) return;
             isActiveInput = true;
 
-            try {
+            try
+            {
                 var response = await httpClient.DeleteAsync($"api/Resident/{selectedResident.ResidentID}");
 
                 if (!response.IsSuccessStatusCode)

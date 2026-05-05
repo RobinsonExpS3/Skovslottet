@@ -1,6 +1,5 @@
 using System.Globalization;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+using System.Net;
 using Microsoft.AspNetCore.Components;
 using Slottet.Shared;
 
@@ -26,27 +25,61 @@ namespace Slottet.Client.Pages.AdminPages
 
         private Guid? openCardId = null;
 
-        protected override async Task OnInitializedAsync() {
-            await LoadAuditLogsAsync();
-            await LoadResidentCardsAsync();
+        protected override async Task OnInitializedAsync()
+        {
+
+            try
+            {
+                using var response = await httpClient.GetAsync("api/shiftboard/current");
+
+                if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized)
+                {
+                    ErrorMessage = "Du har ikke adgang til denne side.";
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                    return;
+                }
+
+                //Model = await response.Content.ReadFromJsonAsync<ShiftBoardDTO>();
+            }
+            catch
+            {
+                ErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+            }
+            finally
+            {
+                IsLoading = false;
+                await LoadAuditLogsAsync();
+                await LoadResidentCardsAsync();
+            }
+
+
         }
 
-        private async Task LoadAuditLogsAsync() {
+        private async Task LoadAuditLogsAsync()
+        {
             IsLoading = true;
             ErrorMessage = null;
 
-            try {
+            try
+            {
                 var query = new List<string> {
                     $"date={SelectedDate:yyyy-MM-dd}"
                 };
 
-                if (!string.IsNullOrWhiteSpace(SelectedShift)) {
+                if (!string.IsNullOrWhiteSpace(SelectedShift))
+                {
                     query.Add($"shift={Uri.EscapeDataString(SelectedShift)}");
                 }
 
                 var url = $"api/AuditLog?{string.Join("&", query)}";
                 var result = await AdminHttp.GetJsonAsync<List<AuditLogDTO>>(httpClient, url);
-                if (result.Failed) {
+                if (result.Failed)
+                {
                     ErrorMessage = result.ErrorMessage;
                     AuditRows = new();
                     return;
@@ -55,22 +88,28 @@ namespace Slottet.Client.Pages.AdminPages
                 AuditRows = (result.Value ?? new())
                     .OrderByDescending(r => r.PerformedAtTime)
                     .ToList();
-            } catch {
+            }
+            catch
+            {
                 ErrorMessage = "Kunne ikke hente audit logs.";
                 AuditRows = new();
             }
-            finally {
+            finally
+            {
                 IsLoading = false;
             }
         }
 
-        private async Task LoadResidentCardsAsync() {
+        private async Task LoadResidentCardsAsync()
+        {
             IsResidentLoading = true;
             ResidentErrorMessage = null;
 
-            try {
+            try
+            {
                 var result = await AdminHttp.GetJsonAsync<ShiftBoardDTO>(httpClient, "api/shiftboard/current");
-                if (result.Failed) {
+                if (result.Failed)
+                {
                     ResidentErrorMessage = result.ErrorMessage;
                     ResidentCards = new();
                     return;
@@ -78,9 +117,13 @@ namespace Slottet.Client.Pages.AdminPages
 
                 var dto = result.Value;
                 ResidentCards = dto?.ResidentCards ?? new();
-            } catch {
+            }
+            catch
+            {
                 ResidentErrorMessage = "Kunne ikke hente beboere.";
-            } finally {
+            }
+            finally
+            {
                 IsResidentLoading = false;
             }
         }
@@ -90,7 +133,8 @@ namespace Slottet.Client.Pages.AdminPages
             openCardId = openCardId == residentCardId ? null : residentCardId;
         }
 
-        protected async Task OnDateChanged(ChangeEventArgs args) {
+        protected async Task OnDateChanged(ChangeEventArgs args)
+        {
             var dateText = args.Value?.ToString();
 
             if (DateOnly.TryParseExact(
@@ -98,13 +142,15 @@ namespace Slottet.Client.Pages.AdminPages
                 "yyyy-MM-dd",
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
-                out var parsedDate)) {
+                out var parsedDate))
+            {
                 SelectedDate = parsedDate;
                 await LoadAuditLogsAsync();
             }
         }
 
-        protected async Task OnShiftChanged(ChangeEventArgs args) {
+        protected async Task OnShiftChanged(ChangeEventArgs args)
+        {
             SelectedShift = args.Value?.ToString() ?? string.Empty;
             await LoadAuditLogsAsync();
         }
