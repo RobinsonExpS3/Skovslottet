@@ -68,7 +68,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetSpecialResponsibilityByIdAsync), new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
+            return CreatedAtAction("GetSpecialResponsibilityById", new { id = specialResponsibility.SpecialResponsibilityID }, specialResponsibility);
         }
 
         /// <summary>
