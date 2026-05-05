@@ -90,7 +90,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+    .AddIdentityCore<ApplicationUser>(options =>
     {
         options.User.RequireUniqueEmail = false;
 
@@ -100,8 +100,23 @@ builder.Services
         options.Password.RequireNonAlphanumeric = true;
         options.Password.RequiredLength = 8;
     })
+    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<SlottetDBContext>()
     .AddDefaultTokenProviders();
+
+//builder.Services
+//    .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+//    {
+//        options.User.RequireUniqueEmail = false;
+
+//        options.Password.RequireDigit = true;
+//        options.Password.RequireLowercase = true;
+//        options.Password.RequireUppercase = true;
+//        options.Password.RequireNonAlphanumeric = true;
+//        options.Password.RequiredLength = 8;
+//    })
+//    .AddEntityFrameworkStores<SlottetDBContext>()
+//    .AddDefaultTokenProviders();
 
 //builder.Services.AddAuthentication("Bearer")
 //    .AddJwtBearer("Bearer", options =>
