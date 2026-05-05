@@ -188,5 +188,10 @@ namespace Slottet.Client.Pages.AdminPages
             roleInput = string.Empty;
             departmentIdInput = Guid.Empty;
         }
+
+        private async Task CreatePassword()
+        { 
+            
+        }
     }
 }
