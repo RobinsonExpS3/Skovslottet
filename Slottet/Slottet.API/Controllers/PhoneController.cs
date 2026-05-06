@@ -52,9 +52,9 @@ namespace Slottet.API.Controllers
         /// <param name="dto">DTO object containing updated phone values.</param>
         /// <returns>Returns NoContent if the update succeeds, otherwise BadRequest or NotFound.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutPhoneAsync(Guid id, PhoneDTO dto)
+        public async Task<IActionResult> PutPhoneAsync(Guid id, [FromBody] PhoneDTO dto)
         {
-            if (dto == null || id != dto.PhoneID)
+            if (dto == null || id != dto.PhoneID || string.IsNullOrWhiteSpace(dto.PhoneNumber))
             {
                 return BadRequest();
             }
