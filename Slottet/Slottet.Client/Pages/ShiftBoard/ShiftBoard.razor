@@ -12,17 +12,29 @@ else if (LoadError is not null)
 }
 else if (Model is null)
 {
-    <p>Ingen vagttavle fundet.</p>
+    <div class="shift-empty">
+        <p>Ingen vagttavle oprettet for <strong>@ShiftLabel</strong> den <strong>@_navDate.ToString("dd. MMM yyyy")</strong>.</p>
+        <div class="shift-nav shift-nav--standalone">
+            <button class="shift-nav-btn" @onclick="GoToPrev">‹ Forrige</button>
+            @if (!IsToday)
+            {
+                <button class="shift-nav-btn shift-nav-btn--today" @onclick="GoToToday">I dag</button>
+            }
+            <button class="shift-nav-btn" @onclick="GoToNext">Næste ›</button>
+        </div>
+    </div>
 }
 else
 {
     <section class="shiftboard-header">
         <h1>@Model.DepartmentName</h1>
-        <p>
-            <strong>Vagttype: </strong>@Model.ShiftType
-            <strong>Start: </strong>@Model.StartDate.ToString("dd-MM-yyyy HH:mm")
-            <strong>Slut: </strong>@Model.EndDate.ToString("dd-MM-yyyy HH:mm")
-        </p>
+        <div class="shift-nav-center">
+            <span class="shift-nav-date">@_navDate.ToString("dd. MMM yyyy")</span>
+            <span class="shift-nav-label @(IsPast ? "shift-nav-label--past" : "")">
+                @ShiftLabel
+                @if (IsPast) { <span class="shift-past-badge">Historisk – skrivebeskyttet</span> }
+            </span>
+        </div>
     </section>
 
     <section class="shiftboard-layout">
@@ -46,10 +58,10 @@ else
                 };
                 var isGroceryToday = resident.GroceryDay == todayDanish;
 
-                <article class="resident-card resident-card--clickable"
+                <article class="resident-card @(!IsPast ? "resident-card--clickable" : "resident-card--readonly")"
                          id="@cardId"
                          @onclick="() => OpenResident(resident, cardId)"
-                         title="Klik for at se detaljer">
+                         title="@(!IsPast ? "Klik for at se detaljer" : "Historisk vagt – skrivebeskyttet")">
 
                     @* ── Navn ── *@
                     <section class="resident-header @resident.RiskCssClass">
@@ -199,6 +211,26 @@ else
                         <li>@task</li>
                     }
                 </ul>
+            </div>
+
+            <div class="shift-footer">
+                <div class="shift-footer-info">
+                    <div class="shift-footer-title">@NavDayLabel @_navDate.ToString("d/M") @Model.ShiftType</div>
+                    <div class="shift-footer-times">
+                        <span>Start: @Model.StartDate.ToString("d/M HH:mm")</span>
+                        <span>Slut: @Model.EndDate.ToString("d/M HH:mm")</span>
+                    </div>
+                </div>
+                <div class="shift-nav">
+                    <button class="shift-nav-btn" @onclick="GoToPrev">‹ Forrige</button>
+                    <div class="shift-nav-right">
+                        @if (!IsToday)
+                        {
+                            <button class="shift-nav-btn shift-nav-btn--today" @onclick="GoToToday">I dag</button>
+                        }
+                        <button class="shift-nav-btn" @onclick="GoToNext">Næste ›</button>
+                    </div>
+                </div>
             </div>
 
             <button class="new-shiftboard-button" @onclick="NavigateToNewShiftBoard">
