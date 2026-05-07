@@ -8,7 +8,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Policy = "AdminOnly")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthDTOService _authService;
@@ -19,6 +19,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet("me")]
+        [Authorize(Policy = "ShiftboardDisplay")]
         public ActionResult<object> GetCurrentUser()
         {
             var roles = User.FindAll(ClaimTypes.Role)
