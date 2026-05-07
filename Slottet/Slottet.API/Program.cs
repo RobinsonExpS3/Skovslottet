@@ -171,8 +171,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<SlottetDBContext>();
-
-    await DBSeeder.SeedAsync(context);
+    await context.Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();

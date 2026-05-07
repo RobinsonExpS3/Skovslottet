@@ -115,6 +115,26 @@ namespace Slottet.API.Controllers
         /// Gets grocery day lookup values used when editing residents.
         /// </summary>
         /// <returns>Returns all grocery day lookup values.</returns>
+        /// <summary>
+        /// Swaps the SortOrder of two residents so they exchange positions in the grid.
+        /// </summary>
+        [HttpPut("swap-order")]
+        public async Task<ActionResult> SwapResidentSortOrderAsync([FromBody] SwapResidentSortOrderDto dto, CancellationToken ct)
+        {
+            if (dto.ResidentIdA == Guid.Empty || dto.ResidentIdB == Guid.Empty || dto.ResidentIdA == dto.ResidentIdB)
+                return BadRequest();
+
+            var swapped = await _residentService.SwapResidentSortOrderAsync(dto.ResidentIdA, dto.ResidentIdB, ct);
+            return swapped ? NoContent() : NotFound();
+        }
+
+        [HttpGet("cards")]
+        public async Task<ActionResult<List<ResidentCardDto>>> GetResidentCardsAsync(CancellationToken ct)
+        {
+            var cards = await _residentService.GetResidentCardsAsync(ct);
+            return Ok(cards);
+        }
+
         [HttpGet("groceryDays")]
         public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentGroceryDaysAsync()
         {

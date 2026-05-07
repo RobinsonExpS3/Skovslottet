@@ -21,6 +21,10 @@ namespace Slottet.Infrastructure.Data.Configurations
             entity.Property(r => r.IsActive)
                 .IsRequired();
 
+            entity.Property(r => r.SortOrder)
+                .IsRequired()
+                .HasDefaultValue(0);
+
             entity.HasOne(g => g.GroceryDay)
                 .WithMany(r => r.Residents)
                 .HasForeignKey(g => g.GroceryDayID)

@@ -96,12 +96,17 @@ namespace Slottet.Infrastructure.Services
         /// <returns>Returns the created EditResidentDTO object.</returns>
         public async Task<EditResidentDTO?> PostResidentAsync(EditResidentDTO dto)
         {
+            var maxSortOrder = await _context.Residents.AnyAsync()
+                ? await _context.Residents.MaxAsync(r => r.SortOrder)
+                : -1;
+
             var resident = new Resident
             {
                 ResidentID = dto.ResidentID == Guid.Empty ? Guid.NewGuid() : dto.ResidentID,
                 ResidentName = dto.ResidentName,
                 IsActive = dto.IsActive,
-                GroceryDayID = dto.GroceryDayID
+                GroceryDayID = dto.GroceryDayID,
+                SortOrder = maxSortOrder + 1
             };
 
             _context.Residents.Add(resident);
@@ -287,6 +292,95 @@ namespace Slottet.Infrastructure.Services
         /// <remarks>This expression can be used with LINQ providers such as Entity Framework to perform
         /// efficient server-side projection of Resident entities to EditResidentDTO objects.</remarks>
         /// <returns>An expression that projects a Resident object into an EditResidentDTO instance.</returns>
+        /// <summary>
+        /// Returns all active residents mapped to ResidentCardDto — same view as ShiftBoard.
+        /// </summary>
+        public async Task<bool> SwapResidentSortOrderAsync(Guid residentIdA, Guid residentIdB, CancellationToken ct = default)
+        {
+            var a = await _context.Residents.FirstOrDefaultAsync(r => r.ResidentID == residentIdA, ct);
+            var b = await _context.Residents.FirstOrDefaultAsync(r => r.ResidentID == residentIdB, ct);
+
+            if (a is null || b is null) return false;
+
+            (a.SortOrder, b.SortOrder) = (b.SortOrder, a.SortOrder);
+            await _context.SaveChangesAsync(ct);
+            return true;
+        }
+
+        public async Task<List<ResidentCardDto>> GetResidentCardsAsync(CancellationToken ct = default)
+        {
+            var residents = await _context.Residents
+                .AsNoTracking()
+                .Where(r => r.IsActive)
+                .OrderBy(r => r.SortOrder)
+                .ThenBy(r => r.ResidentID)
+                .Include(r => r.GroceryDay)
+                .Include(r => r.Medicines)
+                .Include(r => r.PNs)
+                    .ThenInclude(pn => pn.StaffPNs)
+                        .ThenInclude(spn => spn.Staff)
+                .Include(r => r.ResidentPaymentMethods)
+                    .ThenInclude(rpm => rpm.PaymentMethod)
+                .Include(r => r.ResidentStatuses)
+                    .ThenInclude(rs => rs.RiskLevel)
+                .Include(r => r.ResidentStatuses)
+                    .ThenInclude(rs => rs.StaffResidentStatuses)
+                        .ThenInclude(srs => srs.Staff)
+                .ToListAsync(ct);
+
+            return residents.Select(MapToResidentCard).ToList();
+        }
+
+        private static ResidentCardDto MapToResidentCard(Resident resident)
+        {
+            var today = DateTime.Today;
+            var latestStatus = resident.ResidentStatuses
+                .OrderByDescending(s => s.Date)
+                .FirstOrDefault();
+
+            return new ResidentCardDto
+            {
+                ResidentStatusID  = latestStatus?.ResidentStatusID ?? Guid.Empty,
+                ResidentID        = resident.ResidentID,
+                Date              = today,
+                ResidentName      = resident.ResidentName,
+                IsActive          = resident.IsActive,
+                RiskLevel         = latestStatus?.RiskLevel?.RiskLevelName,
+                LatestStatusNote  = latestStatus?.Status,
+                GroceryDay        = resident.GroceryDay?.GroceryDayName,
+                PaymentMethod     = resident.ResidentPaymentMethods
+                                        .Select(rpm => rpm.PaymentMethod?.PaymentMethodName)
+                                        .FirstOrDefault(),
+                AssignedStaff     = latestStatus?.StaffResidentStatuses
+                                        .Select(srs => srs.Staff.StaffName)
+                                        .OrderBy(n => n)
+                                        .ToList() ?? new(),
+                MedicineSchedule  = resident.Medicines
+                                        .Where(m => m.MedicineTime.Date == today)
+                                        .OrderBy(m => m.MedicineTime)
+                                        .Select(m => new MedicineScheduleItemDto
+                                        {
+                                            Label   = m.MedicineTime.ToString("HH:mm"),
+                                            Time    = TimeOnly.FromDateTime(m.MedicineTime),
+                                            IsGiven = m.MedicineGivenTime != null
+                                        })
+                                        .ToList(),
+                PNEntries         = resident.PNs
+                                        .Where(pn => pn.PNGivenTime.Date == today)
+                                        .OrderBy(pn => pn.PNGivenTime)
+                                        .Select(pn => new PNEntryDto
+                                        {
+                                            TimeOfAdministration = pn.PNGivenTime.ToString("HH:mm"),
+                                            Medication           = string.Empty,
+                                            Reason               = pn.PNReason,
+                                            IssuedBy             = pn.StaffPNs
+                                                                       .Select(spn => spn.Staff.StaffName)
+                                                                       .FirstOrDefault() ?? string.Empty
+                                        })
+                                        .ToList()
+            };
+        }
+
         private static Expression<Func<Resident, EditResidentDTO>> MapToDtoExpression()
         {
             return resident => new EditResidentDTO

@@ -359,6 +359,10 @@ namespace Slottet.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.HasKey("ResidentID");
 
                     b.HasIndex("GroceryDayID");

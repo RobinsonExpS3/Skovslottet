@@ -1,31 +1,40 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Slottet.Shared;
 
 namespace Slottet.Client.Pages.AdminPages
 {
     public partial class AdminResident
     {
-        [Inject]
-        private HttpClient httpClient { get; set; }
+        [Inject] private HttpClient Http { get; set; } = default!;
+        [Inject] private IJSRuntime  JS   { get; set; } = default!;
 
-        private string? loadErrorMessage;
+        // ── Data ──────────────────────────────────────────────────────────
+        protected List<ResidentCardDto> Cards     { get; set; } = new();
+        protected List<string>          AllStaff  { get; set; } = new();
+        protected bool                  IsLoading { get; set; } = true;
+        protected string?               LoadError { get; set; }
 
-        // ── Residents ─────────────────────────────────────────────────────
-        private List<EditResidentDTO>? residents;
-        private EditResidentDTO? selectedResident;
-        private bool loadFailed = false;
-        private bool isBusy = false;
+        // ── Overlay ───────────────────────────────────────────────────────
+        protected ResidentCardDto? SelectedResident { get; set; }
+        private   AdminBoundingRect? _cardRect;
+        private   bool             _pendingFlyIn;
 
-        // ── Form inputs ───────────────────────────────────────────────────
-        private string? residentNameInput;
-        private bool isActiveInput = true;
-        private Guid? selectedGroceryDayID;
-        private List<Guid> selectedPaymentMethodIDs = new();
-        private List<TimeInput> medicineTimes = new();
-        private int selectedHour = 8;
-        private int selectedMinute = 0;
+        // ── Drag & drop ───────────────────────────────────────────────────
+        private int _dragSourceSlot = -1;
+        private int _dragTargetSlot = -1;
+
+        // ── Creation form ─────────────────────────────────────────────────
+        private string?         residentNameInput;
+        private bool            isActiveInput          = true;
+        private Guid?           selectedGroceryDayID;
+        private List<Guid>      selectedPaymentMethodIDs = new();
+        private List<TimeInput> medicineTimes            = new();
+        private int             selectedHour             = 8;
+        private int             selectedMinute           = 0;
+        private bool            isBusy                   = false;
 
         // ── Lookups ───────────────────────────────────────────────────────
         private List<ResidentLookupDTO> groceryDays = new();
@@ -71,89 +80,61 @@ namespace Slottet.Client.Pages.AdminPages
 
         // ── Lifecycle ─────────────────────────────────────────────────────
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (_pendingFlyIn && _cardRect is not null)
+            {
+                _pendingFlyIn = false;
+                await JS.InvokeVoidAsync("overlayHelpers.playFlyIn", "overlay-panel-admin-borger", _cardRect);
+            }
+        }
 
-        // ── Data ──────────────────────────────────────────────────────────
-        //private async Task LoadDataAsync()
-        //{
-        //    loadFailed = false;
-        //    loadErrorMessage = null;
-        //    try
-        //    {
-        //        residents = await httpClient.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
-        //        groceryDays = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
-        //        paymentMethods = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
-        //    }
-        //    catch
-        //    {
-        //        residents = new();
-        //        groceryDays = new();
-        //        paymentMethods = new();
-        //        loadFailed = true;
-        //    }
-        //}
-
+        // ── Data loading ──────────────────────────────────────────────────
         private async Task LoadDataAsync()
         {
-            loadFailed = false;
-            loadErrorMessage = null;
-
-            var residentResult = await AdminHttp.GetJsonAsync<List<EditResidentDTO>>(httpClient, "api/Resident/Residents");
-            if (residentResult.Failed)
+            IsLoading = true;
+            LoadError = null;
+            try
             {
-                residents = new();
-                groceryDays = new();
-                paymentMethods = new();
-                loadFailed = true;
-                loadErrorMessage = residentResult.ErrorMessage;
-                return;
+                var cardsTask    = Http.GetFromJsonAsync<List<ResidentCardDto>>("api/Resident/cards");
+                var staffTask    = Http.GetFromJsonAsync<List<EditStaffDTO>>("api/Staff/Staffs");
+                var groceryTask  = Http.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays");
+                var paymentTask  = Http.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods");
+
+                await Task.WhenAll(cardsTask, staffTask, groceryTask, paymentTask);
+
+                Cards         = cardsTask.Result   ?? new();
+                AllStaff      = (staffTask.Result  ?? new()).Select(s => s.StaffName).ToList();
+                groceryDays   = groceryTask.Result  ?? new();
+                paymentMethods= paymentTask.Result  ?? new();
             }
-
-            var groceryDayResult = await AdminHttp.GetJsonAsync<List<ResidentLookupDTO>>(httpClient, "api/Resident/groceryDays");
-            var paymentMethodResult = await AdminHttp.GetJsonAsync<List<ResidentLookupDTO>>(httpClient, "api/Resident/paymentMethods");
-
-            if (groceryDayResult.Failed || paymentMethodResult.Failed)
+            catch (Exception ex)
             {
-                residents = new();
-                groceryDays = new();
-                paymentMethods = new();
-                loadFailed = true;
-                loadErrorMessage = groceryDayResult.ErrorMessage ?? paymentMethodResult.ErrorMessage;
-                return;
+                LoadError = ex.Message;
             }
-
-            residents = residentResult.Value ?? new();
-            groceryDays = groceryDayResult.Value ?? new();
-            paymentMethods = paymentMethodResult.Value ?? new();
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
-
-        private string GetGroceryDayName(Guid id) =>
-            groceryDays.FirstOrDefault(d => d.ID == id)?.Name ?? "–";
-
-        private string GetPaymentMethodNames(EditResidentDTO resident)
+        // ── Overlay ───────────────────────────────────────────────────────
+        protected async Task OpenResident(ResidentCardDto resident, string cardId)
         {
-            if (resident.PaymentMethodIDs is null || resident.PaymentMethodIDs.Count == 0)
-                return "–";
-            return string.Join(", ", resident.PaymentMethodIDs
-                .Select(id => paymentMethods.FirstOrDefault(p => p.ID == id)?.Name ?? "–"));
+            _cardRect        = await JS.InvokeAsync<AdminBoundingRect>("overlayHelpers.getRect", cardId);
+            SelectedResident = resident;
+            _pendingFlyIn    = true;
         }
 
-        // ── Selection ─────────────────────────────────────────────────────
-        private async Task SelectResidentAsync(EditResidentDTO resident)
+        protected void CloseOverlay() => SelectedResident = null;
+
+        protected async Task OnResidentSaved()
         {
-            selectedResident = resident;
-            residentNameInput = resident.ResidentName;
-            selectedGroceryDayID = resident.GroceryDayID;
-            isActiveInput = resident.IsActive;
-
-            var dto = await httpClient.GetFromJsonAsync<EditResidentDTO>($"api/Resident/{resident.ResidentID}");
-            selectedPaymentMethodIDs = dto?.PaymentMethodIDs ?? new();
-            medicineTimes = dto?.MedicineTimes
-                .Select(t => new TimeInput { Time = TimeOnly.FromDateTime(t) })
-                .ToList() ?? new();
+            CloseOverlay();
+            await LoadDataAsync();
         }
 
-        // ── CRUD ──────────────────────────────────────────────────────────
+        // ── Creation CRUD ─────────────────────────────────────────────────
         private async Task CreateAsync()
         {
             if (!CanCreate) return;
@@ -207,11 +188,56 @@ namespace Slottet.Client.Pages.AdminPages
             finally { isBusy = false; }
         }
 
+
+
+        // ── Drag & drop ───────────────────────────────────────────────────
+        private void OnDragStart(int slot)
+        {
+            _dragSourceSlot = slot;
+            _dragTargetSlot = -1;
+        }
+
+        private void OnDragEnd()
+        {
+            _dragSourceSlot = -1;
+            _dragTargetSlot = -1;
+        }
+
+        private async Task OnDrop(int targetSlot)
+        {
+            var src = _dragSourceSlot;
+            _dragSourceSlot = -1;
+            _dragTargetSlot = -1;
+
+            if (src < 0 || src == targetSlot) return;
+            if (src >= Cards.Count || targetSlot >= Cards.Count) return;
+
+            // Optimistisk swap i UI
+            var tmp = Cards[src];
+            Cards[src] = Cards[targetSlot];
+            Cards[targetSlot] = tmp;
+
+            // Persist til API
+            var dto = new Slottet.Shared.SwapResidentSortOrderDto
+            {
+                ResidentIdA = Cards[targetSlot].ResidentID, // nu på src-plads
+                ResidentIdB = Cards[src].ResidentID          // nu på target-plads
+            };
+
+            var response = await Http.PutAsJsonAsync("api/Resident/swap-order", dto);
+            if (!response.IsSuccessStatusCode)
+            {
+                // Rul tilbage ved fejl
+                var revert = Cards[src];
+                Cards[src] = Cards[targetSlot];
+                Cards[targetSlot] = revert;
+            }
+        }
+
         private void ClearForm()
         {
-            selectedResident = null;
-            residentNameInput = null;
-            selectedGroceryDayID = null;
+            residentNameInput        = null;
+            selectedGroceryDayID     = null;
             selectedPaymentMethodIDs.Clear();
             medicineTimes.Clear();
             isActiveInput = true;
@@ -227,19 +253,14 @@ namespace Slottet.Client.Pages.AdminPages
 
         private void RemoveMedicineTime(TimeInput time) => medicineTimes.Remove(time);
 
-        // ── Payment helper ────────────────────────────────────────────────
         private void OnPaymentMethodsChanged(ChangeEventArgs e)
         {
             selectedPaymentMethodIDs.Clear();
             if (e.Value is string[] arr)
-            {
                 foreach (var v in arr)
                     if (Guid.TryParse(v, out var id)) selectedPaymentMethodIDs.Add(id);
-            }
             else if (e.Value is string s && Guid.TryParse(s, out var single))
-            {
                 selectedPaymentMethodIDs.Add(single);
-            }
         }
 
         public class TimeInput
@@ -247,4 +268,6 @@ namespace Slottet.Client.Pages.AdminPages
             public TimeOnly Time { get; set; } = new(8, 0);
         }
     }
+
+    public record AdminBoundingRect(double X, double Y, double Width, double Height);
 }
