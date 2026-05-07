@@ -32,7 +32,101 @@
 }
 
 .shiftboard-header h1 { margin: 0; font-size: 1.1rem; font-weight: 700; }
-.shiftboard-header p  { margin: 0; font-size: 0.78rem; opacity: 0.9; }
+
+/* ── Shift navigation ── */
+.shift-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+}
+
+.shift-nav--standalone {
+    margin-top: 16px;
+    border-top: none;
+    justify-content: center;
+}
+
+.shift-nav-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.shift-nav-right {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.shift-nav-date {
+    font-size: 0.78rem;
+    opacity: 0.85;
+}
+
+.shift-nav-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shift-nav-label--past {
+    opacity: 0.7;
+}
+
+.shift-past-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 20px;
+    padding: 2px 8px;
+    letter-spacing: 0.02em;
+}
+
+.shift-nav-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.12);
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.shift-nav-btn:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+.shift-nav-btn--today {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.6);
+}
+
+/* ── Tom vagt ── */
+.shift-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 16px;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+/* ── Read-only kort ── */
+.resident-card--readonly {
+    opacity: 0.75;
+    cursor: default;
+}
 
 /* ─────────────────────────────────────
    LAYOUT: kort-grid | sidebar
@@ -442,8 +536,45 @@ th.placeholder-col {
 }
 .info-box li:nth-child(even) { background-color: rgba(0, 0, 0, 0.09); }
 
-.new-shiftboard-button {
+.shift-footer {
     margin-top: auto;
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary-mid));
+    border-radius: var(--radius-info);
+    color: white;
+    padding: 8px 12px;
+    box-shadow: var(--shadow-header);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.shift-footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.shift-footer-title {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    opacity: 0.95;
+}
+
+.shift-footer-times {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    opacity: 0.85;
+}
+
+.shift-footer .shift-nav {
+    padding-top: 6px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.new-shiftboard-button {
+    margin-top: 0;
     width: 100%;
     padding: 10px;
     background-color: var(--color-primary-dark);

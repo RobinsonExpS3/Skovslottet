@@ -5,6 +5,7 @@ namespace Slottet.Application.Interfaces
     public interface IShiftBoardDTOService
     {
         Task<ShiftBoardDTO?> GetCurrentShiftBoardAsync(CancellationToken ct = default);
+        Task<ShiftBoardDTO?> GetShiftBoardByDateAndShiftAsync(DateOnly date, string shiftType, CancellationToken ct = default);
         Task<ShiftBoardDTO?> GetShiftBoardDtoByIdAsync(Guid id, CancellationToken ct = default);
         Task<IEnumerable<ShiftBoardEntryDTO>> GetAllShiftBoardsAsync(CancellationToken ct = default);
         Task<ShiftBoardEntryDTO?> GetShiftBoardByIdAsync(Guid id, CancellationToken ct = default);

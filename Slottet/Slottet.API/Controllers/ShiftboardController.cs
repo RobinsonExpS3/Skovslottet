@@ -20,6 +20,20 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <param name="ct">Cancellation token used to cancel the request.</param>
         /// <returns>Returns the latest shift board if found, otherwise NotFound.</returns>
+        [HttpGet("by-shift")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetShiftBoardByDateAndShiftAsync(
+            [FromQuery] DateOnly date,
+            [FromQuery] string shiftType,
+            CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetShiftBoardByDateAndShiftAsync(date, shiftType, ct);
+
+            if (dto == null)
+                return NotFound();
+
+            return Ok(dto);
+        }
+
         [HttpGet("current")]
         public async Task<ActionResult<ShiftBoardDTO>> GetCurrentShiftBoardAsync(CancellationToken ct)
         {
