@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class ResidentController : Controller
     {
         private readonly IResidentDTOService _residentService;
@@ -64,7 +66,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetResidentByIdAsync), new { id = resident.ResidentID }, resident);
+            return CreatedAtAction("GetResidentById", new { id = resident.ResidentID }, resident);
         }
 
         /// <summary>
@@ -134,7 +136,8 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet("groceryDays")]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentGroceryDaysAsync() {
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentGroceryDaysAsync()
+        {
             var groceryDays = await _residentService.GetResidentGroceryDaysAsync();
             return Ok(groceryDays);
         }
@@ -144,7 +147,8 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all payment method lookup values.</returns>
         [HttpGet("paymentMethods")]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentPaymentMethodsAsync() {
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentPaymentMethodsAsync()
+        {
             var paymentMethods = await _residentService.GetResidentPaymentMethodsAsync();
             return Ok(paymentMethods);
         }

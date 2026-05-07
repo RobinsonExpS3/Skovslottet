@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "ShiftboardDisplay")]
     public class ShiftboardController : ControllerBase
     {
         private readonly IShiftBoardDTOService _shiftBoardService;
@@ -118,7 +120,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetShiftBoardByIdAsync), new { id = createdShiftBoard.ShiftBoardID }, createdShiftBoard);
+            return CreatedAtAction("GetShiftBoardById", new { id = createdShiftBoard.ShiftBoardID }, createdShiftBoard);
         }
 
         /// <summary>

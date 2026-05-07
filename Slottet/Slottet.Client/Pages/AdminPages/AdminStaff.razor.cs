@@ -1,36 +1,67 @@
+using System.Net;
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
 using Slottet.Shared;
-using System.Net.Http.Json;
 
 namespace Slottet.Client.Pages.AdminPages
 {
     public partial class AdminStaff
     {
-        [Inject] public HttpClient httpClient { get; set; }
+        [Inject]
+        public HttpClient httpClient { get; set; }
+        private string? loadErrorMessage;
+        private string? passwordInput;
+        private bool isAdminChecked = false;
 
         // ── Staff ─────────────────────────────────────────────────────────
-        private List<EditStaffDTO>?       staffMembers;
-        private List<DepartmentLookupDTO> departments    = new();
-        private string                   staffNameInput  = string.Empty;
-        private string                   initialsInput   = string.Empty;
-        private string                   roleInput       = string.Empty;
-        private Guid                     departmentIdInput;
-        private EditStaffDTO?            selectedItem;
-        private bool                     isBusy          = false;
-        private bool                     loadFailed      = false;
+        private List<EditStaffDTO>? staffMembers;
+        private List<DepartmentLookupDTO> departments = new();
+        private string staffNameInput = string.Empty;
+        private string initialsInput = string.Empty;
+        private string roleInput = string.Empty;
+        private Guid departmentIdInput;
+        private EditStaffDTO? selectedItem;
+        private bool isBusy = false;
+        private bool loadFailed = false;
 
         // ── Særligt Ansvar ────────────────────────────────────────────────
         private List<SpecialResponsibilityEntryDto>? specialResponsibilities;
-        private SpecialResponsibilityEntryDto?       selectedSr;
-        private string?                              srDescriptionInput;
-        private bool                                 srLoadFailed = false;
-        private bool                                 srBusy       = false;
+        private SpecialResponsibilityEntryDto? selectedSr;
+        private string? srDescriptionInput;
+        private bool srLoadFailed = false;
+        private bool srBusy = false;
 
         // ── Init ──────────────────────────────────────────────────────────
         protected override async Task OnInitializedAsync()
         {
-            await LoadDepartments();
-            await Task.WhenAll(LoadStaff(), LoadSr());
+            try
+            {
+                using var response = await httpClient.GetAsync("api/shiftboard/current");
+
+                if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized)
+                {
+                    loadErrorMessage = "Du har ikke adgang til denne side.";
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                    return;
+                }
+
+                //Model = await response.Content.ReadFromJsonAsync<ShiftBoardDTO>();
+            }
+            catch
+            {
+                loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+            }
+            finally
+            {
+                isBusy = false;
+                await LoadDepartments();
+                await Task.WhenAll(LoadStaff(), LoadSr());
+            }
         }
 
         // ═════════════════════════════════════════
@@ -39,13 +70,21 @@ namespace Slottet.Client.Pages.AdminPages
 
         private async Task LoadDepartments()
         {
-            departments = await httpClient.GetFromJsonAsync<List<DepartmentLookupDTO>>("api/Department")
-                ?? new List<DepartmentLookupDTO>();
+            var result = await AdminHttp.GetJsonAsync<List<DepartmentLookupDTO>>(httpClient, "api/Department");
+            if (result.Failed)
+            {
+                departments = new();
+                loadFailed = true;
+                loadErrorMessage = result.ErrorMessage;
+                return;
+            }
+
+            departments = result.Value ?? new();
         }
 
         private bool HasValidInput =>
             !string.IsNullOrWhiteSpace(staffNameInput) &&
-            !string.IsNullOrWhiteSpace(initialsInput)  &&
+            !string.IsNullOrWhiteSpace(initialsInput) &&
             !string.IsNullOrWhiteSpace(roleInput);
 
         private bool CanCreate => !isBusy && HasValidInput && selectedItem is null;
@@ -61,7 +100,7 @@ namespace Slottet.Client.Pages.AdminPages
             catch
             {
                 staffMembers = new List<EditStaffDTO>();
-                loadFailed   = true;
+                loadFailed = true;
             }
         }
 
@@ -70,10 +109,10 @@ namespace Slottet.Client.Pages.AdminPages
 
         private void SelectItem(EditStaffDTO item)
         {
-            selectedItem      = item;
-            staffNameInput    = item.StaffName;
-            initialsInput     = item.Initials;
-            roleInput         = item.Role;
+            selectedItem = item;
+            staffNameInput = item.StaffName;
+            initialsInput = item.Initials;
+            roleInput = item.Role;
             departmentIdInput = item.DepartmentID;
         }
 
@@ -84,17 +123,42 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
+                var staffid = Guid.NewGuid();
+
                 var newItem = new EditStaffDTO
                 {
-                    StaffID      = Guid.NewGuid(),
-                    StaffName    = staffNameInput.Trim(),
-                    Initials     = initialsInput.Trim(),
-                    Role         = roleInput.Trim(),
+                    StaffID = Guid.NewGuid(),
+                    StaffName = staffNameInput.Trim(),
+                    Initials = initialsInput.Trim(),
+                    Role = roleInput.Trim(),
                     DepartmentID = departmentIdInput
                 };
 
-                var response = await httpClient.PostAsJsonAsync("api/Staff", newItem);
-                if (response.IsSuccessStatusCode)
+                var staffResponse = await httpClient.PostAsJsonAsync("api/Staff", newItem);
+
+                if (!staffResponse.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Kunne ikke oprette medarbejder. Prøv venligst igen senere.";
+                    return;
+                }
+
+                var newUser = new CreateUserForStaffDTO
+                {
+                    StaffID = staffid,
+                    UserName = initialsInput.Trim(),
+                    Password = passwordInput,
+                    AuthRole = isAdminChecked ? "Admin" : "Employee"
+                };
+
+                var userResponse = await httpClient.PostAsJsonAsync("api/Auth/createUserForStaff", newUser);
+
+                if (!userResponse.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Medarbejderen blev oprettet, men login kunne ikke oprettes.";
+                    return;
+                }
+
+                if (userResponse.IsSuccessStatusCode)
                 {
                     await LoadStaff();
                     ClearStaffForm();
@@ -113,13 +177,30 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
-                selectedItem!.StaffName    = staffNameInput.Trim();
-                selectedItem.Initials      = initialsInput.Trim();
-                selectedItem.Role          = roleInput.Trim();
-                selectedItem.DepartmentID  = departmentIdInput;
+                selectedItem!.StaffName = staffNameInput.Trim();
+                selectedItem.Initials = initialsInput.Trim();
+                selectedItem.Role = roleInput.Trim();
+                selectedItem.DepartmentID = departmentIdInput;
 
                 var response = await httpClient.PutAsJsonAsync($"api/Staff/{selectedItem.StaffID}", selectedItem);
-                if (response.IsSuccessStatusCode)
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Kunne ikke opdatere medarbejder. Prøv venligst igen senere.";
+                    return;
+                }
+
+                var userUpdate = new CreateUserForStaffDTO
+                {
+                    StaffID = selectedItem.StaffID,
+                    UserName = initialsInput.Trim(),
+                    Password = passwordInput,
+                    AuthRole = isAdminChecked ? "Admin" : "Employee"
+                };
+
+                var userResponse = await httpClient.PutAsJsonAsync($"api/Auth/{selectedItem.StaffID}", userUpdate);
+
+                if (!userResponse.IsSuccessStatusCode)
                 {
                     await LoadStaff();
                     ClearStaffForm();
@@ -159,10 +240,10 @@ namespace Slottet.Client.Pages.AdminPages
 
         private void ClearStaffForm()
         {
-            selectedItem      = null;
-            staffNameInput    = string.Empty;
-            initialsInput     = string.Empty;
-            roleInput         = string.Empty;
+            selectedItem = null;
+            staffNameInput = string.Empty;
+            initialsInput = string.Empty;
+            roleInput = string.Empty;
             departmentIdInput = Guid.Empty;
         }
 
@@ -181,13 +262,13 @@ namespace Slottet.Client.Pages.AdminPages
             catch
             {
                 specialResponsibilities = new List<SpecialResponsibilityEntryDto>();
-                srLoadFailed            = true;
+                srLoadFailed = true;
             }
         }
 
         private void SelectSr(SpecialResponsibilityEntryDto item)
         {
-            selectedSr         = item;
+            selectedSr = item;
             srDescriptionInput = item.Description;
         }
 
@@ -200,7 +281,7 @@ namespace Slottet.Client.Pages.AdminPages
                 var newItem = new SpecialResponsibilityEntryDto
                 {
                     SpecialResponsibilityID = Guid.NewGuid(),
-                    Description             = srDescriptionInput
+                    Description = srDescriptionInput
                 };
                 var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
                 if (response.IsSuccessStatusCode) { await LoadSr(); ClearSrForm(); }
@@ -238,7 +319,7 @@ namespace Slottet.Client.Pages.AdminPages
 
         private void ClearSrForm()
         {
-            selectedSr         = null;
+            selectedSr = null;
             srDescriptionInput = string.Empty;
         }
     }
