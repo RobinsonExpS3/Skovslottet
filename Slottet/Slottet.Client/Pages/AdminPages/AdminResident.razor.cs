@@ -7,7 +7,8 @@ namespace Slottet.Client.Pages.AdminPages
 {
     public partial class AdminResident
     {
-        [Inject] private HttpClient Http { get; set; } = default!;
+        [Inject]
+        private HttpClient httpClient { get; set; }
 
         private string? loadErrorMessage;
 
@@ -45,7 +46,7 @@ namespace Slottet.Client.Pages.AdminPages
         {
             try
             {
-                using var response = await Http.GetAsync("api/shiftboard/current");
+                using var response = await httpClient.GetAsync("api/shiftboard/current");
 
                 if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized)
                 {
@@ -81,9 +82,9 @@ namespace Slottet.Client.Pages.AdminPages
             loadFailed = false;
             try
             {
-                residents = await Http.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
-                groceryDays = await Http.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
-                paymentMethods = await Http.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
+                residents = await httpClient.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
+                groceryDays = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
+                paymentMethods = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
             }
             catch
             {
@@ -113,7 +114,7 @@ namespace Slottet.Client.Pages.AdminPages
             selectedGroceryDayID = resident.GroceryDayID;
             isActiveInput = resident.IsActive;
 
-            var dto = await Http.GetFromJsonAsync<EditResidentDTO>($"api/Resident/{resident.ResidentID}");
+            var dto = await httpClient.GetFromJsonAsync<EditResidentDTO>($"api/Resident/{resident.ResidentID}");
             selectedPaymentMethodIDs = dto?.PaymentMethodIDs ?? new();
             medicineTimes = dto?.MedicineTimes
                 .Select(t => new TimeInput { Time = TimeOnly.FromDateTime(t) })
@@ -135,7 +136,7 @@ namespace Slottet.Client.Pages.AdminPages
                     MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
                     IsActive = isActiveInput
                 };
-                var response = await Http.PostAsJsonAsync("api/Resident", dto);
+                var response = await httpClient.PostAsJsonAsync("api/Resident", dto);
                 if (response.IsSuccessStatusCode) { ClearForm(); await LoadDataAsync(); }
             }
             finally { isBusy = false; }
@@ -156,7 +157,7 @@ namespace Slottet.Client.Pages.AdminPages
                     MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
                     IsActive = isActiveInput
                 };
-                var response = await Http.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
+                var response = await httpClient.PutAsJsonAsync($"api/Resident/{selectedResident.ResidentID}", dto);
                 if (response.IsSuccessStatusCode) { ClearForm(); await LoadDataAsync(); }
             }
             finally { isBusy = false; }
@@ -168,7 +169,7 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
-                var response = await Http.DeleteAsync($"api/Resident/{selectedResident!.ResidentID}");
+                var response = await httpClient.DeleteAsync($"api/Resident/{selectedResident!.ResidentID}");
                 if (response.IsSuccessStatusCode) { ClearForm(); await LoadDataAsync(); }
             }
             finally { isBusy = false; }

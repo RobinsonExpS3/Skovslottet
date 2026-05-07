@@ -1,8 +1,7 @@
 using System.Globalization;
+using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
-using System.Net;
 using Microsoft.AspNetCore.Components;
 using Slottet.Shared;
 
@@ -33,7 +32,6 @@ namespace Slottet.Client.Pages.AdminPages
 
         protected override async Task OnInitializedAsync()
         {
-
             try
             {
                 using var response = await httpClient.GetAsync("api/shiftboard/current");
@@ -63,7 +61,6 @@ namespace Slottet.Client.Pages.AdminPages
                 await LoadResidentCardsAsync();
             }
 
-
         }
 
         private async Task LoadAuditLogsAsync()
@@ -83,21 +80,13 @@ namespace Slottet.Client.Pages.AdminPages
                 }
 
                 var url = $"api/AuditLog?{string.Join("&", query)}";
-                var result = await AdminHttp.GetJsonAsync<List<AuditLogDTO>>(httpClient, url);
-                if (result.Failed)
-                {
-                    ErrorMessage = result.ErrorMessage;
-                    AuditRows = new();
-                    return;
-                }
-
-                AuditRows = (result.Value ?? new())
+                AuditRows = (await httpClient.GetFromJsonAsync<List<AuditLogDTO>>(url) ?? new())
                     .OrderByDescending(r => r.PerformedAtTime)
                     .ToList();
             }
-            catch
+            catch (Exception ex)
             {
-                ErrorMessage = "Kunne ikke hente audit logs.";
+                ErrorMessage = $"Kunne ikke hente audit logs: {ex.Message}";
                 AuditRows = new();
             }
             finally
@@ -113,20 +102,12 @@ namespace Slottet.Client.Pages.AdminPages
 
             try
             {
-                var result = await AdminHttp.GetJsonAsync<ShiftBoardDTO>(httpClient, "api/shiftboard/current");
-                if (result.Failed)
-                {
-                    ResidentErrorMessage = result.ErrorMessage;
-                    ResidentCards = new();
-                    return;
-                }
-
-                var dto = result.Value;
+                var dto = await httpClient.GetFromJsonAsync<ShiftBoardDTO>("api/shiftboard/current");
                 ResidentCards = dto?.ResidentCards ?? new();
             }
-            catch
+            catch (Exception ex)
             {
-                ResidentErrorMessage = "Kunne ikke hente beboere.";
+                ResidentErrorMessage = $"Kunne ikke hente beboere: {ex.Message}";
             }
             finally
             {
@@ -295,5 +276,5 @@ namespace Slottet.Client.Pages.AdminPages
         {
             return value.Contains(searchText, StringComparison.OrdinalIgnoreCase);
         }
-    } 
+    }
 }
