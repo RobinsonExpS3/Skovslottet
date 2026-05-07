@@ -23,7 +23,6 @@ namespace Slottet.Client.Pages.AdminPages
         private List<SpecialResponsibilityEntryDto>? specialResponsibilities;
         private SpecialResponsibilityEntryDto?       selectedSr;
         private string?                              srDescriptionInput;
-        private string?                              srStaffNameInput;
         private bool                                 srLoadFailed = false;
         private bool                                 srBusy       = false;
 
@@ -185,7 +184,6 @@ namespace Slottet.Client.Pages.AdminPages
         {
             selectedSr         = item;
             srDescriptionInput = item.Description;
-            srStaffNameInput   = item.StaffName;
         }
 
         private async Task CreateSr()
@@ -197,8 +195,7 @@ namespace Slottet.Client.Pages.AdminPages
                 var newItem = new SpecialResponsibilityEntryDto
                 {
                     SpecialResponsibilityID = Guid.NewGuid(),
-                    Description             = srDescriptionInput,
-                    StaffName               = srStaffNameInput ?? string.Empty
+                    Description             = srDescriptionInput
                 };
                 var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
                 if (response.IsSuccessStatusCode) { await LoadSr(); ClearSrForm(); }
@@ -213,7 +210,6 @@ namespace Slottet.Client.Pages.AdminPages
             try
             {
                 selectedSr.Description = srDescriptionInput ?? string.Empty;
-                selectedSr.StaffName   = srStaffNameInput   ?? string.Empty;
 
                 var response = await httpClient.PutAsJsonAsync(
                     $"api/SpecialResponsibility/{selectedSr.SpecialResponsibilityID}", selectedSr);
@@ -239,7 +235,6 @@ namespace Slottet.Client.Pages.AdminPages
         {
             selectedSr         = null;
             srDescriptionInput = string.Empty;
-            srStaffNameInput   = string.Empty;
         }
     }
 }

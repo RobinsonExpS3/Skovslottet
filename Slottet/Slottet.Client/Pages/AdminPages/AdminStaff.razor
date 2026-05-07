@@ -117,7 +117,6 @@
                                     <tr @onclick="() => SelectSr(sr)"
                                         class="staff-row @(selectedSr == sr ? "staff-row--selected" : "")">
                                         <td class="col-name">@sr.Description</td>
-                                        <td class="col-role">@sr.StaffName</td>
                                     </tr>
                                 }
                             </tbody>
@@ -128,16 +127,6 @@
                 @* SR-formular *@
                 <div class="sr-form-panel">
                     <input class="form-field" @bind="srDescriptionInput" placeholder="Ansvarsområde" />
-                    <select class="form-field form-select" @bind="srStaffNameInput">
-                        <option value="">– Medarbejder –</option>
-                        @if (staffMembers != null)
-                        {
-                            @foreach (var s in staffMembers)
-                            {
-                                <option value="@s.StaffName">@s.StaffName</option>
-                            }
-                        }
-                    </select>
                     <div class="form-buttons">
                         <button class="btn-admin btn-create"
                                 @onclick="CreateSr"
