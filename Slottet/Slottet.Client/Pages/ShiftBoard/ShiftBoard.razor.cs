@@ -87,7 +87,7 @@ namespace Slottet.Client.Pages.ShiftBoard
             }
             catch
             {
-                LoadError = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                LoadError = "Kunne ikke loade vagttavlen. Prøv venligst igen senere. - ShiftBoard";
             }
             finally
             {

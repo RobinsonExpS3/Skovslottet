@@ -153,438 +153,7 @@ namespace Slottet.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Slottet.Domain.Entities.AuditLog", b =>
-                {
-                    b.Property<Guid>("AuditLogID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("KeyValues")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NewValuesJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldValuesJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("PerformedAtTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("PerformedByStaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PerformedByStaffName")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("TableName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("AuditLogID");
-
-                    b.ToTable("AuditLogs", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.Department", b =>
-                {
-                    b.Property<Guid>("DepartmentID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DepartmentName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("DepartmentID");
-
-                    b.ToTable("Departments", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.DepartmentTask", b =>
-                {
-                    b.Property<Guid>("DepartmentTaskID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DepartmentID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("DepartmentTaskName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("DepartmentTaskID");
-
-                    b.HasIndex("DepartmentID");
-
-                    b.ToTable("DepartmentTasks", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.GroceryDay", b =>
-                {
-                    b.Property<Guid>("GroceryDayID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("GroceryDayName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("GroceryDayID");
-
-                    b.ToTable("GroceryDays", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.Medicine", b =>
-                {
-                    b.Property<Guid>("MedicineID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("MedicineGivenTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("MedicineRegisteredTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("MedicineTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ResidentID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("MedicineID");
-
-                    b.HasIndex("ResidentID");
-
-                    b.ToTable("Medicines", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.PN", b =>
-                {
-                    b.Property<Guid>("PNID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("PNGivenTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PNReason")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("PNRegisteredTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ResidentID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("ResidentStatusID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("PNID");
-
-                    b.HasIndex("ResidentID");
-
-                    b.HasIndex("ResidentStatusID");
-
-                    b.ToTable("PNs", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.PaymentMethod", b =>
-                {
-                    b.Property<Guid>("PaymentMethodID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PaymentMethodName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("PaymentMethodID");
-
-                    b.ToTable("PaymentMethods", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.Phone", b =>
-                {
-                    b.Property<Guid>("PhoneID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DepartmentID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PhoneID");
-
-                    b.HasIndex("DepartmentID");
-
-                    b.ToTable("Phones", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.Resident", b =>
-                {
-                    b.Property<Guid>("ResidentID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("GroceryDayID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ResidentName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.HasKey("ResidentID");
-
-                    b.HasIndex("GroceryDayID");
-
-                    b.ToTable("Residents", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.ResidentPaymentMethod", b =>
-                {
-                    b.Property<Guid>("ResidentID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PaymentMethodID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ResidentID", "PaymentMethodID");
-
-                    b.HasIndex("PaymentMethodID");
-
-                    b.ToTable("ResidentPaymentMethods", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.ResidentStatus", b =>
-                {
-                    b.Property<Guid>("ResidentStatusID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ResidentID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RiskLevelID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ResidentStatusID");
-
-                    b.HasIndex("ResidentID");
-
-                    b.HasIndex("RiskLevelID");
-
-                    b.ToTable("ResidentStatuses", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.RiskLevel", b =>
-                {
-                    b.Property<Guid>("RiskLevelID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("RiskLevelName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("RiskLevelID");
-
-                    b.ToTable("RiskLevels", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.ShiftBoard", b =>
-                {
-                    b.Property<Guid>("ShiftBoardID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ShiftType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ShiftBoardID");
-
-                    b.ToTable("ShiftBoards", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibility", b =>
-                {
-                    b.Property<Guid>("SpecialResponsibilityID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("TaskName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("SpecialResponsibilityID");
-
-                    b.ToTable("SpecialResponsibilities", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibilityStaff", b =>
-                {
-                    b.Property<Guid>("SpecialResponsibilityID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("DepartmentID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("SpecialResponsibilityID", "StaffID", "AssignedAt");
-
-                    b.HasIndex("DepartmentID");
-
-                    b.HasIndex("StaffID");
-
-                    b.ToTable("SpecialResponsibilityStaff", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
-                {
-                    b.Property<Guid>("StaffID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("DepartmentID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Initials")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("StaffName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("StaffID");
-
-                    b.HasIndex("DepartmentID");
-
-                    b.ToTable("Staffs", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.StaffPN", b =>
-                {
-                    b.Property<Guid>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PNID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StaffID", "PNID");
-
-                    b.HasIndex("PNID");
-
-                    b.ToTable("StaffPNs", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.StaffPhone", b =>
-                {
-                    b.Property<Guid>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("PhoneID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("StaffID", "PhoneID", "AssignedAt");
-
-                    b.HasIndex("PhoneID");
-
-                    b.ToTable("StaffPhones", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.StaffResidentStatus", b =>
-                {
-                    b.Property<Guid>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ResidentStatusID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StaffID", "ResidentStatusID");
-
-                    b.HasIndex("ResidentStatusID");
-
-                    b.ToTable("StaffResidentStatuses", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Domain.Entities.StaffShift", b =>
-                {
-                    b.Property<Guid>("ShiftBoardID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("ShiftBoardID", "StaffID");
-
-                    b.HasIndex("StaffID");
-
-                    b.ToTable("StaffShifts", (string)null);
-                });
-
-            modelBuilder.Entity("Slottet.Infrastructure.ApplicationUser", b =>
+            modelBuilder.Entity("Slottet.Domain.Entities.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -655,6 +224,437 @@ namespace Slottet.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Slottet.Domain.Entities.AuditLog", b =>
+                {
+                    b.Property<Guid>("AuditLogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("KeyValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NewValuesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValuesJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PerformedAtTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("PerformedByStaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PerformedByStaffName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("AuditLogID");
+
+                    b.ToTable("AuditLogs");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.Department", b =>
+                {
+                    b.Property<Guid>("DepartmentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DepartmentName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DepartmentID");
+
+                    b.ToTable("Departments");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.DepartmentTask", b =>
+                {
+                    b.Property<Guid>("DepartmentTaskID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DepartmentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DepartmentTaskName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("DepartmentTaskID");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.ToTable("DepartmentTasks");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.GroceryDay", b =>
+                {
+                    b.Property<Guid>("GroceryDayID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("GroceryDayName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("GroceryDayID");
+
+                    b.ToTable("GroceryDays");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.Medicine", b =>
+                {
+                    b.Property<Guid>("MedicineID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("MedicineGivenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("MedicineRegisteredTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("MedicineTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ResidentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("MedicineID");
+
+                    b.HasIndex("ResidentID");
+
+                    b.ToTable("Medicines");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.PN", b =>
+                {
+                    b.Property<Guid>("PNID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("PNGivenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PNReason")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("PNRegisteredTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ResidentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ResidentStatusID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("PNID");
+
+                    b.HasIndex("ResidentID");
+
+                    b.HasIndex("ResidentStatusID");
+
+                    b.ToTable("PNs");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.PaymentMethod", b =>
+                {
+                    b.Property<Guid>("PaymentMethodID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PaymentMethodName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("PaymentMethodID");
+
+                    b.ToTable("PaymentMethods");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.Phone", b =>
+                {
+                    b.Property<Guid>("PhoneID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DepartmentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PhoneID");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.ToTable("Phones");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.Resident", b =>
+                {
+                    b.Property<Guid>("ResidentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("GroceryDayID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ResidentName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
+                    b.HasKey("ResidentID");
+
+                    b.HasIndex("GroceryDayID");
+
+                    b.ToTable("Residents");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.ResidentPaymentMethod", b =>
+                {
+                    b.Property<Guid>("ResidentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PaymentMethodID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ResidentID", "PaymentMethodID");
+
+                    b.HasIndex("PaymentMethodID");
+
+                    b.ToTable("ResidentPaymentMethods");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.ResidentStatus", b =>
+                {
+                    b.Property<Guid>("ResidentStatusID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ResidentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RiskLevelID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ResidentStatusID");
+
+                    b.HasIndex("ResidentID");
+
+                    b.HasIndex("RiskLevelID");
+
+                    b.ToTable("ResidentStatuses");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.RiskLevel", b =>
+                {
+                    b.Property<Guid>("RiskLevelID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RiskLevelName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("RiskLevelID");
+
+                    b.ToTable("RiskLevels");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.ShiftBoard", b =>
+                {
+                    b.Property<Guid>("ShiftBoardID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("EndDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ShiftType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("StartDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ShiftBoardID");
+
+                    b.ToTable("ShiftBoards");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibility", b =>
+                {
+                    b.Property<Guid>("SpecialResponsibilityID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("SpecialResponsibilityID");
+
+                    b.ToTable("SpecialResponsibilities");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibilityStaff", b =>
+                {
+                    b.Property<Guid>("SpecialResponsibilityID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DepartmentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("SpecialResponsibilityID", "StaffID", "AssignedAt");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.HasIndex("StaffID");
+
+                    b.ToTable("SpecialResponsibilityStaff");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
+                {
+                    b.Property<Guid>("StaffID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("DepartmentID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Initials")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("StaffName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("StaffID");
+
+                    b.HasIndex("DepartmentID");
+
+                    b.ToTable("Staffs");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.StaffPN", b =>
+                {
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PNID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("StaffID", "PNID");
+
+                    b.HasIndex("PNID");
+
+                    b.ToTable("StaffPNs");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.StaffPhone", b =>
+                {
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PhoneID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AssignedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("StaffID", "PhoneID", "AssignedAt");
+
+                    b.HasIndex("PhoneID");
+
+                    b.ToTable("StaffPhones");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.StaffResidentStatus", b =>
+                {
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ResidentStatusID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("StaffID", "ResidentStatusID");
+
+                    b.HasIndex("ResidentStatusID");
+
+                    b.ToTable("StaffResidentStatuses");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.StaffShift", b =>
+                {
+                    b.Property<Guid>("ShiftBoardID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ShiftBoardID", "StaffID");
+
+                    b.HasIndex("StaffID");
+
+                    b.ToTable("StaffShifts");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -666,7 +666,7 @@ namespace Slottet.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("Slottet.Infrastructure.ApplicationUser", null)
+                    b.HasOne("Slottet.Domain.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -675,7 +675,7 @@ namespace Slottet.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("Slottet.Infrastructure.ApplicationUser", null)
+                    b.HasOne("Slottet.Domain.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -690,7 +690,7 @@ namespace Slottet.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Slottet.Infrastructure.ApplicationUser", null)
+                    b.HasOne("Slottet.Domain.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -699,11 +699,20 @@ namespace Slottet.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("Slottet.Infrastructure.ApplicationUser", null)
+                    b.HasOne("Slottet.Domain.Entities.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
+                        .WithMany()
+                        .HasForeignKey("StaffID");
+
+                    b.Navigation("Staff");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.DepartmentTask", b =>
@@ -913,15 +922,6 @@ namespace Slottet.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ShiftBoard");
-
-                    b.Navigation("Staff");
-                });
-
-            modelBuilder.Entity("Slottet.Infrastructure.ApplicationUser", b =>
-                {
-                    b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
-                        .WithMany()
-                        .HasForeignKey("StaffID");
 
                     b.Navigation("Staff");
                 });

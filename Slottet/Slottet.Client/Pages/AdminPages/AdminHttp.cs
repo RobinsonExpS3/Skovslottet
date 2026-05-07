@@ -11,7 +11,7 @@ namespace Slottet.Client.Pages.AdminPages
     internal static class AdminHttp
     {
         private const string ForbiddenMessage = "Du har ikke adgang til denne side.";
-        private const string GenericMessage = "Kunne ikke loade data. Prøv venligst igen senere.";
+        private const string GenericMessage = "Kunne ikke loade data. Prøv venligst igen senere. - AdminHttp";
 
         public static async Task<AdminLoadResult<T>> GetJsonAsync<T>(HttpClient httpClient, string requestUri)
         {
