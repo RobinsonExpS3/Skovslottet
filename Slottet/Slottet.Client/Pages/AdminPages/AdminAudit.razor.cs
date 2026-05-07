@@ -80,7 +80,15 @@ namespace Slottet.Client.Pages.AdminPages
                 }
 
                 var url = $"api/AuditLog?{string.Join("&", query)}";
-                AuditRows = (await httpClient.GetFromJsonAsync<List<AuditLogDTO>>(url) ?? new())
+                var result = await AdminHttp.GetJsonAsync<List<AuditLogDTO>>(httpClient, url);
+                if (result.Failed)
+                {
+                    ErrorMessage = result.ErrorMessage;
+                    AuditRows = new();
+                    return;
+                }
+
+                AuditRows = result.Value
                     .OrderByDescending(r => r.PerformedAtTime)
                     .ToList();
             }

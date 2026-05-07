@@ -126,7 +126,7 @@ builder.Services
 //        options.Audience = "slottet-api";
 //    });
 
-//builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 

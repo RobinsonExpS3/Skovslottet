@@ -1,7 +1,7 @@
+using System.Net;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Net;
-using System.Net.Http.Json;
+using Slottet.Client.Pages.AdminPages;
 using Slottet.Shared;
 
 namespace Slottet.Client.Pages.ShiftBoard
@@ -9,42 +9,42 @@ namespace Slottet.Client.Pages.ShiftBoard
     public partial class ShiftBoard
     {
         // ── DI ────────────────────────────────────────────────────────────
-        [Inject] private IJSRuntime        JS  { get; set; } = default!;
-        [Inject] private HttpClient        Http { get; set; } = default!;
-        [Inject] private NavigationManager Nav  { get; set; } = default!;
+        [Inject] private IJSRuntime JS { get; set; } = default!;
+        [Inject] private HttpClient Http { get; set; } = default!;
+        [Inject] private NavigationManager Nav { get; set; } = default!;
 
         // ── Data ──────────────────────────────────────────────────────────
-        protected ShiftBoardDTO? Model     { get; set; }
-        protected bool           IsLoading { get; set; } = true;
-        protected string?        LoadError { get; set; }
+        protected ShiftBoardDTO? Model { get; set; }
+        protected bool IsLoading = false;
+        protected string? LoadError { get; set; }
 
         // ── Navigation ────────────────────────────────────────────────────
         private static readonly string[] ShiftOrder = ["Dag", "Aften", "Nat"];
 
         private DateOnly _navDate;
-        private string   _navShift = string.Empty;
+        private string _navShift = string.Empty;
 
         protected bool IsPast =>
             Model is not null && Model.EndDate < DateTime.Now;
 
         protected string ShiftLabel => _navShift switch
         {
-            "Dag"   => "🌤 Dag (07–15)",
+            "Dag" => "🌤 Dag (07–15)",
             "Aften" => "🌆 Aften (15–23)",
-            "Nat"   => "🌙 Nat (23–07)",
-            _       => _navShift
+            "Nat" => "🌙 Nat (23–07)",
+            _ => _navShift
         };
 
         protected string NavDayLabel => _navDate.DayOfWeek switch
         {
-            DayOfWeek.Monday    => "Mandag",
-            DayOfWeek.Tuesday   => "Tirsdag",
+            DayOfWeek.Monday => "Mandag",
+            DayOfWeek.Tuesday => "Tirsdag",
             DayOfWeek.Wednesday => "Onsdag",
-            DayOfWeek.Thursday  => "Torsdag",
-            DayOfWeek.Friday    => "Fredag",
-            DayOfWeek.Saturday  => "Lørdag",
-            DayOfWeek.Sunday    => "Søndag",
-            _                   => string.Empty
+            DayOfWeek.Thursday => "Torsdag",
+            DayOfWeek.Friday => "Fredag",
+            DayOfWeek.Saturday => "Lørdag",
+            DayOfWeek.Sunday => "Søndag",
+            _ => string.Empty
         };
 
         protected bool IsToday =>
@@ -53,19 +53,47 @@ namespace Slottet.Client.Pages.ShiftBoard
 
         // ── Overlay state ─────────────────────────────────────────────────
         protected ResidentCardDto? SelectedResident { get; set; }
-        protected OverlayPanel     ActivePanel      { get; set; } = OverlayPanel.None;
+        protected OverlayPanel ActivePanel { get; set; } = OverlayPanel.None;
 
         // ── FLIP / animation state ────────────────────────────────────────
         private BoundingRect? _cardRect;
-        private bool          _pendingFlyIn;
-        private bool          _pendingSidebarFlyIn;
-        private string        _sidebarPanelId = string.Empty;
+        private bool _pendingFlyIn;
+        private bool _pendingSidebarFlyIn;
+        private string _sidebarPanelId = string.Empty;
 
         // ── Lifecycle ─────────────────────────────────────────────────────
         protected override async Task OnInitializedAsync()
         {
+            IsLoading = true;
             (_navDate, _navShift) = GetCurrentNavState();
-            await LoadShiftAsync();
+
+            try
+            {
+                using var response = await Http.GetAsync("api/shiftboard/current");
+
+                if (response.StatusCode is HttpStatusCode.Forbidden or HttpStatusCode.Unauthorized)
+                {
+                    LoadError = "Du har ikke adgang til denne side.";
+                    return;
+                }
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    LoadError = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                    return;
+                }
+
+                //Model = await response.Content.ReadFromJsonAsync<ShiftBoardDTO>();
+            }
+            catch
+            {
+                LoadError = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+            }
+            finally
+            {
+                IsLoading = false;
+                await LoadShiftAsync();
+            }
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -110,17 +138,20 @@ namespace Slottet.Client.Pages.ShiftBoard
         {
             IsLoading = true;
             LoadError = null;
-            Model     = null;
+            Model = null;
             CloseOverlay();
 
             try
             {
                 var url = $"api/shiftboard/by-shift?date={_navDate:yyyy-MM-dd}&shiftType={_navShift}";
-                Model = await Http.GetFromJsonAsync<ShiftBoardDTO>(url);
-            }
-            catch
-            {
-                LoadError = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                var result = await AdminHttp.GetJsonAsync<ShiftBoardDTO>(Http, url);
+
+                if (result.Failed)
+                {
+                    LoadError = result.ErrorMessage;
+                    return;
+                }
+                Model = result.Value;
             }
             finally
             {
@@ -131,9 +162,9 @@ namespace Slottet.Client.Pages.ShiftBoard
         // ── Shift helpers ─────────────────────────────────────────────────
         private static (DateOnly date, string shift) GetCurrentNavState()
         {
-            var now   = DateTime.Now;
+            var now = DateTime.Now;
             var shift = CurrentShiftType(now);
-            var date  = (now.Hour < 7)
+            var date = (now.Hour < 7)
                 ? DateOnly.FromDateTime(now.AddDays(-1))   // Nat started yesterday
                 : DateOnly.FromDateTime(now);
             return (date, shift);
@@ -144,9 +175,9 @@ namespace Slottet.Client.Pages.ShiftBoard
             var hour = (at ?? DateTime.Now).Hour;
             return hour switch
             {
-                >= 7 and < 15  => "Dag",
+                >= 7 and < 15 => "Dag",
                 >= 15 and < 23 => "Aften",
-                _              => "Nat"
+                _ => "Nat"
             };
         }
 
@@ -170,24 +201,24 @@ namespace Slottet.Client.Pages.ShiftBoard
         protected async Task OpenResident(ResidentCardDto resident, string cardId)
         {
             if (IsPast) return;
-            _cardRect        = await JS.InvokeAsync<BoundingRect>("overlayHelpers.getRect", cardId);
+            _cardRect = await JS.InvokeAsync<BoundingRect>("overlayHelpers.getRect", cardId);
             SelectedResident = resident;
-            _pendingFlyIn    = true;
-            ActivePanel      = OverlayPanel.None;
+            _pendingFlyIn = true;
+            ActivePanel = OverlayPanel.None;
         }
 
         protected void OpenSidebarPanel(OverlayPanel panel)
         {
-            SelectedResident     = null;
-            ActivePanel          = panel;
-            _sidebarPanelId      = "overlay-panel-" + panel.ToString().ToLower();
+            SelectedResident = null;
+            ActivePanel = panel;
+            _sidebarPanelId = "overlay-panel-" + panel.ToString().ToLower();
             _pendingSidebarFlyIn = true;
         }
 
         protected void CloseOverlay()
         {
             SelectedResident = null;
-            ActivePanel      = OverlayPanel.None;
+            ActivePanel = OverlayPanel.None;
         }
 
         protected void OnResidentSaved() => CloseOverlay();

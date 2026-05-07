@@ -56,15 +56,11 @@ namespace Slottet.Client.Pages.AdminPages
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
+                    loadErrorMessage = "Kunne ikke loade siden. Prøv venligst igen senere.";
                     return;
                 }
 
                 //Model = await response.Content.ReadFromJsonAsync<ShiftBoardDTO>();
-            }
-            catch
-            {
-                loadErrorMessage = "Kunne ikke loade vagttavlen. Prøv venligst igen senere.";
             }
             finally
             {
@@ -77,23 +73,59 @@ namespace Slottet.Client.Pages.AdminPages
 
 
         // ── Data ──────────────────────────────────────────────────────────
+        //private async Task LoadDataAsync()
+        //{
+        //    loadFailed = false;
+        //    loadErrorMessage = null;
+        //    try
+        //    {
+        //        residents = await httpClient.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
+        //        groceryDays = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
+        //        paymentMethods = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
+        //    }
+        //    catch
+        //    {
+        //        residents = new();
+        //        groceryDays = new();
+        //        paymentMethods = new();
+        //        loadFailed = true;
+        //    }
+        //}
+
         private async Task LoadDataAsync()
         {
             loadFailed = false;
-            try
-            {
-                residents = await httpClient.GetFromJsonAsync<List<EditResidentDTO>>("api/Resident/Residents") ?? new();
-                groceryDays = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays") ?? new();
-                paymentMethods = await httpClient.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods") ?? new();
-            }
-            catch
+            loadErrorMessage = null;
+
+            var residentResult = await AdminHttp.GetJsonAsync<List<EditResidentDTO>>(httpClient, "api/Resident/Residents");
+            if (residentResult.Failed)
             {
                 residents = new();
                 groceryDays = new();
                 paymentMethods = new();
                 loadFailed = true;
+                loadErrorMessage = residentResult.ErrorMessage;
+                return;
             }
+
+            var groceryDayResult = await AdminHttp.GetJsonAsync<List<ResidentLookupDTO>>(httpClient, "api/Resident/groceryDays");
+            var paymentMethodResult = await AdminHttp.GetJsonAsync<List<ResidentLookupDTO>>(httpClient, "api/Resident/paymentMethods");
+
+            if (groceryDayResult.Failed || paymentMethodResult.Failed)
+            {
+                residents = new();
+                groceryDays = new();
+                paymentMethods = new();
+                loadFailed = true;
+                loadErrorMessage = groceryDayResult.ErrorMessage ?? paymentMethodResult.ErrorMessage;
+                return;
+            }
+
+            residents = residentResult.Value ?? new();
+            groceryDays = groceryDayResult.Value ?? new();
+            paymentMethods = paymentMethodResult.Value ?? new();
         }
+
 
         private string GetGroceryDayName(Guid id) =>
             groceryDays.FirstOrDefault(d => d.ID == id)?.Name ?? "–";
