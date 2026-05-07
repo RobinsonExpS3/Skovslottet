@@ -9,12 +9,15 @@ namespace Slottet.Client.Pages.AdminPages
         [Inject] public HttpClient httpClient { get; set; }
 
         // ── Staff ─────────────────────────────────────────────────────────
-        private List<Staff>? staffMembers;
-        private string?      staffNameInput;
-        private string?      initialsInput;
-        private string?      roleInput;
-        private Staff?       selectedItem;
-        private bool         loadFailed = false;
+        private List<EditStaffDTO>?       staffMembers;
+        private List<DepartmentLookupDTO> departments    = new();
+        private string                   staffNameInput  = string.Empty;
+        private string                   initialsInput   = string.Empty;
+        private string                   roleInput       = string.Empty;
+        private Guid                     departmentIdInput;
+        private EditStaffDTO?            selectedItem;
+        private bool                     isBusy          = false;
+        private bool                     loadFailed      = false;
 
         // ── Særligt Ansvar ────────────────────────────────────────────────
         private List<SpecialResponsibilityEntryDto>? specialResponsibilities;
@@ -27,6 +30,7 @@ namespace Slottet.Client.Pages.AdminPages
         // ── Init ──────────────────────────────────────────────────────────
         protected override async Task OnInitializedAsync()
         {
+            await LoadDepartments();
             await Task.WhenAll(LoadStaff(), LoadSr());
         }
 
@@ -34,79 +38,128 @@ namespace Slottet.Client.Pages.AdminPages
         //  STAFF
         // ═════════════════════════════════════════
 
+        private async Task LoadDepartments()
+        {
+            departments = await httpClient.GetFromJsonAsync<List<DepartmentLookupDTO>>("api/Department")
+                ?? new List<DepartmentLookupDTO>();
+        }
+
+        private bool HasValidInput =>
+            !string.IsNullOrWhiteSpace(staffNameInput) &&
+            !string.IsNullOrWhiteSpace(initialsInput)  &&
+            !string.IsNullOrWhiteSpace(roleInput)      &&
+            departmentIdInput != Guid.Empty;
+
+        private bool CanCreate => !isBusy && HasValidInput && selectedItem is null;
+        private bool CanUpdate => !isBusy && selectedItem is not null;
+        private bool CanDelete => !isBusy && selectedItem is not null;
+
         private async Task LoadStaff()
         {
             try
             {
-                staffMembers = await httpClient.GetFromJsonAsync<List<Staff>>("api/Staff/Staffs");
+                staffMembers = await httpClient.GetFromJsonAsync<List<EditStaffDTO>>("api/Staff/Staffs");
             }
             catch
             {
-                staffMembers = new List<Staff>();
+                staffMembers = new List<EditStaffDTO>();
                 loadFailed   = true;
             }
         }
 
-        private void SelectItem(Staff item)
+        private string GetDepartmentName(Guid departmentId) =>
+            departments.FirstOrDefault(x => x.ID == departmentId)?.Name ?? departmentId.ToString();
+
+        private void SelectItem(EditStaffDTO item)
         {
-            selectedItem   = item;
-            staffNameInput = item.StaffName;
-            initialsInput  = item.Initials;
-            roleInput      = item.Role;
+            selectedItem      = item;
+            staffNameInput    = item.StaffName;
+            initialsInput     = item.Initials;
+            roleInput         = item.Role;
+            departmentIdInput = item.DepartmentID;
         }
 
         private async Task Create()
         {
-            var newItem = new Staff
-            {
-                StaffID   = Guid.NewGuid(),
-                StaffName = staffNameInput,
-                Initials  = initialsInput,
-                Role      = roleInput
-            };
+            if (!CanCreate) return;
 
-            var response = await httpClient.PostAsJsonAsync("api/Staff", newItem);
-            if (response.IsSuccessStatusCode)
+            isBusy = true;
+            try
             {
-                await LoadStaff();
-                ClearStaffForm();
+                var newItem = new EditStaffDTO
+                {
+                    StaffID      = Guid.NewGuid(),
+                    StaffName    = staffNameInput.Trim(),
+                    Initials     = initialsInput.Trim(),
+                    Role         = roleInput.Trim(),
+                    DepartmentID = departmentIdInput
+                };
+
+                var response = await httpClient.PostAsJsonAsync("api/Staff", newItem);
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadStaff();
+                    ClearStaffForm();
+                }
+            }
+            finally
+            {
+                isBusy = false;
             }
         }
 
         private async Task Update()
         {
-            if (selectedItem == null) return;
+            if (!CanUpdate) return;
 
-            selectedItem.StaffName = staffNameInput;
-            selectedItem.Initials  = initialsInput;
-            selectedItem.Role      = roleInput;
-
-            var response = await httpClient.PutAsJsonAsync($"api/Staff/{selectedItem.StaffID}", selectedItem);
-            if (response.IsSuccessStatusCode)
+            isBusy = true;
+            try
             {
-                await LoadStaff();
-                ClearStaffForm();
+                selectedItem!.StaffName    = staffNameInput.Trim();
+                selectedItem.Initials      = initialsInput.Trim();
+                selectedItem.Role          = roleInput.Trim();
+                selectedItem.DepartmentID  = departmentIdInput;
+
+                var response = await httpClient.PutAsJsonAsync($"api/Staff/{selectedItem.StaffID}", selectedItem);
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadStaff();
+                    ClearStaffForm();
+                }
+            }
+            finally
+            {
+                isBusy = false;
             }
         }
 
         private async Task Delete()
         {
-            if (selectedItem == null) return;
+            if (!CanDelete) return;
 
-            var response = await httpClient.DeleteAsync($"api/Staff/{selectedItem.StaffID}");
-            if (response.IsSuccessStatusCode)
+            isBusy = true;
+            try
             {
-                await LoadStaff();
-                ClearStaffForm();
+                var response = await httpClient.DeleteAsync($"api/Staff/{selectedItem!.StaffID}");
+                if (response.IsSuccessStatusCode)
+                {
+                    await LoadStaff();
+                    ClearStaffForm();
+                }
+            }
+            finally
+            {
+                isBusy = false;
             }
         }
 
         private void ClearStaffForm()
         {
-            selectedItem   = null;
-            staffNameInput = string.Empty;
-            initialsInput  = string.Empty;
-            roleInput      = string.Empty;
+            selectedItem      = null;
+            staffNameInput    = string.Empty;
+            initialsInput     = string.Empty;
+            roleInput         = string.Empty;
+            departmentIdInput = Guid.Empty;
         }
 
         // ═════════════════════════════════════════
@@ -187,15 +240,6 @@ namespace Slottet.Client.Pages.AdminPages
             selectedSr         = null;
             srDescriptionInput = string.Empty;
             srStaffNameInput   = string.Empty;
-        }
-
-        // ── Model ─────────────────────────────────────────────────────────
-        public class Staff
-        {
-            public Guid    StaffID   { get; set; }
-            public string  StaffName { get; set; }
-            public string  Initials  { get; set; }
-            public string  Role      { get; set; }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
@@ -6,6 +6,10 @@ namespace Slottet.Infrastructure.Data.Configurations
 {
     public class StaffResidentStatusConfiguration : IEntityTypeConfiguration<StaffResidentStatus>
     {
+        /// <summary>
+        /// Configures the Entity Framework model for the StaffResidentStatus entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the StaffResidentStatus entity.</param>
         public void Configure(EntityTypeBuilder<StaffResidentStatus> entity)
         {
             entity.HasKey(srs => new { srs.StaffID, srs.ResidentStatusID });

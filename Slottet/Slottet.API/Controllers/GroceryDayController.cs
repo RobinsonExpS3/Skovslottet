@@ -15,10 +15,14 @@ namespace Slottet.API.Controllers
             _groceryDayService = groceryDayService;
         }
 
+        /// <summary>
+        /// Gets all grocery days as lookup DTO objects.
+        /// </summary>
+        /// <returns>Returns all grocery days.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetAllGroceryDaysAsync()
         {
-            var groceryDays = await _groceryDayService.GetAllAsync();
+            var groceryDays = await _groceryDayService.GetAllGroceryDaysAsync();
 
             return Ok(groceryDays);
         }

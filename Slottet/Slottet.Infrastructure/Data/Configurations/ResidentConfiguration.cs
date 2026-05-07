@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
@@ -6,6 +6,10 @@ namespace Slottet.Infrastructure.Data.Configurations
 {
     public class ResidentConfiguration : IEntityTypeConfiguration<Resident>
     {
+        /// <summary>
+        /// Configures the Entity Framework model for the Resident entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the Resident entity.</param>
         public void Configure(EntityTypeBuilder<Resident> entity)
         {
             entity.HasKey(r => new { r.ResidentID });

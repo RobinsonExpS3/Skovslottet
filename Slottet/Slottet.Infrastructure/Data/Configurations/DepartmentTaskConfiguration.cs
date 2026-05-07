@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +9,10 @@ namespace Slottet.Infrastructure.Data.Configurations
 {
     public class DepartmentTaskConfiguration : IEntityTypeConfiguration<DepartmentTask>
     {
+        /// <summary>
+        /// Configures the Entity Framework model for the DepartmentTask entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the DepartmentTask entity.</param>
         public void Configure(EntityTypeBuilder<DepartmentTask> entity)
         {
             entity.HasKey(dt => new { dt.DepartmentTaskID });

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
@@ -6,6 +6,10 @@ namespace Slottet.Infrastructure.Data.Configurations
 {
     public class DepartmentConfiguration : IEntityTypeConfiguration<Department>
     {
+        /// <summary>
+        /// Configures the Entity Framework model for the Department entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the Department entity.</param>
         public void Configure(EntityTypeBuilder<Department> entity)
         {
             entity.HasKey(d => new { d.DepartmentID });

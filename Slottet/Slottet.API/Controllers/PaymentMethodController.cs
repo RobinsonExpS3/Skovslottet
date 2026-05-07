@@ -15,10 +15,14 @@ namespace Slottet.API.Controllers
             _paymentMethodService = paymentMethodService;
         }
 
+        /// <summary>
+        /// Gets all payment methods as lookup DTO objects.
+        /// </summary>
+        /// <returns>Returns all payment methods.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetAllPaymentMethodsAsync()
         {
-            var paymentMethods = await _paymentMethodService.GetAllAsync();
+            var paymentMethods = await _paymentMethodService.GetAllPaymentMethodsAsync();
 
             return Ok(paymentMethods);
         }

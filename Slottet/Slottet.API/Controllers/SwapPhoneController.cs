@@ -16,28 +16,26 @@ namespace Slottet.API.Controllers
             _swapPhoneService = swapPhoneService;
         }
 
+        /// <summary>
+        /// Gets all phones with their latest staff assignment.
+        /// </summary>
+        /// <returns>Returns all phone assignments.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SwapPhoneDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<SwapPhoneDTO>>> GetAllSwapPhonesAsync()
         {
-            return Ok(await _swapPhoneService.GetAllAsync());
+            return Ok(await _swapPhoneService.GetAllSwapPhonesAsync());
         }
-
-        //[HttpGet("{phoneId:guid}")]
-        //public async Task<ActionResult<SwapPhoneDTO>> GetById(Guid phoneId)
-        //{
-        //    var phone = await _swapPhoneService.GetByIdAsync(phoneId);
-
-        //    if (phone == null) return NotFound();
-
-        //    return Ok(phone);
-        //}
-
+        /// <summary>
+        /// Assigns a phone to a staff member.
+        /// </summary>
+        /// <param name="dto">DTO object containing phone and staff information.</param>
+        /// <returns>Returns NoContent if the assignment succeeds, otherwise NotFound.</returns>
         [HttpPost("assign")]
-        public async Task<IActionResult> SwapPhone([FromBody] SwapPhoneDTO dto)
+        public async Task<IActionResult> PostSwapPhoneAsync([FromBody] SwapPhoneDTO dto)
         {
             //if (dto == null ||  dto.StaffID == Guid.Empty) return BadRequest();
 
-            var updated = await _swapPhoneService.UpdateAsync(dto);
+            var updated = await _swapPhoneService.PostSwapPhoneAsync(dto);
             if (!updated) return NotFound();
 
             return NoContent();

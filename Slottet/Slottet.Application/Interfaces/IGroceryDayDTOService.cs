@@ -4,6 +4,6 @@ namespace Slottet.Application.Interfaces
 {
     public interface IGroceryDayDTOService
     {
-        Task<IEnumerable<ResidentLookupDTO>> GetAllAsync();
+        Task<IEnumerable<ResidentLookupDTO>> GetAllGroceryDaysAsync();
     }
 }

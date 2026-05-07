@@ -4,6 +4,6 @@ namespace Slottet.Application.Interfaces
 {
     public interface IPaymentMethodDTOService
     {
-        Task<IEnumerable<ResidentLookupDTO>> GetAllAsync();
+        Task<IEnumerable<ResidentLookupDTO>> GetAllPaymentMethodsAsync();
     }
 }

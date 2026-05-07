@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Slottet.Domain.Entities;
 
@@ -6,6 +6,10 @@ namespace Slottet.Infrastructure.Data.Configurations
 {
     public class PNConfiguration : IEntityTypeConfiguration<PN>
     {
+        /// <summary>
+        /// Configures the Entity Framework model for the PN entity.
+        /// </summary>
+        /// <param name="entity">The builder used to configure the PN entity.</param>
         public void Configure(EntityTypeBuilder<PN> entity)
         {
             entity.HasKey(p => p.PNID);
