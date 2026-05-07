@@ -46,8 +46,7 @@ namespace Slottet.Client.Pages.AdminPages
         private bool HasValidInput =>
             !string.IsNullOrWhiteSpace(staffNameInput) &&
             !string.IsNullOrWhiteSpace(initialsInput)  &&
-            !string.IsNullOrWhiteSpace(roleInput)      &&
-            departmentIdInput != Guid.Empty;
+            !string.IsNullOrWhiteSpace(roleInput);
 
         private bool CanCreate => !isBusy && HasValidInput && selectedItem is null;
         private bool CanUpdate => !isBusy && selectedItem is not null;
