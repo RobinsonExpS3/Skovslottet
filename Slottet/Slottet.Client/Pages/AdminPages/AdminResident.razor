@@ -1,101 +1,143 @@
-﻿@page "/adminResident"
+@page "/adminResident"
 @rendermode InteractiveWebAssembly
 
-<div class="admin-page">
+<div class="admin-page" @onclick="ClearForm">
 
     <AdminHeader Active="resident" />
 
     <div class="admin-layout">
-        <section class="admin-card">
 
-            <div class="admin-card-header">
-                <h2>Rediger beboer</h2>
+        @* ── VENSTRE: Beboer-kort grid ── *@
+        <main class="resident-card-panel">
+            @if (residents == null)
+            {
+                <p class="state-text">Indlæser…</p>
+            }
+            else if (loadFailed)
+            {
+                <p class="state-text state-text--error">Kunne ikke loade data. Prøv venligst igen senere.</p>
+            }
+            else
+            {
+                <div class="r-card-grid">
+                    @foreach (var resident in residents)
+                    {
+                        <article class="r-card @(selectedResident == resident ? "r-card--selected" : "") @(!resident.IsActive ? "r-card--inactive" : "")"
+                                 @onclick:stopPropagation
+                                 @onclick="() => SelectResidentAsync(resident)"
+                                 title="Klik for at redigere">
+
+                            @* ── Navn ── *@
+                            <header class="r-card-name">
+                                <h3>@resident.ResidentName</h3>
+                            </header>
+
+                            @* ── Info-sektioner ── *@
+                            <div class="r-card-body">
+
+                                <section class="r-section">
+                                    <span class="r-label">Handledag</span>
+                                    <span class="r-value">@GetGroceryDayName(resident.GroceryDayID)</span>
+                                </section>
+
+                                <section class="r-section">
+                                    <span class="r-label">Betaling</span>
+                                    <span class="r-value">@GetPaymentMethodNames(resident)</span>
+                                </section>
+
+                                <section class="r-section r-section--status">
+                                    <span class="r-label">Status</span>
+                                    <span class="r-status-badge @(resident.IsActive ? "r-status--active" : "r-status--inactive")">
+                                        @(resident.IsActive ? "✓ Aktiv" : "✗ Inaktiv")
+                                    </span>
+                                </section>
+
+                            </div>
+
+                        </article>
+                    }
+                </div>
+            }
+        </main>
+
+        @* ── HØJRE: Opret / Rediger beboer ── *@
+        <aside class="resident-sidebar" @onclick:stopPropagation>
+
+            <div class="resident-form-box">
+                <h3>Navn & Status</h3>
+                <input class="form-field" @bind="residentNameInput" @bind:event="oninput" placeholder="Navn…" />
+                <label class="resident-active-label">
+                    <input type="checkbox" @bind="isActiveInput" />
+                    Aktiv
+                </label>
             </div>
 
-	<div class="table-layout">
-		<table class="table-form">
-			@if(residents == null)
-			{
-				<tr>
-					<td>Loading...</td>
-				</tr>
-			}
-			else if (loadFailed) 
-			{
-				<tr>
-					<td>Kunne ikke loade data. Prøv venligst igen senere</td>
-				</tr>
-			}
-			else
-			{
-				@foreach(var resident in residents)
-				{
-					<tr @onclick="() => SelectResidentAsync(resident)" 
-						class="@(selectedResident == resident ? "selected-row" : "")"
-						style="cursor: pointer;">
-						<td>@resident.ResidentName</td>
-						<td>@GetGroceryDayName(resident.GroceryDayID)</td>
-					</tr>
-				}
-			}
-		</table>
+            <div class="resident-form-box">
+                <h3>Handledag</h3>
+                <select class="form-field form-select" @bind="selectedGroceryDayID">
+                    <option value="">– Vælg handledag –</option>
+                    @foreach (var day in groceryDays)
+                    {
+                        <option value="@day.ID">@day.Name</option>
+                    }
+                </select>
+            </div>
 
-		<div class="button-column">
-			<label>
-				<input type="checkbox" @bind="isActiveInput"/>
-				Aktiv
-            </label>
-			<input class="r-table-input" @bind="residentNameInput" placeholder="Indtast navn..." />
-			<select @bind="selectedGroceryDayID">
-				<option value="">Vælg handledag</option>
-				@foreach (var day in groceryDays) {
-					<option value="@day.ID">@day.Name</option>
-				}
-			</select>
+            <div class="resident-form-box">
+                <h3>Betalingsmetode</h3>
+                <select class="form-field form-select resident-multiselect" multiple @onchange="OnPaymentMethodsChanged">
+                    @foreach (var method in paymentMethods)
+                    {
+                        <option value="@method.ID" selected="@selectedPaymentMethodIDs.Contains(method.ID)">
+                            @method.Name
+                        </option>
+                    }
+                </select>
+            </div>
 
-			<select multiple @onchange="OnPaymentMethodsChanged">
-				@foreach (var method in paymentMethods) {
-					<option value="@method.ID" selected="@selectedPaymentMethodIDs.Contains(method.ID)">
-						@method.Name
-					</option>
-				}
-			</select>
+            <div class="resident-form-box">
+                <h3>Medicintider</h3>
+                <div class="medicine-picker-row">
+                    <select class="form-field form-select" @bind="selectedHour">
+                        @for (int i = 0; i < 24; i++)
+                        {
+                            <option value="@i">@i.ToString("D2")</option>
+                        }
+                    </select>
+                    <span class="medicine-picker-colon">:</span>
+                    <select class="form-field form-select" @bind="selectedMinute">
+                        @for (int i = 0; i < 60; i += 5)
+                        {
+                            <option value="@i">@i.ToString("D2")</option>
+                        }
+                    </select>
+                    <button class="btn-admin btn-create medicine-add-btn" type="button" @onclick="AddMedicineTime">+</button>
+                </div>
+                <div class="medicine-tag-list">
+                    @if (!medicineTimes.Any())
+                    {
+                        <span class="state-text">Ingen tider valgt</span>
+                    }
+                    else
+                    {
+                        @foreach (var time in medicineTimes)
+                        {
+                            <div class="medicine-tag">
+                                <span>@time.Time.ToString("HH:mm")</span>
+                                <button type="button" class="medicine-tag-remove" @onclick="() => RemoveMedicineTime(time)">✕</button>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
 
-			<div>
-				<label>Vælg medicintid</label>
-				<select @bind="selectedHour">
-					@for (int i = 0; i < 24; i++) {
-						<option value="@i">@i.ToString("D2")</option>
-					}
-				</select>
-				:
-				<select @bind="selectedMinute">
-					@for (int i = 0; i < 60; i += 5) {
-						<option value="@i">@i.ToString("D2")</option>
-					}
-				</select>
-				<button type="button" @onclick="AddMedicineTime">Tilføj</button>
-			</div>
+            <div class="form-buttons">
+                <button class="btn-admin btn-create" @onclick="CreateAsync"  disabled="@(!CanCreate)">Opret</button>
+                <button class="btn-admin btn-update" @onclick="UpdateAsync"  disabled="@(!CanUpdate)">Opdater</button>
+                <button class="btn-admin btn-delete" @onclick="DeleteAsync"  disabled="@(!CanDelete)">Slet</button>
+            </div>
 
-			<div>
-				<strong>Valgte tider:</strong>
-				@if (!medicineTimes.Any()) {
-					<p>Ingen tider valgt</p>
-				}
-				@foreach (var time in medicineTimes) {
-					<div>
-						@time.Time.ToString("HH:mm")
-						<button type="button" @onclick="() => RemoveMedicineTime(time)">Fjern tid</button>
-					</div>
-				}
-			</div>
+        </aside>
 
-			<button type="button" class="column-button" @onclick="CreateAsync" disabled="@(!CanCreate)">Opret</button>
-			<button type="button" class="column-button" @onclick="UpdateAsync" disabled="@(!CanUpdate)">Opdater</button>
-			<button type="button" class="column-button" @onclick="DeleteAsync" disabled="@(!CanDelete)">Slet</button>
-		</div>
-	</div>
-
-        </section>
     </div>
 </div>
