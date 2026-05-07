@@ -10,73 +10,74 @@ else if (ErrorMessage is not null)
 }
 else
 {
-<div class="container">
-    <div class="top-bar">
-        <div class="date-picker">
-            <label for="audit-date">Dato</label>
-            <input id="audit-date" type="date" min="2026-04-01" value="@SelectedDateText" @onchange="OnDateChanged"/>
-        </div>
-        
-        <div>
-            <label for="audit-shift">Vagt</label>
-            <select id="audit-shift" class="shift-picker" value="@SelectedShift" @onchange="OnShiftChanged">
-                <option value="">Vælg vagt</option>
-                <option value="day">Dag</option>
-                <option value="evening">Aften</option>
-                <option value="night">Nat</option>
-            </select>
-        </div>
+    <div class="container">
+        <div class="top-bar">
+            <div class="date-picker">
+                <label for="audit-date">Dato</label>
+                <input id="audit-date" type="date" min="2026-04-01" value="@SelectedDateText" @onchange="OnDateChanged"/>
+            </div>
 
-        <div class="audit-search">
-            <label for="audit-search">Søg</label>
-            <input
+            <div>
+                <label for="audit-shift">Vagt</label>
+                <select id="audit-shift" class="shift-picker" value="@SelectedShift" @onchange="OnShiftChanged">
+                    <option value="">Vælg vagt</option>
+                    <option value="day">Dag</option>
+                    <option value="evening">Aften</option>
+                    <option value="night">Nat</option>
+                </select>
+            </div>
+
+            <div class="audit-search">
+                <label for="audit-search">Søg</label>
+                <input
                 id="audit-search"
                 class="audit-search-input"
                 type="search"
                 placeholder="Søg i auditlog"
                 @bind="SearchText"
-				@bind:event="oninput" />
+                @bind:event="oninput" />
+            </div>
+        </div>
+
+        <div class="audit-panel">
+            @if (IsLoading)
+            {
+                <p>Indlæser audit logs...</p>
+            }
+            else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <p>@ErrorMessage</p>
+            }
+            else
+            {
+                <table class="audit-table">
+                    <thead>
+                        <tr>
+                            <th>Tid</th>
+                            <th>Hvem</th>
+                            <th>Handling</th>
+                            <th>Tabel</th>
+                            <th>Omhandler</th>
+                            <th>Tidligere Værdi</th>
+                            <th>Ny Værdi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in FilteredAuditDisplayRows)
+                        {
+                            <tr class="audit-row">
+                                <td class="audit-cell audit-cell-time">@row.Time.ToString("dd-MM-yyyy HH:mm")</td>
+                                <td class="audit-cell audit-cell-person">@row.PerformedBy</td>
+                                <td class="audit-cell audit-cell-action">@row.Action</td>
+                                <td class="audit-cell audit-cell-table">@row.TableName</td>
+                                <td class="audit-cell audit-cell-subject">@row.Subject</td>
+                                <td class="audit-cell audit-cell-old-value">@row.OldValue</td>
+                                <td class="audit-cell audit-cell-new-value">@row.NewValue</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
         </div>
     </div>
-
-    <div class="audit-panel">
-        @if(IsLoading)
-        {
-            <p>Indlæser audit logs...</p>
-        }
-        else if(!string.IsNullOrWhiteSpace(ErrorMessage))
-        {
-            <p>@ErrorMessage</p>
-        }
-        else
-        {
-            <table class="audit-table">
-                <thead>
-                    <tr>
-                        <th>Tid</th>
-                        <th>Hvem</th>
-                        <th>Handling</th>
-                        <th>Tabel</th>
-                        <th>Omhandler</th>
-                        <th>Tidligere Værdi</th>
-                        <th>Ny Værdi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var row in FilteredAuditDisplayRows)
-                    {
-                        <tr class="audit-row">
-                            <td class="audit-cell audit-cell-time">@row.Time.ToString("dd-MM-yyyy HH:mm")</td>
-                            <td class="audit-cell audit-cell-person">@row.PerformedBy</td>
-                            <td class="audit-cell audit-cell-action">@row.Action</td>
-                            <td class="audit-cell audit-cell-table">@row.TableName</td>
-                            <td class="audit-cell audit-cell-subject">@row.Subject</td>
-                            <td class="audit-cell audit-cell-old-value">@row.OldValue</td>
-                            <td class="audit-cell audit-cell-new-value">@row.NewValue</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
-</div>
+}
