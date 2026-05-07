@@ -113,7 +113,17 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<SlottetDBContext>();
 
+    Console.WriteLine(">>> Starter EnsureDeletedAsync...");
+    await context.Database.EnsureDeletedAsync();
+    Console.WriteLine(">>> EnsureDeletedAsync OK");
+
+    Console.WriteLine(">>> Starter MigrateAsync...");
+    await context.Database.MigrateAsync();
+    Console.WriteLine(">>> MigrateAsync OK");
+
+    Console.WriteLine(">>> Starter SeedAsync...");
     await DBSeeder.SeedAsync(context);
+    Console.WriteLine(">>> SeedAsync OK");
 }
 
 app.UseHttpsRedirection();

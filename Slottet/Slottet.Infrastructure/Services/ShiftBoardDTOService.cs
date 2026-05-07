@@ -257,6 +257,8 @@ namespace Slottet.Infrastructure.Services
             return await _context.Residents
                 .AsNoTracking()
                 .Where(r => r.IsActive)
+                .OrderBy(r => r.SortOrder)
+                .ThenBy(r => r.ResidentID)
                 .Include(r => r.GroceryDay)
                 .Include(r => r.Medicines)
                 .Include(r => r.PNs)
