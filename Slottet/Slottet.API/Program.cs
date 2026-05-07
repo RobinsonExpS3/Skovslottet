@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Slottet.API;
 using Slottet.API.Auth;
 using Slottet.API.Controllers;
 using Slottet.API.Middlewares;
@@ -166,13 +167,9 @@ app.UseExceptionHandler(errorApp =>
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<SlottetDBContext>();
-    await context.Database.MigrateAsync();
-    await DBSeeder.SeedAsync(context);
+    await app.MigrateAndSeedDatabaseAsync();
 }
 
 app.UseHttpsRedirection();
