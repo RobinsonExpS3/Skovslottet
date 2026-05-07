@@ -1,18 +1,10 @@
 @page "/adminStaff"
 @rendermode InteractiveWebAssembly
 
-<div class="admin-page">
+<div class="admin-page" @onclick="ClearAll">
 
     @* ── HEADER ── *@
-    <header class="admin-header">
-        <h1>Administration</h1>
-        <nav class="admin-nav">
-            <a href="/adminResident"             class="admin-nav-btn">Beboer</a>
-            <a href="/adminStaff"                class="admin-nav-btn admin-nav-btn--active">Personale</a>
-            <a href="/adminSpecialResponsibility" class="admin-nav-btn">Særligt Ansvar</a>
-            <a href="/adminAudit"                class="admin-nav-btn">Audit Log</a>
-        </nav>
-    </header>
+    <AdminHeader Active="staff" />
 
     @* ── MAIN LAYOUT ── *@
     <div class="admin-layout">
@@ -42,7 +34,7 @@
                             <tbody>
                                 @foreach (var item in staffMembers)
                                 {
-                                    <tr @onclick="() => SelectItem(item)"
+                                    <tr @onclick:stopPropagation @onclick="() => SelectItem(item)"
                                         class="staff-row @(selectedItem == item ? "staff-row--selected" : "")">
                                         <td class="col-name">@item.StaffName</td>
                                         <td class="col-initials">@item.Initials</td>
@@ -59,9 +51,9 @@
                 </div>
 
                 @* Personale-formular *@
-                <div class="staff-form-panel">
-                    <input  class="form-field" @bind="staffNameInput" placeholder="Navn" />
-                    <input  class="form-field" @bind="initialsInput"  placeholder="Initialer" />
+                <div class="staff-form-panel" @onclick:stopPropagation>
+                    <input class="form-field" @bind="staffNameInput" @bind:event="oninput" placeholder="Navn" />
+                    <input class="form-field" @bind="initialsInput"  @bind:event="oninput" placeholder="Initialer" />
                     <select class="form-field form-select" @bind="roleInput">
                         <option value="">Vælg rolle</option>
                         <option value="staff">Pædagog</option>
@@ -114,7 +106,7 @@
                             <tbody>
                                 @foreach (var sr in specialResponsibilities)
                                 {
-                                    <tr @onclick="() => SelectSr(sr)"
+                                    <tr @onclick:stopPropagation @onclick="() => SelectSr(sr)"
                                         class="staff-row @(selectedSr == sr ? "staff-row--selected" : "")">
                                         <td class="col-name">@sr.Description</td>
                                     </tr>
@@ -125,8 +117,8 @@
                 </div>
 
                 @* SR-formular *@
-                <div class="sr-form-panel">
-                    <input class="form-field" @bind="srDescriptionInput" placeholder="Ansvarsområde" />
+                <div class="sr-form-panel" @onclick:stopPropagation>
+                    <input class="form-field" @bind="srDescriptionInput" @bind:event="oninput" placeholder="Ansvarsområde" />
                     <div class="form-buttons">
                         <button class="btn-admin btn-create"
                                 @onclick="CreateSr"

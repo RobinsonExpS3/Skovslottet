@@ -151,6 +151,12 @@ namespace Slottet.Client.Pages.AdminPages
             }
         }
 
+        private void ClearAll()
+        {
+            ClearStaffForm();
+            ClearSrForm();
+        }
+
         private void ClearStaffForm()
         {
             selectedItem      = null;

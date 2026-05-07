@@ -1,0 +1,94 @@
+/* ═══════════════════════
+   BEBOER PAGE
+   ═══════════════════════ */
+
+.admin-card {
+    grid-column: 1 / -1;
+    overflow-y: auto;
+}
+
+.table-layout {
+    display: flex;
+    gap: 0;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.table-form {
+    flex: 1;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.table-form tr {
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-primary-lighter);
+    transition: background-color 0.12s;
+}
+
+.table-form tr:hover {
+    background-color: var(--color-bg-section);
+}
+
+.table-form .selected-row {
+    background-color: var(--color-bg-medicine-header) !important;
+}
+
+.table-form td {
+    padding: 10px 18px;
+    color: var(--color-text-dark);
+}
+
+.button-column {
+    flex-shrink: 0;
+    width: 240px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: var(--color-bg-section);
+    border-left: var(--border-inner);
+    overflow-y: auto;
+}
+
+.r-table-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    background-color: var(--color-bg-card);
+    font-size: 0.85rem;
+    color: var(--color-text-dark);
+    font-family: inherit;
+}
+
+.r-table-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.column-button {
+    width: 100%;
+    padding: 9px 14px;
+    border: none;
+    border-radius: var(--radius-section);
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    background-color: var(--color-primary-dark);
+    color: white;
+    transition: background-color 0.15s, opacity 0.15s;
+}
+
+.column-button:disabled {
+    opacity: 0.38;
+    cursor: default;
+}
+
+.column-button:not(:disabled):hover {
+    background-color: var(--color-primary-mid);
+}

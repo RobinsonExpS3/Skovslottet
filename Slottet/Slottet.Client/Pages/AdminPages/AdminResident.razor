@@ -1,8 +1,16 @@
 ﻿@page "/adminResident"
 @rendermode InteractiveWebAssembly
 
-<div class="view-box">
-	<h2>Rediger beboer</h2>
+<div class="admin-page">
+
+    <AdminHeader Active="resident" />
+
+    <div class="admin-layout">
+        <section class="admin-card">
+
+            <div class="admin-card-header">
+                <h2>Rediger beboer</h2>
+            </div>
 
 	<div class="table-layout">
 		<table class="table-form">
@@ -87,4 +95,7 @@
 			<button type="button" class="column-button" @onclick="DeleteAsync" disabled="@(!CanDelete)">Slet</button>
 		</div>
 	</div>
+
+        </section>
+    </div>
 </div>
