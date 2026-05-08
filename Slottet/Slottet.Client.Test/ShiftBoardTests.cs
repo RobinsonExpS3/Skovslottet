@@ -11,7 +11,6 @@ namespace Slottet.Client.Test {
     public class ShiftBoardTests : BunitContext {
         private FakeHttpMessageHandler _handler = null!;
 
-
         [TestInitialize]
         public void Setup() {
             _handler = new FakeHttpMessageHandler();
@@ -100,6 +99,142 @@ namespace Slottet.Client.Test {
             };
         }
 
+        // Tests
+        [TestMethod]
+        public void ShiftBoard_LoadsShiftBoard_WhenApiReturnsData() {
+            SetupSuccessfulInitialLoad();
 
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("Slottet", component.Markup);
+                Assert.Contains("John Doe", component.Markup);
+                Assert.Contains("Har haft en rolig morgen", component.Markup);
+                Assert.Contains("12345678", component.Markup);
+                Assert.Contains("Medicinansvar", component.Markup);
+                Assert.Contains("Tøm opvaskemaskine", component.Markup);
+            });
+        }
+
+        [TestMethod]
+        public void ShiftBoard_CallsExpectedEndpoints_WhenInitialized() {
+            SetupSuccessfulInitialLoad();
+
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.IsTrue(WasCalled(HttpMethod.Get, "api/shiftboard/current"));
+                Assert.IsTrue(WasCalled(HttpMethod.Get, CurrentShiftUrl()));
+            });
+        }
+
+        [TestMethod]
+        public void ShiftBoard_ShowsAccessDenied_WhenCurrentAndShiftReturnForbidden() {
+            _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Forbidden);
+            _handler.AddStatus(HttpMethod.Get, CurrentShiftUrl(), HttpStatusCode.Forbidden);
+
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("Du har ikke adgang til denne side.", component.Markup);
+            });
+        }
+
+        [TestMethod]
+        public void ShiftBoard_ShowsLoadError_WhenShiftLoadFails() {
+            _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
+            _handler.AddStatus(HttpMethod.Get, CurrentShiftUrl(), HttpStatusCode.InternalServerError);
+
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("Kunne ikke loade data", component.Markup);
+            });
+        }
+
+        [TestMethod]
+        public void ShiftBoard_ShowsEmptyMessage_WhenNoShiftBoardExists() {
+            _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
+            _handler.AddJson<ShiftBoardDTO?>(HttpMethod.Get, CurrentShiftUrl(), null);
+
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("Ingen vagttavle oprettet", component.Markup);
+            });
+        }
+
+        [TestMethod]
+        public void ShiftBoard_NavigateToNewShiftBoard_GoesToAdminStaff() {
+            SetupSuccessfulInitialLoad();
+
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("Ny vagt-tavle", component.Markup);
+            });
+
+            component.Find("button.new-shiftboard-button").Click();
+
+            var nav = Services.GetRequiredService<NavigationManager>();
+            Assert.EndsWith("/adminStaff", nav.Uri);
+        }
+
+        [TestMethod]
+        public void ShiftBoard_OpenPhoneList_ShowsPhoneListOverlay() {
+            SetupSuccessfulInitialLoad();
+
+            JSInterop.SetupVoid("overlayHelpers.playFlyIn", _ => true);
+
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("Telefonnumre", component.Markup);
+            });
+
+            component.FindAll(".info-box--clickable")[0].Click();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("overlay-panel-phonelist", component.Markup);
+            });
+        }
+
+        [TestMethod]
+        public void ShiftBoard_OpenDepartmentTasks_ShowsDepartmentTaskOverlay() {
+            SetupSuccessfulInitialLoad();
+
+            JSInterop.SetupVoid("overlayHelpers.playFlyIn", _ => true);
+
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("Afdelingens opgaver", component.Markup);
+            });
+
+            component.FindAll(".info-box--clickable")[2].Click();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("overlay-panel-departmenttasks", component.Markup);
+            });
+        }
+
+        [TestMethod]
+        public void ShiftBoard_OpenSpecialResponsibilities_ShowsSpecialResponsibilityOverlay() {
+            SetupSuccessfulInitialLoad();
+
+            JSInterop.SetupVoid("overlayHelpers.playFlyIn", _ => true);
+
+            var component = Render<ShiftBoard>();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("Særligt ansvar", component.Markup);
+            });
+
+            component.FindAll(".info-box--clickable")[1].Click();
+
+            component.WaitForAssertion(() => {
+                Assert.Contains("overlay-panel-specialresponsibilities", component.Markup);
+            });
+        }
     }
 }
