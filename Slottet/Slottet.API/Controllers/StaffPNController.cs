@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "EmployeeOrAdmin")]
     public class StaffPNController : ControllerBase
     {
         private readonly IStaffPNDTOService _staffPNService;
@@ -20,6 +22,7 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all staff PN assignments.</returns>
         [HttpGet]
+        [Authorize(Policy = "ShiftboardDisplay")]
         public async Task<ActionResult<IEnumerable<StaffPNDTO>>> GetAllStaffPNsAsync()
         {
             var staffPNs = await _staffPNService.GetAllStaffPNsAsync();

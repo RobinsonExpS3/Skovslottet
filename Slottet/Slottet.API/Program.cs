@@ -1,12 +1,20 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Slottet.API;
+using Slottet.API.Auth;
 using Slottet.API.Controllers;
 using Slottet.API.Middlewares;
 using Slottet.Application.Interfaces;
+using Slottet.Domain.Entities;
 using Slottet.Infrastructure;
 using Slottet.Infrastructure.Auditing;
 using Slottet.Infrastructure.Data;
 using Slottet.Infrastructure.Services;
+
+
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,11 +41,35 @@ builder.Services.AddScoped<AuditInterceptor>();
 builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();
 builder.Services.AddScoped<IStaffPNDTOService, StaffPNDTOService>();
 builder.Services.AddScoped<IDepartmentTaskDTOService, DepartmentTaskDTOService>();
+builder.Services.AddScoped<IAuthDTOService, AuthDTOService>();
 
 // Builder for EF Core
 builder.Services.AddDbContext<SlottetDBContext>((ai, options) =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
         .AddInterceptors(ai.GetRequiredService<AuditInterceptor>()));
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddAuthentication("Dev")
+        .AddScheme<AuthenticationSchemeOptions, DevAuthHandler>("Dev", options => { });
+}
+else
+{
+    builder.Services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+            options.Authority = "https://localhost:5001";
+            options.RequireHttpsMetadata = true;
+            options.Audience = "slottet-api";
+        });
+}
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+    options.AddPolicy("EmployeeOrAdmin", p => p.RequireRole("Employee", "Admin"));
+    options.AddPolicy("ShiftboardDisplay", p => p.RequireRole("Storskaerm", "Employee", "Admin"));
+});
 
 builder.Services.AddCors(options =>
 {
@@ -58,6 +90,34 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services
+    .AddIdentityCore<ApplicationUser>(options =>
+    {
+        options.User.RequireUniqueEmail = false;
+
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequiredLength = 8;
+    })
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<SlottetDBContext>()
+    .AddDefaultTokenProviders();
+
+//builder.Services
+//    .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+//    {
+//        options.User.RequireUniqueEmail = false;
+
+//        options.Password.RequireDigit = true;
+//        options.Password.RequireLowercase = true;
+//        options.Password.RequireUppercase = true;
+//        options.Password.RequireNonAlphanumeric = true;
+//        options.Password.RequiredLength = 8;
+//    })
+//    .AddEntityFrameworkStores<SlottetDBContext>()
+//    .AddDefaultTokenProviders();
 
 //builder.Services.AddAuthentication("Bearer")
 //    .AddJwtBearer("Bearer", options =>
@@ -67,7 +127,7 @@ builder.Services.AddCors(options =>
 //        options.Audience = "slottet-api";
 //    });
 
-//builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -107,13 +167,9 @@ app.UseExceptionHandler(errorApp =>
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    //app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<SlottetDBContext>();
-
-    await DBSeeder.SeedAsync(context);
+    await app.MigrateAndSeedDatabaseAsync();
 }
 
 app.UseHttpsRedirection();
@@ -121,8 +177,8 @@ app.UseHttpsRedirection();
 app.UseCors("blazorApp");
 app.UseCors("blazorApp2");
 
+app.UseAuthentication();
 app.UseMiddleware<AuditScopeMiddleware>();
-//app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

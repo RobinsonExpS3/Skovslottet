@@ -25,10 +25,10 @@ namespace Slottet.Infrastructure.Data.Seed
 
             var staffs = new List<Staff>
             {
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Hestemand Hestesen", DepartmentID = skovenDepartmentId, Initials = "HH", Role = "Pædagog" },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Søren Skovfis", DepartmentID = skovenDepartmentId, Initials = "SS", Role = "Pædagog" },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Lise Lægemand", DepartmentID = slottetDepartmentId, Initials = "LL", Role = "Administrator " },
-                new Staff { StaffID = Guid.NewGuid(), StaffName = "Peter Pedalskid", DepartmentID = slottetDepartmentId, Initials = "PP", Role = "Pædagog" },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Hestemand Hestesen", DepartmentID = skovenDepartmentId, Initials = "HH", Role = "staff" },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Søren Skovfis", DepartmentID = skovenDepartmentId, Initials = "SS", Role = "staff" },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Lise Lægemand", DepartmentID = slottetDepartmentId, Initials = "LL", Role = "admin" },
+                new Staff { StaffID = Guid.NewGuid(), StaffName = "Peter Pedalskid", DepartmentID = slottetDepartmentId, Initials = "PP", Role = "staff" },
             };
 
             context.Staffs.AddRange(staffs);

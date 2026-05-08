@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
@@ -7,6 +8,7 @@ namespace Slottet.API.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "EmployeeOrAdmin")]
     public class SwapPhoneController : ControllerBase
     {
         private readonly ISwapPhoneDTOService _swapPhoneService;
@@ -21,6 +23,7 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all phone assignments.</returns>
         [HttpGet]
+        [Authorize(Policy = "ShiftboardDisplay")]
         public async Task<ActionResult<IEnumerable<SwapPhoneDTO>>> GetAllSwapPhonesAsync()
         {
             return Ok(await _swapPhoneService.GetAllSwapPhonesAsync());

@@ -17,6 +17,7 @@ namespace Slottet.Infrastructure.Data
             await ShiftBoardSeeder.SeedAsync(context);
             await ResidentSeeder.SeedAsync(context);
             await DepartmentTaskSeeder.SeedAsync(context);
+            await SpecialResponsibilitySeeder.SeedAsync(context);
 
             // ── Tier 3: FK → Tier 2 ──────────────────────────────────────
             await ResidentStatusSeeder.SeedAsync(context);

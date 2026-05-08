@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
@@ -7,6 +8,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class StaffController : Controller
     {
         private readonly IStaffDTOService _staffService;
@@ -33,7 +35,7 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <param name="id">The ID of the staff member to retrieve.</param>
         /// <returns>Returns the staff member if found, otherwise NotFound.</returns>
-        [HttpGet("{id}", Name = "GetStaffById")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<EditStaffDTO>> GetStaffByIdAsync(Guid id)
         {
             var staff = await _staffService.GetStaffByIdAsync(id);
@@ -69,7 +71,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetStaffByIdAsync), new { id = result.StaffID }, result);
+            return CreatedAtAction("GetStaffById", new { id = result.StaffID }, result);
         }
 
         /// <summary>

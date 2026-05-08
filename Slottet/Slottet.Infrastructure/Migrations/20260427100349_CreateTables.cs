@@ -159,6 +159,7 @@ namespace Slottet.Infrastructure.Migrations
                     ResidentID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ResidentName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     GroceryDayID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>

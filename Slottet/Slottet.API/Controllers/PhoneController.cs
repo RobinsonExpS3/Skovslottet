@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "AdminOnly")]
     public class PhoneController : ControllerBase
     {
         private readonly IPhoneDTOService _phoneService;
@@ -88,7 +90,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetPhoneByIdAsync), new { id = createdPhone.PhoneID }, createdPhone);
+            return CreatedAtAction("GetPhoneById", new { id = createdPhone.PhoneID }, createdPhone);
         }
 
         /// <summary>

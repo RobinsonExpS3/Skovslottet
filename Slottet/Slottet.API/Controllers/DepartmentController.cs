@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Slottet.Infrastructure.Data;
@@ -7,6 +8,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class DepartmentController : Controller
     {
         private readonly SlottetDBContext _context;

@@ -20,18 +20,18 @@ namespace Slottet.Infrastructure.Data.Seed
                 : throw new InvalidOperationException("Dag ikke fundet");
 
             var residents = new List<Resident> {
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Anna Bentsen", IsActive = true, GroceryDayID = GetDayID("Mandag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Carsten Didriksen", IsActive = true, GroceryDayID = GetDayID("Mandag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Enaya Frederiksen", IsActive = true, GroceryDayID = GetDayID("Onsdag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Gert Heller", IsActive = true, GroceryDayID = GetDayID("Fredag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Ida Jacoby", IsActive = true, GroceryDayID = GetDayID("Lørdag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Karl Larsen", IsActive = true, GroceryDayID = GetDayID("Lørdag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Mette Nielsen", IsActive = true, GroceryDayID = GetDayID("Lørdag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Ole Pontoppidan", IsActive = true, GroceryDayID = GetDayID("Lørdag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Quint Roberts", IsActive = true, GroceryDayID = GetDayID("Lørdag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Søren Thomasson", IsActive = true, GroceryDayID = GetDayID("Lørdag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Ulke Venja", IsActive = true, GroceryDayID = GetDayID("Lørdag") },
-                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Whilmer Xander", IsActive = true, GroceryDayID = GetDayID("Lørdag") }
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Anna Bentsen",     IsActive = true, GroceryDayID = GetDayID("Mandag"),  SortOrder = 0  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Carsten Didriksen",IsActive = true, GroceryDayID = GetDayID("Mandag"),  SortOrder = 1  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Enaya Frederiksen",IsActive = true, GroceryDayID = GetDayID("Onsdag"),  SortOrder = 2  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Gert Heller",      IsActive = true, GroceryDayID = GetDayID("Fredag"),  SortOrder = 3  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Ida Jacoby",       IsActive = true, GroceryDayID = GetDayID("Lørdag"),  SortOrder = 4  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Karl Larsen",      IsActive = true, GroceryDayID = GetDayID("Lørdag"),  SortOrder = 5  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Mette Nielsen",    IsActive = true, GroceryDayID = GetDayID("Lørdag"),  SortOrder = 6  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Ole Pontoppidan",  IsActive = true, GroceryDayID = GetDayID("Lørdag"),  SortOrder = 7  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Quint Roberts",    IsActive = true, GroceryDayID = GetDayID("Lørdag"),  SortOrder = 8  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Søren Thomasson",  IsActive = true, GroceryDayID = GetDayID("Lørdag"),  SortOrder = 9  },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Ulke Venja",       IsActive = true, GroceryDayID = GetDayID("Lørdag"),  SortOrder = 10 },
+                new Resident { ResidentID = Guid.NewGuid(), ResidentName = "Whilmer Xander",   IsActive = true, GroceryDayID = GetDayID("Lørdag"),  SortOrder = 11 }
             };
 
             context.Residents.AddRange(residents);
