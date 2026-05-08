@@ -120,6 +120,34 @@ namespace Slottet.Infrastructure.Services {
             return JsonSerializer.Serialize(displayValues);
         }
 
+        /// <summary>
+        /// Resolves a human-readable subject for an audit log entry.
+        /// </summary>
+        /// <param name="tableName">
+        /// The name of the table recorded on the audit log (for example "Staffs", "Residents",
+        /// "ShiftBoards" etc.). This value is used to select a specialized resolver for common tables.
+        /// </param>
+        /// <param name="keyValues">
+        /// Parsed key/value pairs from the audit log's KeyValues JSON. Keys are property names
+        /// (e.g. "StaffID", "ResidentID") and values are string representations (often GUIDs).
+        /// </param>
+        /// <returns>
+        /// A task that resolves to a subject string suitable for display. If no key values are provided
+        /// the method returns the Danish text "Ikke givet". If a known table is provided a specialized
+        /// resolver is used; otherwise <see cref="ResolveFallbackSubjectAsync(IReadOnlyDictionary{string, string?})"/>
+        /// is invoked which attempts to resolve each key individually.
+        /// </returns>
+        /// <remarks>
+        /// Supported table names (mapped to dedicated resolvers):
+        /// ShiftBoards, Staffs, Residents, Medicines, PNs, ResidentStatuses, StaffShifts,
+        /// StaffResidentStatuses, ResidentPaymentMethods, SpecialResponsibilities,
+        /// SpecialResponsibilityStaff, Departments, DepartmentTasks, GroceryDays,
+        /// PaymentMethods, Phones, RiskLevels.
+        ///
+        /// The resolution process may perform asynchronous database lookups via the injected
+        /// <see cref="SlottetDBContext"/>. Unknown references are converted to a readable
+        /// fallback using <see cref="GetUnknownReferenceText(string)"/>.
+        /// </remarks>
         private async Task<string> ResolveSubjectAsync(string tableName, IReadOnlyDictionary<string, string?> keyValues) {
             if (keyValues.Count == 0) {
                 return "Ikke givet";
@@ -147,7 +175,7 @@ namespace Slottet.Infrastructure.Services {
             };
         }
 
-        private async Task<string?> ResolveValueAsync(string propertyName, string? value) {
+        private async Task<string> ResolveValueAsync(string propertyName, string? value) {
             if (string.IsNullOrWhiteSpace(value) || !Guid.TryParse(value, out var id)) {
                 return value;
             }
