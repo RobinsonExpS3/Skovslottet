@@ -118,7 +118,7 @@ namespace Slottet.Client.Test {
 
         [TestMethod]
         public void AdminStaff_ShowsAccessDeniedMessage_WhenShiftBoardReturnsUnauthorized() {
-            _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Forbidden);
+            _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Unauthorized);
             _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDTO>());
             _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
             _handler.AddJson(HttpMethod.Get, "api/SpecialResponsibility/SpecialResponsibilities",
