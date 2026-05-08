@@ -158,7 +158,7 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result.Result, typeof(CreatedAtActionResult));
             var created = (CreatedAtActionResult)result.Result!;
             Assert.AreEqual(201, created.StatusCode);
-            Assert.AreEqual(nameof(_controller.GetResidentByIdAsync), created.ActionName);
+            Assert.AreEqual("GetResidentById", created.ActionName);
         }
 
         [TestMethod]

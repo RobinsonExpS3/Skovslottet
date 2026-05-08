@@ -133,7 +133,7 @@ namespace Slottet.API.Test {
             Assert.IsInstanceOfType(result.Result, typeof(CreatedAtActionResult));
             var created = (CreatedAtActionResult)result.Result!;
             Assert.AreEqual(201, created.StatusCode);
-            Assert.AreEqual(nameof(_controller.GetPhoneByIdAsync), created.ActionName);
+            Assert.AreEqual("GetPhoneById", created.ActionName);
             Assert.AreEqual(ValidPhoneId, created.RouteValues!["id"]);
         }
 
