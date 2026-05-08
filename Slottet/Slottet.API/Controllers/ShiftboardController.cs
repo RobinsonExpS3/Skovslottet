@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "ShiftboardDisplay")]
     public class ShiftboardController : ControllerBase
     {
         private readonly IShiftBoardDTOService _shiftBoardService;
@@ -20,6 +22,20 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <param name="ct">Cancellation token used to cancel the request.</param>
         /// <returns>Returns the latest shift board if found, otherwise NotFound.</returns>
+        [HttpGet("by-shift")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetShiftBoardByDateAndShiftAsync(
+            [FromQuery] DateOnly date,
+            [FromQuery] string shiftType,
+            CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetShiftBoardByDateAndShiftAsync(date, shiftType, ct);
+
+            if (dto == null)
+                return NotFound();
+
+            return Ok(dto);
+        }
+
         [HttpGet("current")]
         public async Task<ActionResult<ShiftBoardDTO>> GetCurrentShiftBoardAsync(CancellationToken ct)
         {
@@ -104,7 +120,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetShiftBoardByIdAsync), new { id = createdShiftBoard.ShiftBoardID }, createdShiftBoard);
+            return CreatedAtAction("GetShiftBoardById", new { id = createdShiftBoard.ShiftBoardID }, createdShiftBoard);
         }
 
         /// <summary>

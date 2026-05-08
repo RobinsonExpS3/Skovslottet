@@ -20,6 +20,22 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="ct">Cancellation token used to cancel the database query.</param>
         /// <returns>Returns the latest ShiftBoardDTO object if found, otherwise null.</returns>
+        public async Task<ShiftBoardDTO?> GetShiftBoardByDateAndShiftAsync(DateOnly date, string shiftType, CancellationToken ct = default)
+        {
+            var start = date.ToDateTime(TimeOnly.MinValue);
+            var end   = date.AddDays(1).ToDateTime(TimeOnly.MinValue);
+
+            var id = await _context.ShiftBoards
+                .AsNoTracking()
+                .Where(sb => sb.ShiftType == shiftType
+                          && sb.StartDateTime >= start
+                          && sb.StartDateTime < end)
+                .Select(sb => sb.ShiftBoardID)
+                .FirstOrDefaultAsync(ct);
+
+            return id == Guid.Empty ? null : await GetShiftBoardDtoByIdAsync(id, ct);
+        }
+
         public async Task<ShiftBoardDTO?> GetCurrentShiftBoardAsync(CancellationToken ct = default)
         {
             var latestId = await _context.ShiftBoards
@@ -241,6 +257,8 @@ namespace Slottet.Infrastructure.Services
             return await _context.Residents
                 .AsNoTracking()
                 .Where(r => r.IsActive)
+                .OrderBy(r => r.SortOrder)
+                .ThenBy(r => r.ResidentID)
                 .Include(r => r.GroceryDay)
                 .Include(r => r.Medicines)
                 .Include(r => r.PNs)

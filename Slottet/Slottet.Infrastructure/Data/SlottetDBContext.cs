@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data
 {
-    public class SlottetDBContext : DbContext
+    public class SlottetDBContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
 
         public SlottetDBContext(DbContextOptions<SlottetDBContext> options)

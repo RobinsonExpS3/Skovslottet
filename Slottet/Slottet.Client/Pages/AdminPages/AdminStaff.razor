@@ -1,58 +1,158 @@
-﻿@page "/adminStaff"
+@page "/adminStaff"
 @rendermode InteractiveWebAssembly
-@using Slottet.Shared
 
-<div class="view-box" @onclick="ClearForm">
-    <h2>Rediger personale</h2>
+@if (isBusy)
+{
+    <p>Indlæser...</p>  
+}
+else if (loadErrorMessage is not null)
+{
+    <p>@loadErrorMessage</p>
+}
+else
+{
+    <div class="admin-page" @onclick="ClearAll">
 
+        @* ── HEADER ── *@
+        <AdminHeader Active="staff" />
 
-    <div class="table-layout">
-        <table class="table-form" @onclick:stopPropagation>
-            <thead>
-                <tr>
-                    <th>Navn</th>
-                    <th>Initialer</th>
-                    <th>Rolle</th>
-                    <th>Afdeling</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in staffMembers)
-                {
-                    <tr @onclick="() => SelectItem(item)" class="@(selectedItem == item ? "selected-row" : "")">
-                        <td>@item.StaffName</td>
-                        <td>@item.Initials</td>
-                        <td>@(item.Role == "staff" ? "Pædagog" : item.Role == "admin" ? "Administrator" : item.Role)</td>
-                        <td>@GetDepartmentName(item.DepartmentID)</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        @* ── MAIN LAYOUT ── *@
+        <div class="admin-layout">
 
-        <div class="button-column" @onclick:stopPropagation>
-            <p>
-                <strong>
-                    @(selectedItem == null ? "Opret ny medarbejder" : "Rediger medarbejder")
-                </strong>
-            </p>
-          
-            <input class="sp-table-input" @bind="staffNameInput" placeholder="Indtast navn" />
-            <input class="sp-table-input" @bind="initialsInput" placeholder="Indtast initialer" />
-            <select class="role-picker" @bind="roleInput">
-                <option value="">Vælg rolle</option>
-                <option value="staff">Pædagog</option>
-                <option value="admin">Administrator</option>
-            </select>
-            <select class="Deparment-picker" @bind="departmentIdInput">
-                <option value="@Guid.Empty">Vælg Afdeling</option>
-                @foreach (var department in departments)
-                {
-                    <option value="@department.ID">@department.Name</option>
-                }
-            </select>
-            <button class="column-button" @onclick="Create" disabled="@(!CanCreate)">Opret</button>
-            <button class="column-button" @onclick="Update" disabled="@(!CanUpdate)">Opdater</button>
-            <button class="column-button" @onclick="Delete" disabled="@(!CanDelete)">Slet</button>
+            @* ── VENSTRE: Rediger personale ── *@
+            <section class="admin-card staff-card">
+
+                <div class="admin-card-header">
+                    <h2>Rediger personale</h2>
+                </div>
+
+                <div class="staff-editor">
+
+                    @* Personale-liste *@
+                    <div class="staff-list-panel">
+                        @if (staffMembers == null)
+                        {
+                            <p class="state-text">Indlæser…</p>
+                        }
+                        else if (loadFailed)
+                        {
+                            <p class="state-text state-text--error">Kunne ikke loade data. Prøv venligst igen senere.</p>
+                        }
+                        else
+                        {
+                            <table class="staff-table">
+                                <tbody>
+                                    @foreach (var item in staffMembers)
+                                    {
+                                        <tr @onclick:stopPropagation @onclick="() => SelectItem(item)"
+                                        class="staff-row @(selectedItem == item ? "staff-row--selected" : "")">
+                                            <td class="col-name">@item.StaffName</td>
+                                            <td class="col-initials">@item.Initials</td>
+                                            <td class="col-role">
+                                                @(
+                                                                                    item.Role == "admin" ? "Administrator"
+                                                                                                                      : item.Role == "staff" ? "Pædagog"
+                                                                                                                      : item.Role ?? "–"
+                                                            )
+                                                        </td>
+                                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+
+                    @* Personale-formular *@
+                    <div class="staff-form-panel" @onclick:stopPropagation>
+                        <input class="form-field" @bind="staffNameInput" @bind:event="oninput" placeholder="Navn" />
+                        <input class="form-field" @bind="initialsInput"  @bind:event="oninput" placeholder="Initialer" />
+                        <select class="form-field form-select" @bind="roleInput">
+                            <option value="">Vælg rolle</option>
+                            <option value="staff">Pædagog</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                        <div class="form-buttons">
+                            <button class="btn-admin btn-create"
+                            @onclick="Create"
+                            disabled="@(string.IsNullOrWhiteSpace(staffNameInput) || selectedItem != null)">
+                                Opret
+                            </button>
+                            <button class="btn-admin btn-update"
+                            @onclick="Update"
+                            disabled="@(selectedItem == null)">
+                                Opdater
+                            </button>
+                            <button class="btn-admin btn-delete"
+                            @onclick="Delete"
+                            disabled="@(selectedItem == null)">
+                                Slet
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            @* ── HØJRE: Særligt Ansvar ── *@
+            <section class="admin-card sr-card">
+
+                <div class="admin-card-header">
+                    <h2>Særligt Ansvar</h2>
+                </div>
+
+                <div class="sr-editor">
+
+                    @* SR-liste *@
+                    <div class="sr-list-panel">
+                        @if (specialResponsibilities == null)
+                        {
+                            <p class="state-text">Indlæser…</p>
+                        }
+                        else if (srLoadFailed)
+                        {
+                            <p class="state-text state-text--error">Kunne ikke loade data.</p>
+                        }
+                        else
+                        {
+                            <table class="staff-table">
+                                <tbody>
+                                    @foreach (var sr in specialResponsibilities)
+                                    {
+                                        <tr @onclick:stopPropagation @onclick="() => SelectSr(sr)"
+                                        class="staff-row @(selectedSr == sr ? "staff-row--selected" : "")">
+                                            <td class="col-name">@sr.Description</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+
+                    @* SR-formular *@
+                    <div class="sr-form-panel" @onclick:stopPropagation>
+                        <input class="form-field" @bind="srDescriptionInput" @bind:event="oninput" placeholder="Ansvarsområde" />
+                        <div class="form-buttons">
+                            <button class="btn-admin btn-create"
+                            @onclick="CreateSr"
+                            disabled="@(string.IsNullOrWhiteSpace(srDescriptionInput) || selectedSr != null || srBusy)">
+                                Opret
+                            </button>
+                            <button class="btn-admin btn-update"
+                            @onclick="UpdateSr"
+                            disabled="@(selectedSr == null || srBusy)">
+                                Opdater
+                            </button>
+                            <button class="btn-admin btn-delete"
+                            @onclick="DeleteSr"
+                            disabled="@(selectedSr == null || srBusy)">
+                                Slet
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
         </div>
     </div>
-</div>
+}

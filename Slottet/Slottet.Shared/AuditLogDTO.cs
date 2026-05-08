@@ -8,8 +8,10 @@ namespace Slottet.Shared {
         public DateTime PerformedAtTime { get; set; }
 
         public string Action { get; set; } = string.Empty;
+        public string Category { get; set; } = string.Empty;
         public string TableName { get; set; } = string.Empty;
         public string KeyValues { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
 
         public string? OldValuesJson { get; set; }
         public string? NewValuesJson { get; set; }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
@@ -7,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "EmployeeOrAdmin")]
     public class DepartmentTaskController : Controller
     {
         private readonly IDepartmentTaskDTOService _departmentTaskService;

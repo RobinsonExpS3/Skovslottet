@@ -13,5 +13,7 @@ namespace Slottet.Application.Interfaces {
 
         Task<List<ResidentLookupDTO>> GetResidentGroceryDaysAsync();
         Task<List<ResidentLookupDTO>> GetResidentPaymentMethodsAsync();
+        Task<List<ResidentCardDto>> GetResidentCardsAsync(CancellationToken ct = default);
+        Task<bool> SwapResidentSortOrderAsync(Guid residentIdA, Guid residentIdB, CancellationToken ct = default);
     }
 }

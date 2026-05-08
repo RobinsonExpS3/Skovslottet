@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
@@ -6,6 +7,7 @@ namespace Slottet.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Policy = "AdminOnly")]
     public class ResidentController : Controller
     {
         private readonly IResidentDTOService _residentService;
@@ -64,7 +66,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetResidentByIdAsync), new { id = resident.ResidentID }, resident);
+            return CreatedAtAction("GetResidentById", new { id = resident.ResidentID }, resident);
         }
 
         /// <summary>
@@ -113,8 +115,29 @@ namespace Slottet.API.Controllers
         /// Gets grocery day lookup values used when editing residents.
         /// </summary>
         /// <returns>Returns all grocery day lookup values.</returns>
+        /// <summary>
+        /// Swaps the SortOrder of two residents so they exchange positions in the grid.
+        /// </summary>
+        [HttpPut("swap-order")]
+        public async Task<ActionResult> SwapResidentSortOrderAsync([FromBody] SwapResidentSortOrderDto dto, CancellationToken ct)
+        {
+            if (dto.ResidentIdA == Guid.Empty || dto.ResidentIdB == Guid.Empty || dto.ResidentIdA == dto.ResidentIdB)
+                return BadRequest();
+
+            var swapped = await _residentService.SwapResidentSortOrderAsync(dto.ResidentIdA, dto.ResidentIdB, ct);
+            return swapped ? NoContent() : NotFound();
+        }
+
+        [HttpGet("cards")]
+        public async Task<ActionResult<List<ResidentCardDto>>> GetResidentCardsAsync(CancellationToken ct)
+        {
+            var cards = await _residentService.GetResidentCardsAsync(ct);
+            return Ok(cards);
+        }
+
         [HttpGet("groceryDays")]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentGroceryDaysAsync() {
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentGroceryDaysAsync()
+        {
             var groceryDays = await _residentService.GetResidentGroceryDaysAsync();
             return Ok(groceryDays);
         }
@@ -124,7 +147,8 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all payment method lookup values.</returns>
         [HttpGet("paymentMethods")]
-        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentPaymentMethodsAsync() {
+        public async Task<ActionResult<IEnumerable<ResidentLookupDTO>>> GetResidentPaymentMethodsAsync()
+        {
             var paymentMethods = await _residentService.GetResidentPaymentMethodsAsync();
             return Ok(paymentMethods);
         }

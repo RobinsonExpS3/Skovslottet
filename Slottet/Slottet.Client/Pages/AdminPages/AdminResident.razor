@@ -1,90 +1,268 @@
-﻿@page "/adminResident"
+@page "/adminResident"
 @rendermode InteractiveWebAssembly
 
-<div class="view-box">
-	<h2>Rediger beboer</h2>
+<div class="admin-page" @onclick="ClearForm">
 
-	<div class="table-layout">
-		<table class="table-form">
-			@if(residents == null)
-			{
-				<tr>
-					<td>Loading...</td>
-				</tr>
-			}
-			else if (loadFailed) 
-			{
-				<tr>
-					<td>Kunne ikke loade data. Prøv venligst igen senere</td>
-				</tr>
-			}
-			else
-			{
-				@foreach(var resident in residents)
-				{
-					<tr @onclick="() => SelectResidentAsync(resident)" 
-						class="@(selectedResident == resident ? "selected-row" : "")"
-						style="cursor: pointer;">
-						<td>@resident.ResidentName</td>
-						<td>@GetGroceryDayName(resident.GroceryDayID)</td>
-					</tr>
-				}
-			}
-		</table>
+    <AdminHeader Active="resident" />
 
-		<div class="button-column">
-			<label>
-				<input type="checkbox" @bind="isActiveInput"/>
-				Aktiv
-            </label>
-			<input class="r-table-input" @bind="residentNameInput" placeholder="Indtast navn..." />
-			<select @bind="selectedGroceryDayID">
-				<option value="">Vælg handledag</option>
-				@foreach (var day in groceryDays) {
-					<option value="@day.ID">@day.Name</option>
-				}
-			</select>
+    @if (IsLoading)
+    {
+        <p class="state-text">Indlæser beboere…</p>
+    }
+    else if (LoadError is not null)
+    {
+        <p class="state-text state-text--error">Fejl: @LoadError</p>
+    }
+    else
+    {
+        <section class="admin-resident-layout">
 
-			<select multiple @onchange="OnPaymentMethodsChanged">
-				@foreach (var method in paymentMethods) {
-					<option value="@method.ID" selected="@selectedPaymentMethodIDs.Contains(method.ID)">
-						@method.Name
-					</option>
-				}
-			</select>
+            @* ── VENSTRE: Resident-kort grid (identisk med ShiftBoard) ── *@
+            <main class="left-panel">
+                <div class="resident-card-grid">
+                    @for (int slot = 0; slot < 12; slot++)
+                    {
+                        int s = slot; // capture for closures
+                        if (slot < Cards.Count)
+                        {
+                            var resident       = Cards[slot];
+                            var displayedMeds  = resident.MedicineSchedule.Take(6).ToList();
+                            var cardId         = "admin-kort-" + resident.ResidentStatusID;
+                            var todayDanish    = DateTime.Today.DayOfWeek switch
+                            {
+                                DayOfWeek.Monday    => "Mandag",
+                                DayOfWeek.Tuesday   => "Tirsdag",
+                                DayOfWeek.Wednesday => "Onsdag",
+                                DayOfWeek.Thursday  => "Torsdag",
+                                DayOfWeek.Friday    => "Fredag",
+                                DayOfWeek.Saturday  => "Lørdag",
+                                DayOfWeek.Sunday    => "Søndag",
+                                _                   => string.Empty
+                            };
+                            var isGroceryToday = resident.GroceryDay == todayDanish;
+                            var isDragOver     = _dragTargetSlot == s && _dragSourceSlot != s;
 
-			<div>
-				<label>Vælg medicintid</label>
-				<select @bind="selectedHour">
-					@for (int i = 0; i < 24; i++) {
-						<option value="@i">@i.ToString("D2")</option>
-					}
-				</select>
-				:
-				<select @bind="selectedMinute">
-					@for (int i = 0; i < 60; i += 5) {
-						<option value="@i">@i.ToString("D2")</option>
-					}
-				</select>
-				<button type="button" @onclick="AddMedicineTime">Tilføj</button>
-			</div>
+                            <article class="resident-card resident-card--clickable @(isDragOver ? "resident-card--drag-over" : "")"
+                                     id="@cardId"
+                                     draggable="true"
+                                     @ondragstart="() => OnDragStart(s)"
+                                     @ondragend="OnDragEnd"
+                                     @ondragenter="() => _dragTargetSlot = s"
+                                     @ondragleave="() => { if (_dragTargetSlot == s) _dragTargetSlot = -1; }"
+                                     @ondragover:preventDefault="true"
+                                     @ondrop="() => OnDrop(s)"
+                                     @onclick:stopPropagation
+                                     @onclick="() => OpenResident(resident, cardId)"
+                                     title="Klik for at redigere – træk for at flytte">
 
-			<div>
-				<strong>Valgte tider:</strong>
-				@if (!medicineTimes.Any()) {
-					<p>Ingen tider valgt</p>
-				}
-				@foreach (var time in medicineTimes) {
-					<div>
-						@time.Time.ToString("HH:mm")
-						<button type="button" @onclick="() => RemoveMedicineTime(time)">Fjern tid</button>
-					</div>
-				}
-			</div>
+                                @* ── Navn ── *@
+                                <section class="resident-header @resident.RiskCssClass">
+                                    <h3>@resident.ResidentName</h3>
+                                </section>
 
-			<button type="button" class="column-button" @onclick="CreateAsync" disabled="@(!CanCreate)">Opret</button>
-			<button type="button" class="column-button" @onclick="UpdateAsync" disabled="@(!CanUpdate)">Opdater</button>
-			<button type="button" class="column-button" @onclick="DeleteAsync" disabled="@(!CanDelete)">Slet</button>
-		</div>
-	</div>
+                                @* ── Seneste status ── *@
+                                <section class="resident-status">
+                                    <h4>Seneste status</h4>
+                                    <p>@resident.LatestStatusNote</p>
+                                </section>
+
+                                @* ── Body-grid ── *@
+                                <div class="card-body-grid">
+
+                                    @* Medicin *@
+                                    <section class="medicine-section">
+                                        @if (displayedMeds.Count == 0)
+                                        {
+                                            <div class="medicine-empty">Ingen Medicin</div>
+                                        }
+                                        else
+                                        {
+                                            <table class="medicine-table">
+                                                <tbody>
+                                                    <tr>
+                                                        <th rowspan="2">Medicin</th>
+                                                        @foreach (var med in displayedMeds)
+                                                        {
+                                                            <th>@med.Label</th>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        @foreach (var med in displayedMeds)
+                                                        {
+                                                            <td>
+                                                                <div class="dose-box @(med.IsGiven ? "given" : "not-given")">
+                                                                    @(med.IsGiven ? "💊" : " ")
+                                                                </div>
+                                                            </td>
+                                                        }
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        }
+                                    </section>
+
+                                    @* Ansvarlig personale *@
+                                    <section class="assigned-staff">
+                                        <h4>Ansvarlig personale</h4>
+                                        <div class="staff-initials-row">
+                                            @foreach (var staff in resident.AssignedStaff.Take(2))
+                                            {
+                                                var initials = string.Join(".", staff.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => char.ToUpper(w[0])));
+                                                <span class="staff-initial-pill">@initials</span>
+                                            }
+                                        </div>
+                                    </section>
+
+                                    @* PN *@
+                                    @{
+                                        var pnSorted = resident.PNEntries
+                                            .OrderBy(p => TimeOnly.TryParse(p.TimeOfAdministration, out var pt) ? pt : TimeOnly.MaxValue)
+                                            .Take(3).ToList();
+                                    }
+                                    <section class="pn-section">
+                                        @if (pnSorted.Count == 0)
+                                        {
+                                            <div class="medicine-empty">Ingen PN registreret</div>
+                                        }
+                                        else
+                                        {
+                                            <table class="pn-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>PN</th>
+                                                        @foreach (var pn in pnSorted) { <th>@pn.TimeOfAdministration</th> }
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td class="pn-row-label">Præparat</td>
+                                                        @foreach (var pn in pnSorted) { <td class="pn-medication">@pn.Medication</td> }
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="pn-row-label">Årsag</td>
+                                                        @foreach (var pn in pnSorted) { <td>@pn.Reason</td> }
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="pn-row-label">Udstedt af</td>
+                                                        @foreach (var pn in pnSorted) { <td>@pn.IssuedBy</td> }
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        }
+                                    </section>
+
+                                    @* Betaling + Handledag *@
+                                    <div class="payment-grocery">
+                                        <section class="payment-method">
+                                            <h4>Betaling</h4>
+                                            <p>@resident.PaymentMethod</p>
+                                        </section>
+                                        <section class="grocery-day @(isGroceryToday ? "grocery-day--today" : string.Empty)">
+                                            <h4>Handledag</h4>
+                                            <span class="grocery-text">@resident.GroceryDay</span>
+                                        </section>
+                                    </div>
+
+                                </div>
+                            </article>
+                        }
+                        else
+                        {
+                            @* Blankt kort *@
+                            <article class="resident-card resident-card--empty"></article>
+                        }
+                    }
+                </div>
+            </main>
+
+            @* ── HØJRE: Opret ny beboer ── *@
+            <aside class="right-panel" @onclick:stopPropagation>
+
+                <div class="info-box">
+                    <h3>Ny beboer</h3>
+                    <input class="form-field" @bind="residentNameInput" @bind:event="oninput" placeholder="Navn…" />
+                    <label class="create-active-label">
+                        <input type="checkbox" @bind="isActiveInput" />
+                        Aktiv
+                    </label>
+                </div>
+
+                <div class="info-box">
+                    <h3>Handledag</h3>
+                    <select class="form-field form-select" @bind="selectedGroceryDayID">
+                        <option value="">– Vælg handledag –</option>
+                        @foreach (var day in groceryDays)
+                        {
+                            <option value="@day.ID">@day.Name</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="info-box">
+                    <h3>Betalingsmetode</h3>
+                    <select class="form-field form-select create-multiselect" multiple @onchange="OnPaymentMethodsChanged">
+                        @foreach (var method in paymentMethods)
+                        {
+                            <option value="@method.ID" selected="@selectedPaymentMethodIDs.Contains(method.ID)">
+                                @method.Name
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="info-box">
+                    <h3>Medicintider</h3>
+                    <div class="create-time-row">
+                        <select class="form-field form-select" @bind="selectedHour">
+                            @for (int i = 0; i < 24; i++)
+                            {
+                                <option value="@i">@i.ToString("D2")</option>
+                            }
+                        </select>
+                        <span class="create-time-colon">:</span>
+                        <select class="form-field form-select" @bind="selectedMinute">
+                            @for (int i = 0; i < 60; i += 5)
+                            {
+                                <option value="@i">@i.ToString("D2")</option>
+                            }
+                        </select>
+                        <button class="create-add-btn" type="button" @onclick="AddMedicineTime">+</button>
+                    </div>
+                    <div class="create-tag-list">
+                        @if (!medicineTimes.Any())
+                        {
+                            <span style="font-size:0.78rem; color: var(--color-text-muted);">Ingen tider valgt</span>
+                        }
+                        else
+                        {
+                            @foreach (var time in medicineTimes)
+                            {
+                                <div class="create-tag">
+                                    <span>@time.Time.ToString("HH:mm")</span>
+                                    <button type="button" class="create-tag-remove" @onclick="() => RemoveMedicineTime(time)">✕</button>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <button class="new-shiftboard-button" @onclick="CreateAsync" disabled="@(!CanCreate)">
+                    Opret beboer
+                </button>
+
+            </aside>
+
+        </section>
+    }
 </div>
+
+@* ── OVERLAY: Rediger beboer (identisk med ShiftBoard) ── *@
+@if (SelectedResident is not null)
+{
+    <Overlay IsVisible="true"
+             OnClose="CloseOverlay"
+             Size="lg"
+             PanelId="overlay-panel-admin-borger">
+        <ResidentCard Resident="SelectedResident" AllStaff="AllStaff" OnSaved="OnResidentSaved" />
+    </Overlay>
+}

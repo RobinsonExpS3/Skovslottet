@@ -3,6 +3,7 @@
 @import url('css/Design/typography.css');
 @import url('css/Design/global.css');
 @import url('css/Design/liste-editor.css');
+@import url('css/Design/admin.css');
 
 /* ── Base ── */
 a, .btn-link {
