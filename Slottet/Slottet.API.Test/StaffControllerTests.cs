@@ -67,7 +67,7 @@ namespace Slottet.API.Test
                     StaffID = Guid.NewGuid(),
                     StaffName = "Bo Berg",
                     Initials = "BB",
-                    Role = "Pædagig",
+                    Role = "Pædagog",
                     DepartmentID = Guid.NewGuid()
                 }
             };
