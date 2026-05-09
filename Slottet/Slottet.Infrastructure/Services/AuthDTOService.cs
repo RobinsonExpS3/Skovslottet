@@ -13,7 +13,7 @@ namespace Slottet.Infrastructure.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
-        public AuthDTOService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        public AuthDTOService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager)   
         {
             _userManager = userManager;
             _roleManager = roleManager;

@@ -107,6 +107,10 @@ namespace Slottet.Client.Pages.AdminPages
         private string GetDepartmentName(Guid departmentId) =>
             departments.FirstOrDefault(x => x.ID == departmentId)?.Name ?? departmentId.ToString();
 
+        private Guid GetDepartmentSkoven() =>
+            departments.FirstOrDefault(x =>
+                string.Equals(x.Name, "Skoven", StringComparison.OrdinalIgnoreCase))?.ID ?? Guid.Empty;
+
         private void SelectItem(EditStaffDTO item)
         {
             selectedItem = item;
@@ -127,11 +131,11 @@ namespace Slottet.Client.Pages.AdminPages
 
                 var newItem = new EditStaffDTO
                 {
-                    StaffID = Guid.NewGuid(),
+                    StaffID = staffid,
                     StaffName = staffNameInput.Trim(),
                     Initials = initialsInput.Trim(),
                     Role = roleInput.Trim(),
-                    DepartmentID = departmentIdInput
+                    DepartmentID = GetDepartmentSkoven(),
                 };
 
                 var staffResponse = await httpClient.PostAsJsonAsync("api/Staff", newItem);
@@ -140,6 +144,13 @@ namespace Slottet.Client.Pages.AdminPages
                 {
                     loadErrorMessage = "Kunne ikke oprette medarbejder. Prøv venligst igen senere.";
                     return;
+                }
+
+
+
+                if (roleInput == "admin")
+                {
+                    isAdminChecked = true;
                 }
 
                 var newUser = new CreateUserForStaffDTO
@@ -170,6 +181,11 @@ namespace Slottet.Client.Pages.AdminPages
             }
         }
 
+        private async Task CreateStaffUser()
+        {
+
+        }
+
         private async Task Update()
         {
             if (!CanUpdate) return;
@@ -190,6 +206,11 @@ namespace Slottet.Client.Pages.AdminPages
                     return;
                 }
 
+                if (roleInput == "admin")
+                {
+                    isAdminChecked = true;
+                }
+
                 var userUpdate = new CreateUserForStaffDTO
                 {
                     StaffID = selectedItem.StaffID,
@@ -200,7 +221,7 @@ namespace Slottet.Client.Pages.AdminPages
 
                 var userResponse = await httpClient.PutAsJsonAsync($"api/Auth/{selectedItem.StaffID}", userUpdate);
 
-                if (!userResponse.IsSuccessStatusCode)
+                if (userResponse.IsSuccessStatusCode)
                 {
                     await LoadStaff();
                     ClearStaffForm();
@@ -219,8 +240,11 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
+                var userResponse = await httpClient.DeleteAsync($"api/Auth/{selectedItem!.StaffID}");
+
                 var response = await httpClient.DeleteAsync($"api/Staff/{selectedItem!.StaffID}");
-                if (response.IsSuccessStatusCode)
+
+                if (response.IsSuccessStatusCode && userResponse.IsSuccessStatusCode)
                 {
                     await LoadStaff();
                     ClearStaffForm();
@@ -245,6 +269,7 @@ namespace Slottet.Client.Pages.AdminPages
             initialsInput = string.Empty;
             roleInput = string.Empty;
             departmentIdInput = Guid.Empty;
+            passwordInput = string.Empty;
         }
 
         // ═════════════════════════════════════════

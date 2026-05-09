@@ -71,6 +71,7 @@ else
                             <option value="staff">Pædagog</option>
                             <option value="admin">Administrator</option>
                         </select>
+                        <input class="form-field" @bind="passwordInput" @bind:event="oninput" placeholder="Nyt kodeord" />
                         <div class="form-buttons">
                             <button class="btn-admin btn-create"
                             @onclick="Create"
