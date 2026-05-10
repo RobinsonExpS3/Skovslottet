@@ -30,6 +30,7 @@ builder.Services.AddScoped<IPaymentMethodDTOService, PaymentMethodDTOService>();
 builder.Services.AddScoped<IPhoneDTOService, PhoneDTOService>();
 builder.Services.AddScoped<IAuditScope, AuditScope>();
 builder.Services.AddScoped<AuditInterceptor>();
+builder.Services.AddScoped<IAuditLogKeyValueService, AuditLogKeyValueService>();
 builder.Services.AddScoped<IAuditLogDTOService, AuditLogDTOService>();
 builder.Services.AddScoped<IStaffPNDTOService, StaffPNDTOService>();
 builder.Services.AddScoped<IDepartmentTaskDTOService, DepartmentTaskDTOService>();

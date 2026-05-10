@@ -1,0 +1,186 @@
+@startuml AuditLog_Class_Diagram
+title Slottet - Auditlog design klassediagram
+
+skinparam packageStyle folder
+skinparam linetype ortho
+skinparam shadowing false
+hide circle
+
+package "Slottet.API" as API <<Project>> {
+  package "Controllers" as APIControllers <<Folder>> {
+    class AuditLogController {
+      - IAuditLogDTOService _auditLogService
+      + AuditLogController(auditLogService: IAuditLogDTOService)
+      + GetAllAuditLogsAsync(date: DateOnly?, shift: string?): Task<ActionResult>
+    }
+  }
+
+  package "Middlewares" as APIMiddlewares <<Folder>> {
+    class AuditScopeMiddleware {
+      - RequestDelegate _next
+      + AuditScopeMiddleware(next: RequestDelegate)
+      + InvokeAsync(context: HttpContext, auditScope: IAuditScope): Task
+    }
+  }
+
+  class APIProgram <<Program>>
+}
+
+package "Slottet.Application" as Application <<Project>> {
+  package "Interfaces" as AppInterfaces <<Folder>> {
+    interface IAuditLogDTOService {
+      + GetAllAuditLogsAsync(): Task
+      + GetAllAuditLogsAsync(date: DateOnly?, shift: string?): Task
+    }
+
+    interface IAuditLogKeyValueService {
+      + EnrichAuditLogsAsync(auditLogs: IList): Task
+    }
+
+    interface IAuditScope {
+      + Guid? PerformedByStaffID
+      + string? PerformedByStaffName
+      + DateTime? PerformedAtTime
+    }
+  }
+}
+
+package "Slottet.Domain" as Domain <<Project>> {
+  package "Entities" as DomainEntities <<Folder>> {
+    class AuditLog {
+      + Guid AuditLogID
+      + DateTime TimeStamp
+      + string? Action
+      + string? TableName
+      + string? KeyValues
+      + string? OldValuesJson
+      + string? NewValuesJson
+      + Guid? PerformedByStaffID
+      + string? PerformedByStaffName
+      + DateTime? PerformedAtTime
+    }
+  }
+}
+
+package "Slottet.Infrastructure" as Infrastructure <<Project>> {
+  class AuditScope {
+    + Guid? PerformedByStaffID
+    + string? PerformedByStaffName
+    + DateTime? PerformedAtTime
+  }
+
+  package "Auditing" as InfraAuditing <<Folder>> {
+    class AuditInterceptor {
+      - IAuditScope _auditScope
+      + AuditInterceptor(auditScope: IAuditScope)
+      + SavingChangesAsync(eventData: DbContextEventData, result: InterceptionResult<int>, cancellationToken: CancellationToken): ValueTask<InterceptionResult<int>>
+      - CreateAuditLogs(context: DbContext): List<AuditLog>
+    }
+  }
+
+  package "Data" as InfraData <<Folder>> {
+    class SlottetDBContext {
+      + DbSet<AuditLog> AuditLogs
+      # OnModelCreating(modelBuilder: ModelBuilder): void
+    }
+
+    package "Configurations" as InfraConfigurations <<Folder>> {
+      class AuditLogConfiguration {
+        + Configure(entity: EntityTypeBuilder<AuditLog>): void
+      }
+    }
+  }
+
+  package "Services" as InfraServices <<Folder>> {
+    class AuditLogDTOService {
+      - SlottetDBContext _context
+      - IAuditLogKeyValueService _auditLogKeyValueService
+      + AuditLogDTOService(context: SlottetDBContext, auditLogKeyValueService: IAuditLogKeyValueService)
+      + GetAllAuditLogsAsync(): Task
+      + GetAllAuditLogsAsync(date: DateOnly?, shift: string?): Task
+      - MapToDtoExpression(): Expression
+    }
+
+    class AuditLogKeyValueService {
+      - SlottetDBContext _context
+      + AuditLogKeyValueService(context: SlottetDBContext)
+      + EnrichAuditLogsAsync(auditLogs: IList): Task
+      - ResolveSubjectAsync(tableName: string, keyValues: Dictionary): Task<string>
+      - ResolveAuditValuesJsonAsync(json: string?): Task<string?>
+      - ResolveValueAsync(propertyName: string, value: string?): Task<string?>
+      - ParseAuditValues(json: string?): Dictionary<string, string?>
+    }
+  }
+}
+
+package "Slottet.Shared" as Shared <<Project>> {
+  class AuditLogDTO {
+    + Guid AuditLogID
+    + DateTime PerformedAtTime
+    + string Action
+    + string Category
+    + string TableName
+    + string KeyValues
+    + string Subject
+    + string? OldValuesJson
+    + string? NewValuesJson
+    + Guid PerformedByStaffID
+    + string PerformedByStaffName
+  }
+}
+
+' Dependency injection and request flow
+APIProgram ..> IAuditScope : AddScoped
+APIProgram ..> AuditScope : AddScoped
+APIProgram ..> AuditInterceptor : AddScoped
+APIProgram ..> IAuditLogDTOService : AddScoped
+APIProgram ..> AuditLogDTOService : AddScoped
+APIProgram ..> IAuditLogKeyValueService : AddScoped
+APIProgram ..> AuditLogKeyValueService : AddScoped
+APIProgram ..> AuditScopeMiddleware : UseMiddleware
+APIProgram ..> SlottetDBContext : AddDbContext
+
+' API read side
+AuditLogController ..> IAuditLogDTOService : queries
+IAuditLogDTOService <|.. AuditLogDTOService
+AuditLogDTOService --> SlottetDBContext : reads
+AuditLogDTOService --> IAuditLogKeyValueService : enriches through
+AuditLogDTOService ..> AuditLog : maps from
+AuditLogDTOService ..> AuditLogDTO : maps to
+IAuditLogKeyValueService <|.. AuditLogKeyValueService
+AuditLogKeyValueService --> SlottetDBContext : resolves display values
+AuditLogKeyValueService ..> AuditLogDTO : enriches subject/values
+
+' Audit write side
+AuditScopeMiddleware ..> IAuditScope : sets current staff/time
+IAuditScope <|.. AuditScope
+AuditInterceptor --> IAuditScope : reads current scope
+SlottetDBContext ..> AuditInterceptor : SaveChanges interceptor
+AuditInterceptor ..> AuditLog : creates
+SlottetDBContext "1" o-- "0..*" AuditLog : AuditLogs
+
+' EF configuration
+SlottetDBContext ..> AuditLogConfiguration : applies
+AuditLogConfiguration ..> AuditLog : configures
+
+note right of AuditInterceptor
+  Captures Added, Modified and Deleted
+  entities during SaveChangesAsync.
+
+  AuditLog itself is excluded to avoid
+  auditing audit rows.
+end note
+
+note right of AuditLogDTOService
+  Filters audit logs by date and shift,
+  maps entities to DTOs, and delegates
+  semantic enrichment.
+end note
+
+note right of AuditLogKeyValueService
+  Makes audit key values semantically
+  understandable for staff by resolving
+  subjects and foreign IDs to display text.
+end note
+
+@enduml
