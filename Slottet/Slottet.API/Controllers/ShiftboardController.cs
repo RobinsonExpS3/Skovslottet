@@ -107,6 +107,7 @@ namespace Slottet.API.Controllers
         /// <param name="ct">Cancellation token used to cancel the request.</param>
         /// <returns>Returns the created shift board.</returns>
         [HttpPost]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<ShiftBoardEntryDTO>> PostShiftBoardAsync([FromBody] ShiftBoardEntryDTO dto, CancellationToken ct)
         {
             if (dto == null)
@@ -131,6 +132,7 @@ namespace Slottet.API.Controllers
         /// <param name="ct">Cancellation token used to cancel the request.</param>
         /// <returns>Returns NoContent if the update succeeds, otherwise BadRequest or NotFound.</returns>
         [HttpPut("{id:guid}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> PutShiftBoardAsync(Guid id, [FromBody] ShiftBoardEntryDTO dto, CancellationToken ct)
         {
             if (dto == null || id != dto.ShiftBoardID)
@@ -155,6 +157,7 @@ namespace Slottet.API.Controllers
         /// <param name="ct">Cancellation token used to cancel the request.</param>
         /// <returns>Returns NoContent if the deletion succeeds, otherwise NotFound.</returns>
         [HttpDelete("{id:guid}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> DeleteShiftBoardAsync(Guid id, CancellationToken ct)
         {
             var deleted = await _shiftBoardService.DeleteShiftBoardAsync(id, ct);
