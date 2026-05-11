@@ -15,6 +15,9 @@ namespace Slottet.Client.Pages.AdminPages
         private string staffNameInput = string.Empty;
         private string initialsInput = string.Empty;
         private string roleInput = string.Empty;
+        private string passwordInput = string.Empty;
+        private string authRoleInput = string.Empty;
+        private bool isAdminChecked;
         private Guid departmentIdInput;
         private EditStaffDTO? selectedItem;
         private bool isBusy;
@@ -101,6 +104,7 @@ namespace Slottet.Client.Pages.AdminPages
             initialsInput = item.Initials;
             roleInput = item.Role;
             departmentIdInput = item.DepartmentID;
+            passwordInput = string.Empty;
         }
 
         private string GetDepartmentName(Guid departmentId) =>
@@ -113,17 +117,42 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
+                var staffid = Guid.NewGuid();
+
                 var newItem = new EditStaffDTO
                 {
-                    StaffID = Guid.NewGuid(),
+                    StaffID = staffid,
                     StaffName = staffNameInput.Trim(),
                     Initials = initialsInput.Trim(),
                     Role = roleInput.Trim(),
                     DepartmentID = departmentIdInput
                 };
 
-                var response = await httpClient.PostAsJsonAsync("api/Staff", newItem);
-                if (response.IsSuccessStatusCode)
+                var staffResponse = await httpClient.PostAsJsonAsync("api/Staff", newItem);
+
+                if (!staffResponse.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Kunne ikke oprette medarbejder. Prøv venligst igen senere.";
+                    return;
+                }
+
+                var newUser = new CreateUserForStaffDTO
+                {
+                    StaffID = staffid,
+                    UserName = initialsInput.Trim(),
+                    Password = passwordInput,
+                    AuthRole = isAdminChecked ? "Admin" : "Employee"
+                };
+
+                var userResponse = await httpClient.PostAsJsonAsync("api/Auth/createUserForStaff", newUser);
+
+                if (!userResponse.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Medarbejderen blev oprettet, men login kunne ikke oprettes.";
+                    return;
+                }
+
+                if (userResponse.IsSuccessStatusCode)
                 {
                     await LoadData();
                     ClearForm();
@@ -148,11 +177,32 @@ namespace Slottet.Client.Pages.AdminPages
                 selectedItem.DepartmentID = departmentIdInput;
 
                 var response = await httpClient.PutAsJsonAsync($"api/Staff/{selectedItem.StaffID}", selectedItem);
-                if (response.IsSuccessStatusCode)
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    await LoadData();
-                    ClearForm();
+                    loadErrorMessage = "Kunne ikke opdatere medarbejder. Prøv venligst igen senere.";
+                    return;
                 }
+
+                var userUpdate = new CreateUserForStaffDTO
+                {
+                    StaffID = selectedItem.StaffID,
+                    UserName = initialsInput.Trim(),
+                    Password = passwordInput,
+                    AuthRole = isAdminChecked ? "Admin" : "Employee"
+                };
+
+                var userResponse = await httpClient.PutAsJsonAsync($"api/Auth/{selectedItem.StaffID}", userUpdate);
+
+                if (!userResponse.IsSuccessStatusCode)
+                {
+                    loadErrorMessage = "Medarbejderen blev opdateret, men login kunne ikke opdateres.";
+                    return;
+                }
+
+                await LoadData();
+                ClearForm();
+                
             }
             finally
             {
@@ -186,13 +236,14 @@ namespace Slottet.Client.Pages.AdminPages
             staffNameInput = string.Empty;
             initialsInput = string.Empty;
             roleInput = string.Empty;
+            passwordInput = string.Empty;
+            isAdminChecked = false;
             departmentIdInput = Guid.Empty;
         }
 
         private async Task CreatePassword()
-        { 
+        {
 
-            
         }
 
 

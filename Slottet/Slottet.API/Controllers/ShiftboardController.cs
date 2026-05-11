@@ -106,7 +106,7 @@ namespace Slottet.API.Controllers
                 return BadRequest();
             }
 
-            return CreatedAtAction(nameof(GetShiftBoardByIdAsync), new { id = createdShiftBoard.ShiftBoardID }, createdShiftBoard);
+            return CreatedAtAction("GetShiftBoardById", new { id = createdShiftBoard.ShiftBoardID }, createdShiftBoard);
         }
 
         /// <summary>
