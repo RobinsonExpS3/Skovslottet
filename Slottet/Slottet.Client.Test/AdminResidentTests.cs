@@ -248,6 +248,13 @@ namespace Slottet.Client.Test
             {
                 Assert.IsTrue(WasCalled(HttpMethod.Post, "api/Resident"));
             });
+
+           
         }
     }
 }
+    
+
+
+
+
