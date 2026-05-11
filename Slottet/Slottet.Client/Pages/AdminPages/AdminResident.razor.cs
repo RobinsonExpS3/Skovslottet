@@ -74,7 +74,15 @@ namespace Slottet.Client.Pages.AdminPages
             finally
             {
                 isBusy = false;
-                await LoadDataAsync();
+
+                if (LoadError is null)
+                {
+                    await LoadDataAsync();
+                }
+                else
+                {
+                    IsLoading = false;
+                }
             }
         }
 
