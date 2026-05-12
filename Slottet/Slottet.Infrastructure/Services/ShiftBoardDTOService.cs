@@ -64,7 +64,8 @@ namespace Slottet.Infrastructure.Services
             }
 
             var departmentId = shiftBoard.StaffShifts
-                .Select(ss => ss.Staff.DepartmentID)
+                .Where(ss => !ss.IsDeleted && ss.Staff != null)
+                .Select(ss => ss.Staff!.DepartmentID)
                 .FirstOrDefault();
 
             var department = departmentId == Guid.Empty
@@ -85,8 +86,9 @@ namespace Slottet.Infrastructure.Services
                     {
                         Number = phone.PhoneNumber,
                         StaffName = phone.StaffPhones
+                            .Where(sp => !sp.IsDeleted && sp.Staff != null)
                             .OrderByDescending(sp => sp.AssignedAt)
-                            .Select(sp => sp.Staff.StaffName)
+                            .Select(sp => sp.Staff!.StaffName)
                             .FirstOrDefault() ?? string.Empty
                     })
                     .ToList() ?? new(),
@@ -300,7 +302,8 @@ namespace Slottet.Infrastructure.Services
                     .Select(rpm => rpm.PaymentMethod?.PaymentMethodName)
                     .FirstOrDefault(),
                 AssignedStaff = latestStatus?.StaffResidentStatuses
-                    .Select(srs => srs.Staff.StaffName)
+                    .Where(srs => !srs.IsDeleted && srs.Staff != null)
+                    .Select(srs => srs.Staff!.StaffName)
                     .OrderBy(name => name)
                     .ToList() ?? new(),
                 MedicineSchedule = MapMedicineSchedule(resident, today),
@@ -345,7 +348,8 @@ namespace Slottet.Infrastructure.Services
                     Medication = string.Empty,
                     Reason = pn.PNReason,
                     IssuedBy = pn.StaffPNs
-                        .Select(spn => spn.Staff.StaffName)
+                        .Where(spn => !spn.IsDeleted && spn.Staff != null)
+                        .Select(spn => spn.Staff!.StaffName)
                         .FirstOrDefault() ?? string.Empty
                 })
                 .ToList();

@@ -17,6 +17,6 @@ namespace Slottet.Shared {
         public string? NewValuesJson { get; set; }
 
         public Guid PerformedByStaffID { get; set; }
-        public string PerformedByStaffName { get; set; } = string.Empty;
+        public string PerformedByStaffName { get; set; }
     }
 }

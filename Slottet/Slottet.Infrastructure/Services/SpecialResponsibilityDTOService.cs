@@ -134,12 +134,14 @@ namespace Slottet.Infrastructure.Services
                 SpecialResponsibilityID = specialResponsibility.SpecialResponsibilityID,
                 Description = specialResponsibility.TaskName,
                 StaffName = specialResponsibility.SpecialResponsibilityStaffs
+                    .Where(srs => !srs.IsDeleted && srs.Staff != null)
                     .OrderByDescending(srs => srs.AssignedAt)
-                    .Select(srs => srs.Staff.StaffName)
+                    .Select(srs => srs.Staff!.StaffName)
                     .FirstOrDefault() ?? "Unassigned",
                 StaffInitials = specialResponsibility.SpecialResponsibilityStaffs
+                    .Where(srs => !srs.IsDeleted && srs.Staff != null)
                     .OrderByDescending(srs => srs.AssignedAt)
-                    .Select(srs => srs.Staff.Initials)
+                    .Select(srs => srs.Staff!.Initials)
                     .FirstOrDefault() ?? string.Empty
             };
         }

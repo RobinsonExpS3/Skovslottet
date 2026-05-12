@@ -12,7 +12,12 @@ namespace Slottet.Infrastructure.Data.Configurations
         /// <param name="entity">The builder used to configure the SpecialResponsibilityStaff entity.</param>
         public void Configure(EntityTypeBuilder<SpecialResponsibilityStaff> entity)
         {
-            entity.HasKey(x => new { x.SpecialResponsibilityID, x.StaffID, x.AssignedAt });
+            entity.ToTable("SpecialResponsibilityStaff");
+
+            entity.HasKey(x => x.SpecialResponsibilityStaffID);
+
+            entity.Property(x => x.IsDeleted)
+                .IsRequired();
 
             entity.HasOne(x => x.SpecialResponsibility)
                 .WithMany(x => x.SpecialResponsibilityStaffs)
@@ -22,7 +27,7 @@ namespace Slottet.Infrastructure.Data.Configurations
             entity.HasOne(x => x.Staff)
                 .WithMany()
                 .HasForeignKey(x => x.StaffID)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             entity.HasOne(x => x.Department)
                 .WithMany()

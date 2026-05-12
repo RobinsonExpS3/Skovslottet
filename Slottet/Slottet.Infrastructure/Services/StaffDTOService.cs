@@ -119,6 +119,61 @@ namespace Slottet.Infrastructure.Services
                 return false;
             }
 
+            var staffResidentStatuses = await _context.StaffResidentStatuses
+                .Where(srs => srs.StaffID == id)
+                .ToListAsync();
+
+            var staffShifts = await _context.StaffShifts
+                .Where(ss => ss.StaffID == id)
+                .ToListAsync();
+
+            var staffPhones = await _context.StaffPhones
+                .Where(sp => sp.StaffID == id)
+                .ToListAsync();
+
+            var staffPNs = await _context.StaffPNs
+                .Where(spn => spn.StaffID == id)
+                .ToListAsync();
+
+            var specialResponsibilityStaffs = await _context.Set<SpecialResponsibilityStaff>()
+                .Where(srs => srs.StaffID == id)
+                .ToListAsync();
+
+            foreach (var staffResidentStatus in staffResidentStatuses)
+            {
+                staffResidentStatus.IsDeleted = true;
+                staffResidentStatus.StaffID = null;
+            }
+
+            foreach (var staffShift in staffShifts)
+            {
+                staffShift.IsDeleted = true;
+                staffShift.StaffID = null;
+            }
+
+            foreach (var staffPhone in staffPhones)
+            {
+                staffPhone.IsDeleted = true;
+                staffPhone.StaffID = null;
+            }
+
+            foreach (var staffPN in staffPNs)
+            {
+                staffPN.IsDeleted = true;
+                staffPN.StaffID = null;
+            }
+
+            foreach (var specialResponsibilityStaff in specialResponsibilityStaffs)
+            {
+                specialResponsibilityStaff.IsDeleted = true;
+                specialResponsibilityStaff.StaffID = null;
+            }
+
+            var linkedUsers = await _context.Users
+                .Where(user => user.StaffID == id)
+                .ToListAsync();
+
+            _context.Users.RemoveRange(linkedUsers);
             _context.Staffs.Remove(staff);
             await _context.SaveChangesAsync();
             return true;

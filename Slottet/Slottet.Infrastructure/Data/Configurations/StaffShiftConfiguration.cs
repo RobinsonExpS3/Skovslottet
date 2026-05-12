@@ -12,7 +12,10 @@ namespace Slottet.Infrastructure.Data.Configurations
         /// <param name="entity">The builder used to configure the StaffShift entity.</param>
         public void Configure(EntityTypeBuilder<StaffShift> entity)
         {
-            entity.HasKey(ss => new { ss.ShiftBoardID, ss.StaffID });
+            entity.HasKey(ss => ss.StaffShiftID);
+
+            entity.Property(ss => ss.IsDeleted)
+                .IsRequired();
 
             entity.HasOne(sb => sb.ShiftBoard)
                 .WithMany(ss => ss.StaffShifts)
@@ -22,7 +25,7 @@ namespace Slottet.Infrastructure.Data.Configurations
             entity.HasOne(s => s.Staff)
                 .WithMany(ss => ss.StaffShifts)
                 .HasForeignKey(s => s.StaffID)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
