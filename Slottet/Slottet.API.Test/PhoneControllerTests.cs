@@ -5,20 +5,35 @@ using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
 namespace Slottet.API.Test {
+    /// <summary>
+    /// Unit tests for PhoneController.
+    /// Verifies controller responses, validation handling,
+    /// and interaction with IPhoneDTOService.
+    /// </summary>
     [TestClass]
     public class PhoneControllerTests {
+        // Mocked service dependency used by the controller during testing.
         private Mock<IPhoneDTOService> _mockService = null!;
+
+        // Controller instance under test.
         private PhoneController _controller = null!;
 
+        // Shared valid test IDs used across multiple tests.
         private static readonly Guid ValidPhoneId = Guid.NewGuid();
         private static readonly Guid ValidDepartmentId = Guid.NewGuid();
 
+        /// <summary>
+        /// Initializes mocks and controller before each test executes.
+        /// </summary>
         [TestInitialize]
         public void Setup() {
             _mockService = new Mock<IPhoneDTOService>();
             _controller = new PhoneController(_mockService.Object);
         }
 
+        /// <summary>
+        /// Creates a reusable valid PhoneDTO instance for test scenarios.
+        /// </summary>
         private static PhoneDTO ValidDto() => new PhoneDTO {
             PhoneID = ValidPhoneId,
             PhoneNumber = "12345678",

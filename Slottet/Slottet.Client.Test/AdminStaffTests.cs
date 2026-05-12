@@ -8,10 +8,20 @@ using Slottet.Shared;
 using Slottet.Client.Test.Helpers;
 
 namespace Slottet.Client.Test {
+    /// <summary>
+    /// bUnit tests for the AdminStaff page.
+    /// Verifies rendering, API interaction, validation,
+    /// authorization handling, and CRUD workflows.
+    /// </summary>
     [TestClass]
     public class AdminStaffTests : BunitContext {
+        // Fake HTTP handler used to mock backend API responses.
         private FakeHttpMessageHandler _handler = null!;
 
+        /// <summary>
+        /// Configures the fake HTTP client and dependency injection
+        /// before each test executes.
+        /// </summary>
         [TestInitialize]
         public void Setup() {
             _handler = new FakeHttpMessageHandler();
@@ -22,6 +32,11 @@ namespace Slottet.Client.Test {
         }
 
         // Helpers
+
+        /// <summary>
+        /// Configures successful mock responses for all required
+        /// API endpoints during component initialization.
+        /// </summary>
         private void SetupSuccessfulInitialLoad() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
 
@@ -43,6 +58,10 @@ namespace Slottet.Client.Test {
                 new List<SpecialResponsibilityEntryDto>());
         }
 
+        /// <summary>
+        /// Configures successful mock responses using a specific staff ID.
+        /// Used for scenarios that require validating update or delete requests.
+        /// </summary>
         private void SetupSuccessfulInitialLoadWithStaffId(Guid staffId) {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
 
@@ -66,9 +85,16 @@ namespace Slottet.Client.Test {
                 new List<SpecialResponsibilityEntryDto>());
         }
 
+        /// <summary>
+        /// Extracts the relative request path from an HTTP request message.
+        /// </summary>
         private static string Path(HttpRequestMessage request) =>
             request.RequestUri!.PathAndQuery.TrimStart('/');
 
+        /// <summary>
+        /// Checks whether a request with the specified HTTP method and path
+        /// was executed during the test.
+        /// </summary>
         private bool WasCalled(HttpMethod method, string path) =>
             _handler.Requests.Any(r => r.Method == method && Path(r) == path);
 
@@ -211,10 +237,12 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Anna Hansen", component.Markup);
             });
 
+            // Fill create form with valid values.
             component.Find("input[placeholder='Navn']").Input("Peter Jensen");
             component.Find("input[placeholder='Initialer']").Input("PJ");
             component.Find("select").Change("staff");
 
+            // Trigger create action.
             component.Find("button.btn-create").Click();
 
             component.WaitForAssertion(() =>
@@ -241,15 +269,19 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Anna Hansen", component.Markup);
             });
 
+            // Fill create form with valid values.
             component.Find("input[placeholder='Navn']").Input("Peter Jensen");
             component.Find("input[placeholder='Initialer']").Input("PJ");
             component.Find("select").Change("staff");
 
+            // Attempt to create staff member.
             component.Find("button.btn-create").Click();
 
             component.WaitForAssertion(() =>
             {
                 Assert.Contains("Kunne ikke oprette medarbejder", component.Markup);
+
+                // Verify login creation endpoint was not called.
                 Assert.IsFalse(WasCalled(HttpMethod.Post, "api/Auth/createUserForStaff"));
             });
         }
@@ -272,10 +304,12 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Anna Hansen", component.Markup);
             });
 
+            // Fill create form with valid values.
             component.Find("input[placeholder='Navn']").Input("Peter Jensen");
             component.Find("input[placeholder='Initialer']").Input("PJ");
             component.Find("select").Change("staff");
 
+            // Trigger create workflow.
             component.Find("button.btn-create").Click();
 
             component.WaitForAssertion(() =>
@@ -299,14 +333,17 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Anna Hansen", component.Markup);
             });
 
+            // Select staff row from rendered table.
             component.Find("tr.staff-row").Click();
 
             var nameInput = component.Find("input[placeholder='Navn']");
             var initialsInput = component.Find("input[placeholder='Initialer']");
 
+            // Verify form fields are populated with selected staff values.
             Assert.AreEqual("Anna Hansen", nameInput.GetAttribute("value"));
             Assert.AreEqual("AH", initialsInput.GetAttribute("value"));
 
+            // Verify update and delete buttons become enabled.
             Assert.IsFalse(component.Find("button.btn-update").HasAttribute("disabled"));
             Assert.IsFalse(component.Find("button.btn-delete").HasAttribute("disabled"));
         }
@@ -330,6 +367,7 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Anna Hansen", component.Markup);
             });
 
+            // Select staff row and trigger delete action.
             component.Find("tr.staff-row").Click();
             component.Find("button.btn-delete").Click();
 
@@ -354,6 +392,7 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Anna Hansen", component.Markup);
             });
 
+            // Verify action buttons are initially disabled.
             Assert.IsTrue(component.Find("button.btn-update").HasAttribute("disabled"));
             Assert.IsTrue(component.Find("button.btn-delete").HasAttribute("disabled"));
         }
@@ -375,6 +414,7 @@ namespace Slottet.Client.Test {
 
             var createButton = component.Find("button.btn-create");
 
+            // Verify create button remains disabled without required input.
             Assert.IsTrue(createButton.HasAttribute("disabled"));
         }
     }

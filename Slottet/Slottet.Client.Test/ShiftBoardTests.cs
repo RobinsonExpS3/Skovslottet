@@ -7,10 +7,20 @@ using Slottet.Client.Test.Helpers;
 using Slottet.Shared;
 
 namespace Slottet.Client.Test {
+    /// <summary>
+    /// bUnit tests for the ShiftBoard page.
+    /// Verifies rendering, API interaction, authorization handling,
+    /// navigation, and overlay functionality.
+    /// </summary>
     [TestClass]
     public class ShiftBoardTests : BunitContext {
+        // Fake HTTP handler used to mock backend API responses.
         private FakeHttpMessageHandler _handler = null!;
 
+        /// <summary>
+        /// Configures the fake HTTP client and dependency injection
+        /// before each test executes.
+        /// </summary>
         [TestInitialize]
         public void Setup() {
             _handler = new FakeHttpMessageHandler();
@@ -21,12 +31,24 @@ namespace Slottet.Client.Test {
         }
 
         // Helpers
+
+        /// <summary>
+        /// Extracts the relative request path from an HTTP request message.
+        /// </summary>
         private static string Path(HttpRequestMessage request) =>
             request.RequestUri!.PathAndQuery.TrimStart('/');
 
+        /// <summary>
+        /// Checks whether a request with the specified HTTP method and path
+        /// was executed during the test.
+        /// </summary>
         private bool WasCalled(HttpMethod method, string path) =>
             _handler.Requests.Any(r => r.Method == method && Path(r) == path);
 
+        /// <summary>
+        /// Calculates the current shift type based on the provided time.
+        /// Defaults to the current system time when no value is supplied.
+        /// </summary>
         private static string CurrentShiftType(DateTime? at = null) {
             var hour = (at ?? DateTime.Now).Hour;
 
@@ -37,6 +59,10 @@ namespace Slottet.Client.Test {
             };
         }
 
+        /// <summary>
+        /// Calculates the active shift date.
+        /// Night shifts before 07:00 belong to the previous calendar day.
+        /// </summary>
         private static DateOnly CurrentShiftDate(DateTime? at = null) {
             var now = at ?? DateTime.Now;
 
@@ -45,6 +71,9 @@ namespace Slottet.Client.Test {
                 : DateOnly.FromDateTime(now);
         }
 
+        /// <summary>
+        /// Builds the expected API URL for retrieving the current shift board.
+        /// </summary>
         private static string CurrentShiftUrl() {
             var date = CurrentShiftDate();
             var shift = CurrentShiftType();
@@ -52,11 +81,17 @@ namespace Slottet.Client.Test {
             return $"api/shiftboard/by-shift?date={date:yyyy-MM-dd}&shiftType={shift}";
         }
 
+        /// <summary>
+        /// Configures successful mock responses for the current shift board page load.
+        /// </summary>
         private void SetupSuccessfulInitialLoad(ShiftBoardDTO? dto = null) {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
             _handler.AddJson(HttpMethod.Get, CurrentShiftUrl(), dto ?? ValidShiftBoardDto());
         }
 
+        /// <summary>
+        /// Creates a reusable valid ShiftBoardDTO instance for test scenarios.
+        /// </summary>
         private static ShiftBoardDTO ValidShiftBoardDto() {
             return new ShiftBoardDTO {
                 ShiftBoardId = Guid.NewGuid(),
@@ -197,9 +232,12 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Ny vagt-tavle", component.Markup);
             });
 
+            // Trigger navigation to the admin staff page.
             component.Find("button.new-shiftboard-button").Click();
 
             var nav = Services.GetRequiredService<NavigationManager>();
+
+            // Verify navigation target.
             Assert.EndsWith("/adminStaff", nav.Uri);
         }
 
@@ -211,6 +249,7 @@ namespace Slottet.Client.Test {
         public void ShiftBoard_OpenPhoneList_ShowsPhoneListOverlay() {
             SetupSuccessfulInitialLoad();
 
+            // Mock overlay animation helper.
             JSInterop.SetupVoid("overlayHelpers.playFlyIn", _ => true);
 
             var component = Render<ShiftBoard>();
@@ -219,6 +258,7 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Telefonnumre", component.Markup);
             });
 
+            // Open phone list overlay.
             component.FindAll(".info-box--clickable")[0].Click();
 
             component.WaitForAssertion(() => {
@@ -234,6 +274,7 @@ namespace Slottet.Client.Test {
         public void ShiftBoard_OpenDepartmentTasks_ShowsDepartmentTaskOverlay() {
             SetupSuccessfulInitialLoad();
 
+            // Mock overlay animation helper.
             JSInterop.SetupVoid("overlayHelpers.playFlyIn", _ => true);
 
             var component = Render<ShiftBoard>();
@@ -242,6 +283,7 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Afdelingens opgaver", component.Markup);
             });
 
+            // Open department tasks overlay.
             component.FindAll(".info-box--clickable")[2].Click();
 
             component.WaitForAssertion(() => {
@@ -257,6 +299,7 @@ namespace Slottet.Client.Test {
         public void ShiftBoard_OpenSpecialResponsibilities_ShowsSpecialResponsibilityOverlay() {
             SetupSuccessfulInitialLoad();
 
+            // Mock overlay animation helper.
             JSInterop.SetupVoid("overlayHelpers.playFlyIn", _ => true);
 
             var component = Render<ShiftBoard>();
@@ -265,6 +308,7 @@ namespace Slottet.Client.Test {
                 Assert.Contains("Særligt ansvar", component.Markup);
             });
 
+            // Open special responsibilities overlay.
             component.FindAll(".info-box--clickable")[1].Click();
 
             component.WaitForAssertion(() => {

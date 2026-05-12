@@ -6,15 +6,27 @@ using Slottet.Shared;
 
 namespace Slottet.API.Test
 {
+    /// <summary>
+    /// Unit tests for StaffController.
+    /// Verifies controller responses, validation handling,
+    /// and interaction with IStaffDTOService.
+    /// </summary>
     [TestClass]
     public class StaffControllerTests
     {
+        // Mocked service dependency used by the controller during testing.
         private Mock<IStaffDTOService> _mockService = null!;
+
+        // Controller instance under test.
         private StaffController _controller = null!;
 
+        // Shared valid test IDs used across multiple tests.
         private static readonly Guid ValidStaffId = Guid.NewGuid();
         private static readonly Guid ValidDepartmentId = Guid.NewGuid();
 
+        /// <summary>
+        /// Initializes mocks and controller before each test executes.
+        /// </summary>
         [TestInitialize]
         public void Setup()
         {
@@ -22,6 +34,9 @@ namespace Slottet.API.Test
             _controller = new StaffController(_mockService.Object);
         }
 
+        /// <summary>
+        /// Creates a reusable valid EditStaffDTO instance for test scenarios.
+        /// </summary>
         private static EditStaffDTO ValidDto() => new EditStaffDTO
         {
             StaffID = ValidStaffId,
