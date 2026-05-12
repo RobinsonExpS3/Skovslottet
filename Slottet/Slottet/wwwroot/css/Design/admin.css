@@ -5,6 +5,21 @@
 
 /* ── PAGE ── */
 .admin-page {
+    /* Admin red theme — overrider globale grønne variabler */
+    --color-primary-dark:    #7B1A1A;
+    --color-primary-mid:     #A52626;
+    --color-primary:         #C0392B;
+    --color-primary-light:   #D98B8B;
+    --color-primary-lighter: #F2D0D0;
+    --color-bg-section-header: #F5E0E0;
+    --color-bg-section:      #FBF0F0;
+    --color-text-heading:    #5A1010;
+    --color-text-label:      #A52626;
+    --shadow-card:           0 3px 10px rgba(120, 20, 20, 0.10);
+    --shadow-header:         0 4px 12px rgba(120, 20, 20, 0.30);
+    --border-outer:          3px solid var(--color-primary);
+    --border-inner:          1.5px solid var(--color-primary-light);
+
     height: 100vh;
     box-sizing: border-box;
     padding: 10px 14px;
