@@ -181,10 +181,6 @@ namespace Slottet.Client.Pages.AdminPages
             }
         }
 
-        private async Task CreateStaffUser()
-        {
-
-        }
 
         private async Task Update()
         {

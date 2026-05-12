@@ -138,8 +138,7 @@ namespace Slottet.Client.Pages.AdminPages
 
         protected async Task OnResidentSaved()
         {
-            CloseOverlay();
-            await LoadDataAsync();
+            await UpdateAsync();
         }
 
         // ── Creation CRUD ─────────────────────────────────────────────────
@@ -179,9 +178,17 @@ namespace Slottet.Client.Pages.AdminPages
                     IsActive = isActiveInput
                 };
                 var response = await Http.PutAsJsonAsync($"api/Resident/{SelectedResident.ResidentID}", dto);
-                if (response.IsSuccessStatusCode) { ClearForm(); await LoadDataAsync(); }
+                if (response.IsSuccessStatusCode)
+                {
+                    ClearForm();
+                    await LoadDataAsync();
+                }
             }
-            finally { isBusy = false; }
+            finally
+            {
+                CloseOverlay();
+                isBusy = false;
+            }
         }
 
         private async Task DeleteAsync()
