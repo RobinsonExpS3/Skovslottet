@@ -89,6 +89,11 @@ namespace Slottet.Client.Test
             _handler.Requests.Any(r => r.Method == method && Path(r) == path);
 
         //Tests
+
+        /// <summary>
+        /// Ensures the AdminResident page renders resident data returned from the API.
+        /// Verifies that the bUnit-rendered markup contains the resident name from the mocked API response.
+        /// </summary>
         [TestMethod]
         public void AdminResident_LoadsResidentCards_WhenApiReturnsData()
         {
@@ -102,6 +107,11 @@ namespace Slottet.Client.Test
             });
         }
 
+
+        /// <summary>
+        /// Ensures the AdminResident page calls all required API endpoints on initialization.
+        /// Verifies that requests are made to shiftboard, resident cards, staff, grocery days, and payment methods.
+        /// </summary>
         [TestMethod]
         public void AdminResident_CallsExpectedEndpoints_WhenInitialized()
         {
@@ -119,6 +129,10 @@ namespace Slottet.Client.Test
             });
         }
 
+        /// <summary>
+        /// Ensures the AdminResident page displays an access denied message when the shift board returns 403 Forbidden.
+        /// Verifies that the access denied message is present in the rendered component markup.
+        /// </summary
         [TestMethod]
         public void AdminResident_ShowsAccessDeniedMessage_WhenShiftBoardReturnsForbidden()
         {
@@ -135,7 +149,10 @@ namespace Slottet.Client.Test
                 Assert.Contains("Du har ikke adgang til denne side.", component.Markup);
             });
         }
-
+        /// <summary>
+        /// Ensures the AdminResident page displays a load error when the shift board returns an unexpected error status.
+        /// Verifies that the error message is present in the rendered component markup.
+        /// </summary>
         [TestMethod]
         public void AdminResident_ShowsLoadError_WhenShiftBoardReturnsOtherError()
         {
@@ -152,7 +169,10 @@ namespace Slottet.Client.Test
                 Assert.Contains("Kunne ikke loade siden. Prøv venligst igen senere.", component.Markup);
             });
         }
-
+        /// <summary>
+        /// Ensures the AdminResident page displays a load error when the resident cards endpoint fails.
+        /// Verifies that the error prefix is rendered in the component markup when data loading throws an exception.
+        /// </summary>
         [TestMethod]
         public void AdminResident_ShowsLoadError_WhenResidentCardsLoadFails()
         {
@@ -170,6 +190,10 @@ namespace Slottet.Client.Test
             });
         }
 
+        /// <summary>
+        /// Ensures the create button is disabled when no resident name has been entered.
+        /// Verifies that the button's disabled attribute is present before any form input is provided.
+        /// </summary>
         [TestMethod]
         public void AdminResident_CreateButtonIsDisabled_WhenNameIsMissing()
         {
@@ -182,10 +206,14 @@ namespace Slottet.Client.Test
                 Assert.Contains("Anna Hansen", component.Markup);
             });
 
-            // No name entered, no grocery day selected
+            
             Assert.IsTrue(component.Find("button.new-shiftboard-button").HasAttribute("disabled"));
         }
 
+        /// <summary>
+        /// Ensures the create button remains disabled when a name is entered but no grocery day is selected.
+        /// Verifies that both a name and a grocery day are required before the create button becomes enabled.
+        /// </summary>
         [TestMethod]
         public void AdminResident_CreateButtonIsDisabled_WhenGroceryDayIsNotSelected()
         {
@@ -198,12 +226,16 @@ namespace Slottet.Client.Test
                 Assert.Contains("Anna Hansen", component.Markup);
             });
 
-            // Name entered but grocery day still unselected
+            
             component.Find("input[placeholder='Navn…']").Input("Bo Berg");
 
             Assert.IsTrue(component.Find("button.new-shiftboard-button").HasAttribute("disabled"));
         }
 
+        /// <summary>
+        /// Ensures the create button posts to the resident endpoint when all required fields are filled in.
+        /// Verifies that a POST request is made to api/Resident after entering a name and selecting a grocery day.
+        /// </summary>
         [TestMethod]
         public void AdminResident_Create_PostsToResidentEndpoint_WhenFormIsValid()
         {
@@ -240,7 +272,7 @@ namespace Slottet.Client.Test
             });
 
             component.Find("input[placeholder='Navn…']").Input("Bo Berg");
-            component.FindAll("select")[0].Change(groceryDayId.ToString()); // grocery day is the first select
+            component.FindAll("select")[0].Change(groceryDayId.ToString()); 
 
             component.Find("button.new-shiftboard-button").Click();
 

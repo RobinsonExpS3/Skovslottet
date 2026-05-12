@@ -29,7 +29,10 @@ namespace Slottet.Infrastructure.Test {
 
             return new SlottetDBContext(options);
         }
-
+        /// <summary>
+        /// Ensures GetAllStaffAsync retrieves all staff members from the database.
+        /// Verifies that both seeded staff members are returned and identifiable by their IDs.
+        /// </summary>
         [TestMethod]
         public async Task GetAllStaffAsync_ReturnsAllStaff() {
             using var context = CreateContext();

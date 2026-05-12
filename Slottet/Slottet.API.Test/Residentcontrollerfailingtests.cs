@@ -30,7 +30,10 @@ namespace Slottet.Tests.Controllers
             GroceryDayID = ValidGroceryDayId
         };
 
-        // Now correctly asserts 200 OK
+        /// <summary>
+        /// Ensures GetAllResidentsAsync returns a 200 OK status code when the service returns residents.
+        /// Verifies that OkObjectResult is returned even when the resident list is empty.
+        /// </summary>
         [TestMethod]
         public async Task GetAllResidentsAsync_Returns200OK()
         {
@@ -43,7 +46,10 @@ namespace Slottet.Tests.Controllers
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult)); 
         }
 
-        // Now correctly asserts count of 2
+        /// <summary>
+        /// Ensures GetAllResidentsAsync returns the correct number of residents from the service.
+        /// Verifies that the response body contains exactly 2 residents when the service returns 2.
+        /// </summary>
         [TestMethod]
         public async Task GetAllResidentsAsync_ReturnsCorrectCount()
         {
@@ -65,7 +71,10 @@ namespace Slottet.Tests.Controllers
             Assert.AreEqual(2, items.Count()); 
         }
 
-        // Now correctly asserts the actual ValidResidentId
+        /// <summary>
+        /// Ensures GetResidentByIdAsync returns the correct resident matching the requested ID.
+        /// Verifies that the ResidentID on the returned DTO matches the ValidResidentId that was requested.
+        /// </summary>
         [TestMethod]
         public async Task GetResidentByIdAsync_ReturnsCorrectId()
         {
@@ -80,7 +89,10 @@ namespace Slottet.Tests.Controllers
             Assert.AreEqual(ValidResidentId, returned.ResidentID); 
         }
 
-        // Now correctly asserts 201 CreatedAtActionResult
+        /// <summary>
+        /// Ensures PostResidentAsync returns 201 Created when a valid DTO is submitted and the service succeeds.
+        /// Verifies that CreatedAtActionResult is returned rather than an error response.
+        /// </summary>
         [TestMethod]
         public async Task PostResidentAsync_Returns201Created_OnValidDto()
         {

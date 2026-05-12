@@ -34,10 +34,10 @@ namespace Slottet.Infrastructure.Test
             return new SlottetDBContext(options);
         }
 
-        // ---------------------------------------------------------------------
-        // GetAllResidentsAsync
-        // ---------------------------------------------------------------------
-
+        /// <summary>
+        /// Ensures GetAllResidentsAsync retrieves all active residents from the database.
+        /// Verifies that both seeded active residents are returned and identifiable by their IDs.
+        /// </summary>
         [TestMethod]
         public async Task GetAllResidentsAsync_ReturnsAllActiveResidents()
         {
@@ -65,6 +65,10 @@ namespace Slottet.Infrastructure.Test
             Assert.IsTrue(items.Any(r => r.ResidentID == resident2.ResidentID));
         }
 
+        /// <summary>
+        /// Ensures GetAllResidentsAsync filters out inactive residents and only returns active ones.
+        /// Verifies that when both active and inactive residents exist, only the active resident is returned.
+        /// </summary>
         [TestMethod]
         public async Task GetAllResidentsAsync_DoesNotReturn_InactiveResidents()
         {
@@ -91,10 +95,10 @@ namespace Slottet.Infrastructure.Test
             Assert.IsTrue(items.All(r => r.IsActive));
         }
 
-        // ---------------------------------------------------------------------
-        // GetResidentByIdAsync
-        // ---------------------------------------------------------------------
-
+        //// <summary>
+        /// Ensures GetResidentByIdAsync correctly maps all Resident entity fields to the EditResidentDTO.
+        /// Verifies that ResidentID, ResidentName, GroceryDayID, and IsActive are all mapped accurately.
+        /// </summary>
         [TestMethod]
         public async Task GetResidentByIdAsync_ReturnsMappedResident_WhenFound()
         {
@@ -115,6 +119,10 @@ namespace Slottet.Infrastructure.Test
             Assert.IsTrue(result.IsActive);
         }
 
+        /// <summary>
+        /// Ensures GetResidentByIdAsync returns null when no resident matches the given ID.
+        /// Verifies that querying with a random ID that does not exist in the database returns null.
+        /// </summary>
         [TestMethod]
         public async Task GetResidentByIdAsync_ReturnsNull_WhenMissing()
         {
@@ -131,10 +139,10 @@ namespace Slottet.Infrastructure.Test
             Assert.IsNull(result);
         }
 
-        // ---------------------------------------------------------------------
-        // PostResidentAsync
-        // ---------------------------------------------------------------------
-
+        /// <summary>
+        /// Ensures PostResidentAsync assigns a new ResidentID when Guid.Empty is provided.
+        /// Verifies that the resident is created with a non-empty generated ID and persisted to the database.
+        /// </summary>
         [TestMethod]
         public async Task PostResidentAsync_CreatesResident_WithNewID_WhenIDIsEmpty()
         {
@@ -160,9 +168,10 @@ namespace Slottet.Infrastructure.Test
             Assert.AreEqual(1, context.Residents.Count());
         }
 
-        // ---------------------------------------------------------------------
-        // PutResidentAsync
-        // ---------------------------------------------------------------------
+        /// <summary>
+        /// Ensures PutResidentAsync successfully updates all fields of an existing resident.
+        /// Verifies that the changes are persisted to the database and the method returns true.
+        /// </summary>
         [TestMethod]
         public async Task PutResidentAsync_ReturnsTrue_AndUpdatesResident_WhenFound()
         {
@@ -194,6 +203,10 @@ namespace Slottet.Infrastructure.Test
             Assert.AreEqual(GroceryDayId, updatedResident.GroceryDayID);
         }
 
+        /// <summary>
+        /// Ensures PutResidentAsync returns false when no resident matches the given ID.
+        /// Verifies that no changes are made to the database when the resident does not exist.
+        /// </summary>
         [TestMethod]
         public async Task PutResidentAsync_ReturnsFalse_WhenResidentMissing()
         {
@@ -217,10 +230,10 @@ namespace Slottet.Infrastructure.Test
             Assert.AreEqual(0, context.Residents.Count());
         }
 
-        // ---------------------------------------------------------------------
-        // DeleteResidentAsync
-        // ---------------------------------------------------------------------
-
+        /// <summary>
+        /// Ensures DeleteResidentAsync successfully removes an existing resident from the database.
+        /// Verifies that the method returns true and the resident is no longer present in the database.
+        /// </summary>
         [TestMethod]
         public async Task DeleteResidentAsync_ReturnsTrue_AndDeletesResident_WhenFound()
         {
@@ -237,7 +250,10 @@ namespace Slottet.Infrastructure.Test
             Assert.IsTrue(result);
             Assert.IsFalse(context.Residents.Any(r => r.ResidentID == resident.ResidentID));
         }
-
+        /// <summary>
+        /// Ensures DeleteResidentAsync returns false when no resident matches the given ID.
+        /// Verifies that the existing resident remains in the database when an unknown ID is provided.
+        /// </summary>
         [TestMethod]
         public async Task DeleteResidentAsync_ReturnsFalse_WhenResidentMissing()
         {
