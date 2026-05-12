@@ -1,4 +1,4 @@
-# 3. Semester Eksamensprojekt - Slottet
+# 3. Semester Eksamensprojekt - Slottet - Team 1
 ## Formål
 Projektet er udarbejdet som en prototype på et overbliks- og noteringsværktøj for en institution, der håndterer beboer med forskellige udfordringer. Formålet er at skabe overblik for institutionen, særligt ved vagtskifte. 
 
