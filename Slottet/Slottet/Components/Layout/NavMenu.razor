@@ -21,29 +21,12 @@
         @if (canSeeAdminMenu)
         {
             @* Admin (collapsible) *@
-            <button class="nav-icon-btn" @onclick="ToggleAdminMenu" title="Admin">
+            <NavLink class="nav-icon-btn" href="/adminStaff" Match="NavLinkMatch.All">
                 <i class="bi bi-gear-fill"></i>
-            </button>
-
-            @if (isAdminOpen)
-            {
-                @* Admin-undermenu *@
-                <div class="admin-submenu">
-                    <NavLink class="nav-icon-btn" href="adminResident" title="Beboere">
-                        <i class="bi bi-person-plus"></i>
-                    </NavLink>
-                    <NavLink class="nav-icon-btn" href="adminStaff" title="Personale">
-                        <i class="bi bi-people-fill"></i>
-                    </NavLink>
-                    <NavLink class="nav-icon-btn" href="adminSpecialResponsibility" title="Særlige ansvar">
-                        <i class="bi bi-lock-fill"></i>
-                    </NavLink>
-                    <NavLink class="nav-icon-btn" href="adminAudit" title="Logs">
-                        <i class="bi bi-journal-text"></i>
-                    </NavLink>
-                </div>
+            </NavLink>
             }
         }
+
 
     </div>
 </nav>
