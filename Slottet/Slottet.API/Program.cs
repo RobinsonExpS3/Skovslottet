@@ -130,6 +130,8 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+builder.Services.Configure<PasswordHasherOptions>(opt => opt.IterationCount = 210000);
+
 var app = builder.Build();
 
 
