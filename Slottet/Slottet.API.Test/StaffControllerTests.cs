@@ -33,6 +33,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures the controller returns 200 OK when the service successfully retrieves staff.
+        /// Verifies that GetAllStaffAsync wraps the service result in an OkObjectResult.
         /// </summary>
         [TestMethod]
         public async Task GetAllStaffAsync_Returns200OK()
@@ -48,6 +49,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures the controller returns all staff provided by the service.
+        /// Verifies that GetAllStaffAsync returns the staff collection supplied by IStaffDTOService.
         /// </summary>
         [TestMethod]
         public async Task GetAllStaffAsync_ReturnsAllStaffFromService()
@@ -87,6 +89,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 200 OK is returned when the requested staff member exists.
+        /// Verifies that GetStaffByIdAsync returns OkObjectResult when the service resolves a DTO for the requested ID.
         /// </summary>
         [TestMethod]
         public async Task GetStaffByIdAsync_Returns200OK_WhenFound()
@@ -102,6 +105,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures the correct staff data is returned when the staff member exists.
+        /// Verifies that GetStaffByIdAsync preserves the expected DTO values in the OkObjectResult payload.
         /// </summary>
         [TestMethod]
         public async Task GetStaffByIdAsync_ReturnsCorrectStaff_WhenFound()
@@ -123,6 +127,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 404 NotFound is returned when the requested staff member does not exist.
+        /// Verifies that GetStaffByIdAsync maps a null service response to NotFoundResult.
         /// </summary>
         [TestMethod]
         public async Task GetStaffByIdAsync_Returns404NotFound_WhenMissing()
@@ -138,6 +143,8 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures a successful creation returns 201 Created with correct route information.
+        /// Verifies that PostStaffAsync returns CreatedAtActionResult with status code, action name, 
+        /// and route ID populated from the created DTO.
         /// </summary>
         [TestMethod]
         public async Task PostStaffAsync_Returns201Created_WhenServiceSucceeds()
@@ -158,6 +165,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 400 BadRequest is returned when the input DTO is null.
+        /// Verifies that PostStaffAsync rejects a null DTO with BadRequestObjectResult before calling the service.
         /// </summary>
         [TestMethod]
         public async Task PostStaffAsync_Returns400BadRequest_WhenDtoIsNull()
@@ -169,6 +177,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures validation fails when required fields are empty, resulting in 400 BadRequest.
+        /// Verifies that PostStaffAsync rejects an invalid DTO when required string fields fail controller validation.
         /// </summary>
         [TestMethod]
         public async Task PostStaffAsync_Returns400BadRequest_WhenRequiredFieldsAreMissing()
@@ -183,6 +192,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures validation fails when DepartmentID is missing, resulting in 400 BadRequest.
+        /// Verifies that PostStaffAsync rejects Guid.Empty as an invalid DepartmentID.
         /// </summary>
         [TestMethod]
         public async Task PostStaffAsync_Returns400BadRequest_WhenDepartmentIsMissing()
@@ -197,6 +207,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 400 BadRequest is returned when the service fails to create the staff member.
+        /// Verifies that PostStaffAsync maps a null create result from the service to BadRequestResult.
         /// </summary>
         [TestMethod]
         public async Task PostStaffAsync_Returns400BadRequest_WhenServiceReturnsNull()
@@ -213,6 +224,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 204 NoContent is returned when an update operation succeeds.
+        /// Verifies that PutStaffAsync maps a successful service update result to NoContentResult.
         /// </summary>
         [TestMethod]
         public async Task PutStaffAsync_Returns204NoContent_WhenUpdateSucceeds()
@@ -229,6 +241,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 400 BadRequest is returned when the input DTO is null during update.
+        /// Verifies that PutStaffAsync rejects a null update DTO with BadRequestResult.
         /// </summary>
         [TestMethod]
         public async Task PutStaffAsync_Returns400BadRequest_WhenDtoIsNull()
@@ -240,6 +253,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures validation fails when required fields are missing during update.
+        /// Verifies that PutStaffAsync rejects an update DTO when required fields fail controller validation.
         /// </summary>
         [TestMethod]
         public async Task PutStaffAsync_Returns400BadRequest_WhenRequiredFieldsAreMissing()
@@ -254,6 +268,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 404 NotFound is returned when attempting to update a non-existent staff member.
+        /// Verifies that PutStaffAsync maps a false service update result to NotFoundResult.
         /// </summary>
         [TestMethod]
         public async Task PutStaffAsync_Returns404NotFound_WhenStaffMissing()
@@ -270,6 +285,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 204 NoContent is returned when a delete operation succeeds.
+        /// Verifies that DeleteStaffAsync maps a successful service delete result to NoContentResult.
         /// </summary>
         [TestMethod]
         public async Task DeleteStaffAsync_Returns204NoContent_WhenDeleteSucceeds()
@@ -285,6 +301,7 @@ namespace Slottet.API.Test
 
         /// <summary>
         /// Ensures 404 NotFound is returned when attempting to delete a non-existent staff member.
+        /// Verifies that DeleteStaffAsync maps a false service delete result to NotFoundResult.
         /// </summary>
         [TestMethod]
         public async Task DeleteStaffAsync_Returns404NotFound_WhenStaffMissing()

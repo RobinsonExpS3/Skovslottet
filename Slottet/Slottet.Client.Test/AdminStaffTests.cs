@@ -73,7 +73,10 @@ namespace Slottet.Client.Test {
             _handler.Requests.Any(r => r.Method == method && Path(r) == path);
 
 
-        // Tests
+        /// <summary>
+        /// Ensures staff members from the API are displayed when the initial load succeeds.
+        /// Verifies that the rendered AdminStaff markup contains staff name and initials from the mocked API response.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_LoadsStaffMembers_WhenApiReturnsData() {
             SetupSuccessfulInitialLoad();
@@ -87,6 +90,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures AdminStaff requests all required data sources during component initialization.
+        /// Verifies that the bUnit render triggers GET calls for shiftboard access, departments, staff, and special responsibilities.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_CallsExpectedEndpoints_WhenInitialized() {
             SetupSuccessfulInitialLoad();
@@ -101,6 +108,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures access is denied when the shiftboard authorization check returns Forbidden.
+        /// Verifies that the rendered component shows the access denied message for a 403 API response.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_ShowsAccessDeniedMessage_WhenShiftBoardReturnsForbidden() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Forbidden);
@@ -116,6 +127,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures access is denied when the shiftboard authorization check returns Unauthorized.
+        /// Verifies that the rendered component shows the access denied message for a 401 API response.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_ShowsAccessDeniedMessage_WhenShiftBoardReturnsUnauthorized() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Unauthorized);
@@ -132,6 +147,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures a department load failure is surfaced as a general load error.
+        /// Verifies that a failed Department endpoint response renders the expected error message.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_ShowsLoadError_WhenDepartmentLoadFails() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
@@ -149,6 +168,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures a staff load failure is surfaced as a general load error.
+        /// Verifies that a failed Staff endpoint response renders the expected error message.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_ShowsStaffLoadError_WhenStaffLoadFails() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
@@ -170,6 +193,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures valid create form input submits both staff and login creation requests.
+        /// Verifies that bUnit input/change events followed by the create click trigger POST calls to Staff and Auth endpoints.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_Create_PostsStaffAndUser_WhenFormIsValid() {
             SetupSuccessfulInitialLoad();
@@ -197,6 +224,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures staff creation errors stop the login creation flow.
+        /// Verifies that a failed Staff POST renders the create error message and does not call the Auth endpoint.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_ShowsError_WhenCreateStaffFails() {
             SetupSuccessfulInitialLoad();
@@ -223,6 +254,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures login creation failure is handled after staff creation succeeds.
+        /// Verifies that a successful Staff POST followed by a failed Auth POST renders the partial create error message.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_ShowsPartialCreateError_WhenUserCreationFails() {
             SetupSuccessfulInitialLoad();
@@ -249,6 +284,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures selecting a staff row binds the selected staff values into the edit form.
+        /// Verifies that a bUnit row click populates the form inputs and enables update and delete actions.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_SelectStaff_PopulatesFormAndEnablesUpdateAndDelete() {
             SetupSuccessfulInitialLoad();
@@ -272,6 +311,10 @@ namespace Slottet.Client.Test {
             Assert.IsFalse(component.Find("button.btn-delete").HasAttribute("disabled"));
         }
 
+        /// <summary>
+        /// Ensures deleting a selected staff member calls the API with the selected staff ID.
+        /// Verifies that selecting a rendered staff row and clicking delete triggers the expected DELETE request.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_Delete_DeletesSelectedStaff_WhenStaffIsSelected() {
             var staffId = Guid.NewGuid();
@@ -296,6 +339,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures update and delete actions are unavailable before a staff row is selected.
+        /// Verifies that the rendered action buttons have the disabled attribute when no staff member is selected.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_UpdateAndDeleteButtonsAreDisabled_WhenNoStaffIsSelected() {
             SetupSuccessfulInitialLoad();
@@ -311,6 +358,10 @@ namespace Slottet.Client.Test {
             Assert.IsTrue(component.Find("button.btn-delete").HasAttribute("disabled"));
         }
 
+        /// <summary>
+        /// Ensures staff creation cannot be submitted while required form input is missing.
+        /// Verifies that the rendered create button is disabled before a valid name is entered.
+        /// </summary>
         [TestMethod]
         public void AdminStaff_CreateButtonIsDisabled_WhenNameIsMissing() {
             SetupSuccessfulInitialLoad();

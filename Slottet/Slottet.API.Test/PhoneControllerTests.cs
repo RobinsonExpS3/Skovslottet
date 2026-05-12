@@ -27,6 +27,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures the controller returns 200 OK when the service successfully retrieves a list of phones.
+        /// Verifies that GetAllPhonesAsync wraps the service result in an OkObjectResult.
         /// </summary>
         [TestMethod]
         public async Task GetAllPhonesAsync_Returns200OK() {
@@ -41,6 +42,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures the controller returns all phones provided by the service.
+        /// Verifies that GetAllPhonesAsync returns the phone collection supplied by IPhoneDTOService.
         /// </summary>
         [TestMethod]
         public async Task GetAllPhonesAsync_ReturnsAllPhonesFromService() {
@@ -72,6 +74,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 200 OK is returned when the requested phone exists.
+        /// Verifies that GetPhoneByIdAsync returns OkObjectResult when the service resolves a DTO for the requested ID.
         /// </summary>
         [TestMethod]
         public async Task GetPhoneByIdAsync_Returns200OK_WhenFound() {
@@ -86,6 +89,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures the correct phone data is returned when the phone exists.
+        /// Verifies that GetPhoneByIdAsync preserves the expected DTO values in the OkObjectResult payload.
         /// </summary>
         [TestMethod]
         public async Task GetPhoneByIdAsync_ReturnsCorrectPhone_WhenFound() {
@@ -106,6 +110,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 404 NotFound is returned when the requested phone does not exist.
+        /// Verifies that GetPhoneByIdAsync maps a null service response to NotFoundResult.
         /// </summary>
         [TestMethod]
         public async Task GetPhoneByIdAsync_Returns404NotFound_WhenMissing() {
@@ -120,6 +125,8 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures a successful creation returns 201 Created with correct route information.
+        /// Verifies that PostPhoneAsync returns CreatedAtActionResult with status code, action name, 
+        /// and route ID populated from the created DTO.
         /// </summary>
         [TestMethod]
         public async Task PostPhoneAsync_Returns201Created_WhenServiceSucceeds() {
@@ -139,6 +146,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 400 BadRequest is returned when the input DTO is null.
+        /// Verifies that PostPhoneAsync rejects a null DTO with BadRequestResult before calling the service.
         /// </summary>
         [TestMethod]
         public async Task PostPhoneAsync_Returns400BadRequest_WhenDtoIsNull() {
@@ -149,6 +157,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures validation fails when required fields are empty, resulting in 400 BadRequest.
+        /// Verifies that PostPhoneAsync rejects an invalid DTO when required fields fail controller validation.
         /// </summary>
         [TestMethod]
         public async Task PostPhoneAsync_Returns400BadRequest_WhenRequiredFieldsAreMissing() {
@@ -162,6 +171,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures validation fails when DepartmentID is missing, resulting in 400 BadRequest.
+        /// Verifies that PostPhoneAsync rejects Guid.Empty as an invalid DepartmentID.
         /// </summary>
         [TestMethod]
         public async Task PostPhoneAsync_Returns400BadRequest_WhenDepartmentIsMissing() {
@@ -175,6 +185,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 400 BadRequest is returned when the service fails to create a phone.
+        /// Verifies that PostPhoneAsync maps a null create result from the service to BadRequestResult.
         /// </summary>
         [TestMethod]
         public async Task PostPhoneAsync_Returns400BadRequest_WhenServiceReturnsNull() {
@@ -190,6 +201,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 204 NoContent is returned when an update operation succeeds.
+        /// Verifies that PutPhoneAsync maps a successful service update result to NoContentResult.
         /// </summary>
         [TestMethod]
         public async Task PutPhoneAsync_Returns204NoContent_WhenUpdateSucceeds() {
@@ -205,6 +217,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 400 BadRequest is returned when the input DTO is null during update.
+        /// Verifies that PutPhoneAsync rejects a null update DTO with BadRequestResult.
         /// </summary>
         [TestMethod]
         public async Task PutPhoneAsync_Returns400BadRequest_WhenDtoIsNull() {
@@ -215,6 +228,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures validation fails when required fields are missing during update.
+        /// Verifies that PutPhoneAsync rejects an update DTO when required fields fail controller validation.
         /// </summary>
         [TestMethod]
         public async Task PutPhoneAsync_Returns400BadRequest_WhenRequiredFieldsAreMissing() {
@@ -228,6 +242,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 404 NotFound is returned when attempting to update a non-existent phone.
+        /// Verifies that PutPhoneAsync maps a false service update result for the requested phone ID to NotFoundResult.
         /// </summary>
         [TestMethod]
         public async Task PutPhoneAsync_Returns404NotFound_WhenPhoneMissing() {
@@ -246,6 +261,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 204 NoContent is returned when a delete operation succeeds.
+        /// Verifies that DeletePhoneAsync maps a successful service delete result to NoContentResult.
         /// </summary>
         [TestMethod]
         public async Task DeletePhoneAsync_Returns204NoContent_WhenDeleteSucceeds() {
@@ -260,6 +276,7 @@ namespace Slottet.API.Test {
 
         /// <summary>
         /// Ensures 404 NotFound is returned when attempting to delete a non-existent phone.
+        /// Verifies that DeletePhoneAsync maps a false service delete result to NotFoundResult.
         /// </summary>
         [TestMethod]
         public async Task DeletePhoneAsync_Returns404NotFound_WhenPhoneMissing() {

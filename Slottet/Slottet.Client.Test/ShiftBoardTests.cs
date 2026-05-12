@@ -99,7 +99,10 @@ namespace Slottet.Client.Test {
             };
         }
 
-        // Tests
+        /// <summary>
+        /// Ensures the shift board page renders data returned from the API.
+        /// Verifies that the bUnit-rendered markup contains department, resident, phone, responsibility, and task values from the mocked ShiftBoardDTO.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_LoadsShiftBoard_WhenApiReturnsData() {
             SetupSuccessfulInitialLoad();
@@ -116,6 +119,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures ShiftBoard requests the current access check and active shift data during initialization.
+        /// Verifies that the bUnit render triggers GET calls to the current shiftboard endpoint and the calculated shift URL.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_CallsExpectedEndpoints_WhenInitialized() {
             SetupSuccessfulInitialLoad();
@@ -128,6 +135,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures forbidden API responses are handled as an access denied state.
+        /// Verifies that the rendered component shows the access denied message when shiftboard endpoints return 403 Forbidden.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_ShowsAccessDenied_WhenCurrentAndShiftReturnForbidden() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Forbidden);
@@ -140,6 +151,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures a failed shift board load is surfaced as a general load error.
+        /// Verifies that an internal server error from the active shift endpoint renders the expected error message.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_ShowsLoadError_WhenShiftLoadFails() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
@@ -152,6 +167,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures the page handles a missing shift board without rendering shift data.
+        /// Verifies that a null ShiftBoardDTO response renders the empty shift board message.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_ShowsEmptyMessage_WhenNoShiftBoardExists() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
@@ -164,6 +183,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures the new shift board action navigates to the admin staff page.
+        /// Verifies that clicking the new shift board button updates NavigationManager.Uri to /adminStaff.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_NavigateToNewShiftBoard_GoesToAdminStaff() {
             SetupSuccessfulInitialLoad();
@@ -180,6 +203,10 @@ namespace Slottet.Client.Test {
             Assert.EndsWith("/adminStaff", nav.Uri);
         }
 
+        /// <summary>
+        /// Ensures the phone list info box opens its overlay panel.
+        /// Verifies that a bUnit click event on the phone list box renders the phone list overlay after JS interop is mocked.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_OpenPhoneList_ShowsPhoneListOverlay() {
             SetupSuccessfulInitialLoad();
@@ -199,6 +226,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures the department tasks info box opens its overlay panel.
+        /// Verifies that a bUnit click event on the department tasks box renders the department tasks overlay after JS interop is mocked.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_OpenDepartmentTasks_ShowsDepartmentTaskOverlay() {
             SetupSuccessfulInitialLoad();
@@ -218,6 +249,10 @@ namespace Slottet.Client.Test {
             });
         }
 
+        /// <summary>
+        /// Ensures the special responsibilities info box opens its overlay panel.
+        /// Verifies that a bUnit click event on the special responsibilities box renders the special responsibilities overlay after JS interop is mocked.
+        /// </summary>
         [TestMethod]
         public void ShiftBoard_OpenSpecialResponsibilities_ShowsSpecialResponsibilityOverlay() {
             SetupSuccessfulInitialLoad();
