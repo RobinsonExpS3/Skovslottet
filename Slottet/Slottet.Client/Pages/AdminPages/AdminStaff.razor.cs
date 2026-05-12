@@ -172,11 +172,11 @@ namespace Slottet.Client.Pages.AdminPages
                 if (userResponse.IsSuccessStatusCode)
                 {
                     await LoadStaff();
-                    ClearStaffForm();
                 }
             }
             finally
             {
+                ClearStaffForm();
                 isBusy = false;
             }
         }
@@ -224,11 +224,11 @@ namespace Slottet.Client.Pages.AdminPages
                 if (userResponse.IsSuccessStatusCode)
                 {
                     await LoadStaff();
-                    ClearStaffForm();
                 }
             }
             finally
             {
+                ClearStaffForm();
                 isBusy = false;
             }
         }
@@ -247,11 +247,11 @@ namespace Slottet.Client.Pages.AdminPages
                 if (response.IsSuccessStatusCode && userResponse.IsSuccessStatusCode)
                 {
                     await LoadStaff();
-                    ClearStaffForm();
                 }
             }
             finally
             {
+                ClearStaffForm();
                 isBusy = false;
             }
         }
