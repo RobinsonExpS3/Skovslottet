@@ -34,12 +34,10 @@ namespace Slottet.Test.Controllers
             GroceryDayID = Guid.NewGuid(),  
         };
 
-        //---------------------------
-        //Get Api/resident/Residents
-        //---------------------------
-
-
-        // --------------------------- Returns200OK ----------------------------------
+        /// <summary>
+        /// Ensures GetAllResidentsAsync returns a 200 OK status code.
+        /// Verifies that the controller responds with OkObjectResult when the service returns a list of residents.
+        /// </summary>
         [TestMethod]
         public async Task GetAllResidentsAsync_Returns200OK()
         {
@@ -54,7 +52,11 @@ namespace Slottet.Test.Controllers
             //Assert
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
         }
-        // --------------------------- ReturnsAllResidentsFromService ----------------------------------
+        
+        /// <summary>
+        /// Ensures GetAllResidentsAsync passes all residents from the service through to the response body.
+        /// Verifies that the count and content of the returned list matches exactly what the service provided.
+        /// </summary>
         [TestMethod]
         public async Task GetAllResidentsAsync_ReturnAllResidentsFromService()
         {
@@ -80,11 +82,11 @@ namespace Slottet.Test.Controllers
             Assert.AreEqual(2, items.Count());
 
         }
-        // ---------------------------------------------------------------------
-        // GET api/resident/{id}
-        // ---------------------------------------------------------------------
 
-        // --------------------------- Returns200OK_WhenFound ----------------------------------
+        /// <summary>
+        /// Ensures GetResidentByIdAsync returns a 200 OK status code when the resident exists.
+        /// Verifies that the controller returns OkObjectResult when the service finds a matching resident.
+        /// </summary>
         [TestMethod]
         public async Task GetResidentByIdAsync_Returns200OK_WhenFound()
         {
@@ -100,7 +102,10 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
         }
 
-        // ---------------------------ReturnsCorrectResident_WhenFound ---------------------------
+        /// <summary>
+        /// Ensures GetResidentByIdAsync returns the correct resident matching the requested ID.
+        /// Verifies that the ResidentID on the returned DTO matches the ID that was requested.
+        /// </summary>
         [TestMethod]
         public async Task GetResidentByIdAsync_ReturnsCorrectResident_whenFound()
         {
@@ -122,7 +127,10 @@ namespace Slottet.Test.Controllers
 
         }
 
-        //--------------------------- Returns404NotFound_WhenMissing ----------------------------------
+        /// <summary>
+        /// Ensures GetResidentByIdAsync returns 404 NotFound when no resident matches the given ID.
+        /// Verifies that the controller returns NotFoundResult when the service returns null.
+        /// </summary>
         [TestMethod]
         public async Task GetResidentByIdAsync_Returns404NotFound_WhenMissing()
         {
@@ -138,10 +146,11 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result.Result, typeof(NotFoundResult));
         }
 
-        // ---------------------------------------------------------------------
-        // POST api/resident/
-        // ---------------------------------------------------------------------
 
+        /// <summary>
+        /// Ensures PostResidentAsync returns 201 Created when a valid DTO is submitted and the service succeeds.
+        /// Verifies that the controller returns CreatedAtActionResult pointing to GetResidentByIdAsync.
+        /// </summary>
         [TestMethod]
         public async Task PostResidentByIdAsync_Returns201Created_WhenServicesSucceeds()
         {
@@ -161,6 +170,10 @@ namespace Slottet.Test.Controllers
             Assert.AreEqual("GetResidentById", created.ActionName);
         }
 
+        /// <summary>
+        /// Ensures PutResidentAsync rejects a null request body with 400 BadRequest.
+        /// Verifies that the controller validates input before reaching the service.
+        /// </summary>
         [TestMethod]
         public async Task PostResidentAsync_ReturnsBadRequest_WhenDtoIsNull()
         {
@@ -170,6 +183,10 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result.Result, typeof(BadRequestResult));
         }
 
+        /// <summary>
+        /// Ensures PostResidentAsync returns 400 BadRequest when the service fails and returns null.
+        /// Verifies that the controller handles downstream service failures gracefully rather than crashing.
+        /// </summary>
         [TestMethod]
         public async Task PostResidentAsync_Returns400BadRequest_WhenServiceReturnsNull()
         {
@@ -187,10 +204,10 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result.Result, typeof(BadRequestResult));
         }
 
-        // ---------------------------------------------------------------------
-        // PUT api/resident/{id}
-        // ---------------------------------------------------------------------
-
+        /// <summary>
+        /// Ensures PutResidentAsync returns 204 NoContent when the update succeeds.
+        /// Verifies that the controller returns NoContentResult when the service confirms the update.
+        /// </summary>
         [TestMethod]
         public async Task PutResidentAsync_Returns204NoContent_WhenUpdateSucceeds()
         {
@@ -204,6 +221,10 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
         }
 
+        /// <summary>
+        /// Ensures PutResidentAsync returns 404 NotFound when no resident matches the given ID.
+        /// Verifies that the controller maps a false return from the service to a NotFoundResult.
+        /// </summary>
         [TestMethod]
         public async Task PutResidentAsync_Returns404NotFound_WhenResidentMissing()
         {
@@ -217,10 +238,10 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result, typeof(NotFoundResult));
         }
 
-        // ---------------------------------------------------------------------
-        // DELETE api/resident/{id}
-        // ---------------------------------------------------------------------
-
+        /// <summary>
+        /// Ensures DeleteResidentAsync returns 204 NoContent when the deletion succeeds.
+        /// Verifies that the controller returns NoContentResult when the service confirms the deletion.
+        /// </summary>
         [TestMethod]
         public async Task DeleteResidentAsync_Returns204NoContent_WhenDeleteSucceeds()
         {
@@ -233,6 +254,10 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
         }
 
+        /// <summary>
+        /// Ensures DeleteResidentAsync returns 404 NotFound when no resident matches the given ID.
+        /// Verifies that the controller maps a false return from the service to a NotFoundResult.
+        /// </summary>
         [TestMethod]
         public async Task DeleteResidentAsync_Returns404NotFound_WhenResidentMissing()
         {
