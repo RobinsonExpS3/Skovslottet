@@ -9,11 +9,19 @@ namespace Slottet.Infrastructure.Test {
     public class StaffDTOServiceTests {
         private static readonly Guid DepartmentId = Guid.NewGuid();
 
+        /// <summary>
+        /// Creates a valid Department entity for use in tests.
+        /// Ensures all required Department fields are populated with consistent test data.
+        /// </summary>
         private static Department ValidDepartment() => new Department {
             DepartmentID = DepartmentId,
             DepartmentName = "Slottet"
         };
 
+        /// <summary>
+        /// Creates a valid Staff entity for use in tests.
+        /// Ensures the staff member is assigned to the shared Department and contains valid default data.
+        /// </summary>
         private static Staff ValidStaff() => new Staff {
             StaffID = Guid.NewGuid(),
             StaffName = "Anna Andersen",
@@ -22,6 +30,10 @@ namespace Slottet.Infrastructure.Test {
             DepartmentID = DepartmentId
         };
 
+        /// <summary>
+        /// Creates a new in-memory SlottetDBContext instance for isolated unit testing.
+        /// Ensures each test uses a unique database instance to prevent shared state between tests.
+        /// </summary>
         private SlottetDBContext CreateContext() {
             var options = new DbContextOptionsBuilder<SlottetDBContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
@@ -63,6 +75,10 @@ namespace Slottet.Infrastructure.Test {
             Assert.IsTrue(items.Any(s => s.StaffID == staff2.StaffID));
         }
 
+        /// <summary>
+        /// Ensures GetStaffByIdAsync correctly maps all Staff entity fields to the EditStaffDTO.
+        /// Verifies that StaffID, StaffName, Initials, Role, and DepartmentID are all mapped accurately.
+        /// </summary>
         [TestMethod]
         public async Task GetStaffByIdAsync_ReturnsMappedStaff_WhenFound() {
             using var context = CreateContext();
@@ -86,6 +102,10 @@ namespace Slottet.Infrastructure.Test {
             Assert.AreEqual(DepartmentId, result.DepartmentID);
         }
 
+        /// <summary>
+        /// Ensures GetStaffByIdAsync returns null when no staff member matches the given ID.
+        /// Verifies that querying with a random ID that does not exist in the database returns null.
+        /// </summary>
         [TestMethod]
         public async Task GetStaffByIdAsync_ReturnsNull_WhenMissing() {
             using var context = CreateContext();
@@ -102,6 +122,10 @@ namespace Slottet.Infrastructure.Test {
             var result = await service.GetStaffByIdAsync(Guid.NewGuid());
         }
 
+        /// <summary>
+        /// Ensures PostStaffAsync successfully creates a new staff member when the department exists.
+        /// Verifies that a generated StaffID is assigned and the staff member is persisted to the database.
+        /// </summary>
         [TestMethod]
         public async Task PostStaffAsync_CreatesStaff_WhenDepartmentExists() {
             using var context = CreateContext();
@@ -127,6 +151,10 @@ namespace Slottet.Infrastructure.Test {
             Assert.AreEqual(1, context.Staffs.Count());
         }
 
+        /// <summary>
+        /// Ensures PostStaffAsync throws an ArgumentException when the specified department does not exist.
+        /// Verifies that staff members cannot be created with an invalid DepartmentID.
+        /// </summary>
         [TestMethod]
         public async Task PostStaffAsync_ThrowsArgumentException_WhenDepartmentDoesNotExist() {
             using var context = CreateContext();
@@ -150,6 +178,10 @@ namespace Slottet.Infrastructure.Test {
             }
         }
 
+        /// <summary>
+        /// Ensures PutStaffAsync successfully updates all fields of an existing staff member.
+        /// Verifies that the changes are persisted to the database and the method returns true.
+        /// </summary>
         [TestMethod]
         public async Task PutStaffAsync_ReturnsTrue_AndUpdatesStaff_WhenFound() {
             using var context = CreateContext();
@@ -183,6 +215,10 @@ namespace Slottet.Infrastructure.Test {
             Assert.AreEqual(DepartmentId, updatedStaff.DepartmentID);
         }
 
+        /// <summary>
+        /// Ensures PutStaffAsync returns false when no staff member matches the given ID.
+        /// Verifies that no changes are made to the database when the staff member does not exist.
+        /// </summary>
         [TestMethod]
         public async Task PutStaffAsync_ReturnsFalse_WhenStaffMissing() {
             using var context = CreateContext();
@@ -206,6 +242,10 @@ namespace Slottet.Infrastructure.Test {
             Assert.AreEqual(0, context.Staffs.Count());
         }
 
+        /// <summary>
+        /// Ensures DeleteStaffAsync successfully removes an existing staff member from the database.
+        /// Verifies that the method returns true and the staff member is no longer present in the database.
+        /// </summary>
         [TestMethod]
         public async Task DeleteStaffAsync_ReturnsTrue_AndDeletesStaff_WhenFound() {
             using var context = CreateContext();
@@ -225,6 +265,10 @@ namespace Slottet.Infrastructure.Test {
             Assert.IsFalse(context.Staffs.Any(s => s.StaffID == staff.StaffID));
         }
 
+        /// <summary>
+        /// Ensures DeleteStaffAsync returns false when no staff member matches the given ID.
+        /// Verifies that the existing staff member remains in the database when an unknown ID is provided.
+        /// </summary>
         [TestMethod]
         public async Task DeleteStaffAsync_ReturnsFalse_WhenStaffMissing() {
             using var context = CreateContext();

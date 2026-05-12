@@ -11,12 +11,20 @@ namespace Slottet.Infrastructure.Test
     {
         private static readonly Guid GroceryDayId = Guid.NewGuid();
 
+        /// <summary>
+        /// Creates a valid GroceryDay entity for use in tests.
+        /// Ensures all required GroceryDay fields are populated with consistent test data.
+        /// </summary>
         private static GroceryDay ValidGroceryDay() => new GroceryDay
         {
             GroceryDayID = GroceryDayId,
             GroceryDayName = "Mandag"
         };
 
+        /// <summary>
+        /// Creates a valid active Resident entity for use in tests.
+        /// Ensures the resident is assigned to the shared GroceryDay and contains valid default data.
+        /// </summary>
         private static Resident ValidResident() => new Resident
         {
             ResidentID = Guid.NewGuid(),
@@ -25,6 +33,10 @@ namespace Slottet.Infrastructure.Test
             GroceryDayID = GroceryDayId
         };
 
+        /// <summary>
+        /// Creates a new in-memory SlottetDBContext instance for isolated unit testing.
+        /// Ensures each test uses a unique database instance to prevent shared state between tests.
+        /// </summary>
         private SlottetDBContext CreateContext()
         {
             var options = new DbContextOptionsBuilder<SlottetDBContext>()
