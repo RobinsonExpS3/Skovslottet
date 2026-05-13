@@ -42,27 +42,30 @@
                         </button>
                     }
 
-                    @if (_showNewMedicineForm)
+                    @if (!ViewOnly)
                     {
-                        @* Ny medicin: indtastningsform *@
-                        <div class="bkv-ny-medicin-form">
-                            @* Tidspunkt *@
-                            <input class="bkv-input-small"
-                                   type="text"
-                                   value="@_newMedicineLabel"
-                                   @onchange="e => _newMedicineLabel = FormatTime(e.Value?.ToString())"
-                                   placeholder="08:00" />
-                            @* Gem-knap *@
-                            <button type="button" class="bkv-btn-ok" @onclick="AddMedicine">OK</button>
-                            @* Annullér-knap *@
-                            <button type="button" class="bkv-btn-annuller"
-                                    @onclick="() => { _showNewMedicineForm = false; _newMedicineLabel = string.Empty; }">✕</button>
-                        </div>
-                    }
-                    else
-                    {
-                        @* Tilføj ny medicin *@
-                        <button type="button" class="bkv-med-add" @onclick="() => _showNewMedicineForm = true">+</button>
+                        @if (_showNewMedicineForm)
+                        {
+                            @* Ny medicin: indtastningsform *@
+                            <div class="bkv-ny-medicin-form">
+                                @* Tidspunkt *@
+                                <input class="bkv-input-small"
+                                       type="text"
+                                       value="@_newMedicineLabel"
+                                       @onchange="e => _newMedicineLabel = FormatTime(e.Value?.ToString())"
+                                       placeholder="" />
+                                @* Gem-knap *@
+                                <button type="button" class="bkv-btn-ok" @onclick="AddMedicine">OK</button>
+                                @* Annullér-knap *@
+                                <button type="button" class="bkv-btn-annuller"
+                                        @onclick="() => { _showNewMedicineForm = false; _newMedicineLabel = string.Empty; }">✕</button>
+                            </div>
+                        }
+                        else
+                        {
+                            @* Tilføj ny medicin *@
+                            <button type="button" class="bkv-med-add" @onclick="() => _showNewMedicineForm = true">+</button>
+                        }
                     }
                 </div>
             </section>

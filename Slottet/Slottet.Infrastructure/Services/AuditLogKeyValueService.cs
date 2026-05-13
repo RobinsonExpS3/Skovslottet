@@ -248,13 +248,13 @@ namespace Slottet.Infrastructure.Services {
                 .Where(medicine => medicine.MedicineID == id)
                 .Select(medicine => new {
                     medicine.Resident.ResidentName,
-                    medicine.MedicineTime
+                    medicine.ScheduledTime
                 })
                 .FirstOrDefaultAsync();
 
             return medicine is null
                 ? null
-                : $"{medicine.ResidentName} - medicin {medicine.MedicineTime:dd-MM-yyyy HH:mm}";
+                : $"{medicine.ResidentName} - medicin {medicine.ScheduledTime:HH:mm}";
         }
 
         private async Task<string?> ResolvePnNameAsync(Guid id) {

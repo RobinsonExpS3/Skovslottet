@@ -14,77 +14,90 @@ namespace Slottet.Infrastructure.Data.Seed
             if (residents.Count == 0)
                 throw new InvalidOperationException("Residents must be seeded before Medicines.");
 
-            var today = DateTime.Today;
+            var today = DateOnly.FromDateTime(DateTime.Today);
             var now   = DateTime.Now;
 
-            // (residentName, scheduledHour, wasGiven)
-            var data = new (string Name, int Hour, bool Given)[]
+            // (residentName, scheduledHour, scheduledMinute, givenToday)
+            var data = new (string Name, int Hour, int Minute, bool Given)[]
             {
-                ("Anna Bentsen",       8,  true ),
-                ("Anna Bentsen",      13,  false),
-                ("Anna Bentsen",      18,  false),
-                ("Anna Bentsen",      23,  false),
+                ("Anna Bentsen",       8,  0,  true ),
+                ("Anna Bentsen",      13,  0,  false),
+                ("Anna Bentsen",      18,  0,  false),
+                ("Anna Bentsen",      23,  0,  false),
 
-                ("Carsten Didriksen",  8,  true ),
-                ("Carsten Didriksen", 13,  false),
-                ("Carsten Didriksen", 18,  false),
-                ("Carsten Didriksen", 21,  false),
-                ("Carsten Didriksen", 23,  false),
+                ("Carsten Didriksen",  8,  0,  true ),
+                ("Carsten Didriksen", 13,  0,  false),
+                ("Carsten Didriksen", 18,  0,  false),
+                ("Carsten Didriksen", 21,  0,  false),
+                ("Carsten Didriksen", 23,  0,  false),
 
-                ("Enaya Frederiksen",  8,  false),
-                ("Enaya Frederiksen", 13,  true ),
-                ("Enaya Frederiksen", 23,  true ),
+                ("Enaya Frederiksen",  8,  0,  false),
+                ("Enaya Frederiksen", 13,  0,  true ),
+                ("Enaya Frederiksen", 23,  0,  true ),
 
-                ("Gert Heller",        8,  true ),
-                ("Gert Heller",       23,  false),
+                ("Gert Heller",        8,  0,  true ),
+                ("Gert Heller",       23,  0,  false),
 
-                ("Karl Larsen",        8,  false),
-                ("Karl Larsen",       13,  true ),
-                ("Karl Larsen",       18,  false),
+                ("Karl Larsen",        8,  0,  false),
+                ("Karl Larsen",       13,  0,  true ),
+                ("Karl Larsen",       18,  0,  false),
 
-                ("Mette Nielsen",      8,  true ),
-                ("Mette Nielsen",     13,  false),
-                ("Mette Nielsen",     21,  false),
-                ("Mette Nielsen",     23,  false),
+                ("Mette Nielsen",      8,  0,  true ),
+                ("Mette Nielsen",     13,  0,  false),
+                ("Mette Nielsen",     21,  0,  false),
+                ("Mette Nielsen",     23,  0,  false),
 
-                ("Ole Pontoppidan",    8,  false),
-                ("Ole Pontoppidan",   23,  true ),
+                ("Ole Pontoppidan",    8,  0,  false),
+                ("Ole Pontoppidan",   23,  0,  true ),
 
-                ("Quint Roberts",      8,  true ),
-                ("Quint Roberts",     13,  false),
-                ("Quint Roberts",     23,  false),
+                ("Quint Roberts",      8,  0,  true ),
+                ("Quint Roberts",     13,  0,  false),
+                ("Quint Roberts",     23,  0,  false),
 
-                ("Søren Thomasson",    8,  false),
-                ("Søren Thomasson",   23,  false),
+                ("Søren Thomasson",    8,  0,  false),
+                ("Søren Thomasson",   23,  0,  false),
 
-                ("Ulke Venja",         8,  true ),
-                ("Ulke Venja",        13,  true ),
-                ("Ulke Venja",        18,  false),
-                ("Ulke Venja",        21,  false),
-                ("Ulke Venja",        23,  false),
+                ("Ulke Venja",         8,  0,  true ),
+                ("Ulke Venja",        13,  0,  true ),
+                ("Ulke Venja",        18,  0,  false),
+                ("Ulke Venja",        21,  0,  false),
+                ("Ulke Venja",        23,  0,  false),
 
-                ("Whilmer Xander",     8,  false),
-                ("Whilmer Xander",    13,  true ),
-                ("Whilmer Xander",    23,  false),
+                ("Whilmer Xander",     8,  0,  false),
+                ("Whilmer Xander",    13,  0,  true ),
+                ("Whilmer Xander",    23,  0,  false),
             };
 
-            var medicines = new List<Medicine>();
-            foreach (var (name, hour, given) in data)
+            var medicines    = new List<Medicine>();
+            var medicineLogs = new List<MedicineLog>();
+
+            foreach (var (name, hour, minute, given) in data)
             {
                 var resident = residents.FirstOrDefault(r => r.ResidentName == name);
                 if (resident is null) continue;
 
-                medicines.Add(new Medicine
+                var medicine = new Medicine
                 {
-                    MedicineID             = Guid.NewGuid(),
-                    ResidentID             = resident.ResidentID,
-                    MedicineTime           = today.AddHours(hour),
-                    MedicineGivenTime      = given ? today.AddHours(hour).AddMinutes(5) : default,
-                    MedicineRegisteredTime = now,
+                    MedicineID    = Guid.NewGuid(),
+                    ResidentID    = resident.ResidentID,
+                    ScheduledTime = new TimeOnly(hour, minute),
+                };
+
+                medicines.Add(medicine);
+
+                // Seed en log-post for dags dato så kortvisningen viser korrekt status.
+                medicineLogs.Add(new MedicineLog
+                {
+                    MedicineLogID  = Guid.NewGuid(),
+                    MedicineID     = medicine.MedicineID,
+                    Date           = today,
+                    GivenTime      = given ? DateTime.Today.AddHours(hour).AddMinutes(5) : null,
+                    RegisteredTime = given ? now : null,
                 });
             }
 
             context.Medicines.AddRange(medicines);
+            context.MedicineLogs.AddRange(medicineLogs);
             await context.SaveChangesAsync();
         }
     }

@@ -9,6 +9,7 @@ namespace Slottet.Client.Components.ResidentCard
         [Parameter, EditorRequired] public ResidentCardDto Resident { get; set; } = default!;
         [Parameter]                 public List<string>    AllStaff { get; set; } = new();
         [Parameter]                 public EventCallback   OnSaved  { get; set; }
+        [Parameter]                 public bool            ViewOnly { get; set; } = false;
 
         // ── Private PN row wrapper ────────────────────────────────────────
         private class PnRow

@@ -17,6 +17,7 @@ namespace Slottet.Infrastructure.Data
         public DbSet<DepartmentTask> DepartmentTasks => Set<DepartmentTask>();
         public DbSet<GroceryDay> GroceryDays => Set<GroceryDay>();
         public DbSet<Medicine> Medicines => Set<Medicine>();
+        public DbSet<MedicineLog> MedicineLogs => Set<MedicineLog>();
         public DbSet<PaymentMethod> PaymentMethods => Set<PaymentMethod>();
         public DbSet<Phone> Phones => Set<Phone>();
         public DbSet<PN> PNs => Set<PN>();

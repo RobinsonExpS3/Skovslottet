@@ -68,7 +68,7 @@ namespace Slottet.Infrastructure.Services
             residentDto.MedicineTimes = await _context.Medicines
                 .AsNoTracking()
                 .Where(m => m.ResidentID == id)
-                .Select(m => m.MedicineTime)
+                .Select(m => m.ScheduledTime)
                 .ToListAsync();
 
             residentDto.GroceryDays = await GetGroceryDayLookupAsync();
@@ -267,20 +267,18 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="residentID">The ID of the resident to attach medicines to.</param>
         /// <param name="medicineTimes">The medicine times to add.</param>
-        private void AddMedicines(Guid residentID, List<DateTime>? medicineTimes)
+        private void AddMedicines(Guid residentID, List<TimeOnly>? medicineTimes)
         {
             if (medicineTimes == null || medicineTimes.Count == 0)
             {
                 return;
             }
 
-            var medicineRows = medicineTimes.Select(medicineTime => new Medicine
+            var medicineRows = medicineTimes.Select(scheduledTime => new Medicine
             {
-                MedicineID = Guid.NewGuid(),
-                ResidentID = residentID,
-                MedicineTime = medicineTime,
-                MedicineGivenTime = DateTime.Now,
-                MedicineRegisteredTime = DateTime.Now
+                MedicineID    = Guid.NewGuid(),
+                ResidentID    = residentID,
+                ScheduledTime = scheduledTime,
             });
 
             _context.Medicines.AddRange(medicineRows);
@@ -309,6 +307,8 @@ namespace Slottet.Infrastructure.Services
 
         public async Task<List<ResidentCardDto>> GetResidentCardsAsync(CancellationToken ct = default)
         {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
             var residents = await _context.Residents
                 .AsNoTracking()
                 .Where(r => r.IsActive)
@@ -316,7 +316,8 @@ namespace Slottet.Infrastructure.Services
                 .ThenBy(r => r.ResidentID)
                 .Include(r => r.GroceryDay)
                 .Include(r => r.Medicines)
-                .Include(r => r.PNs)
+                    .ThenInclude(m => m.MedicineLogs.Where(ml => ml.Date == today))
+                .Include(r => r.PNs.Where(pn => pn.PNGivenTime.Date == DateTime.Today))
                     .ThenInclude(pn => pn.StaffPNs)
                         .ThenInclude(spn => spn.Staff)
                 .Include(r => r.ResidentPaymentMethods)
@@ -328,12 +329,11 @@ namespace Slottet.Infrastructure.Services
                         .ThenInclude(srs => srs.Staff)
                 .ToListAsync(ct);
 
-            return residents.Select(MapToResidentCard).ToList();
+            return residents.Select(r => MapToResidentCard(r, today)).ToList();
         }
 
-        private static ResidentCardDto MapToResidentCard(Resident resident)
+        private static ResidentCardDto MapToResidentCard(Resident resident, DateOnly today)
         {
-            var today = DateTime.Today;
             var latestStatus = resident.ResidentStatuses
                 .OrderByDescending(s => s.Date)
                 .FirstOrDefault();
@@ -342,7 +342,7 @@ namespace Slottet.Infrastructure.Services
             {
                 ResidentStatusID  = latestStatus?.ResidentStatusID ?? Guid.Empty,
                 ResidentID        = resident.ResidentID,
-                Date              = today,
+                Date              = today.ToDateTime(TimeOnly.MinValue),
                 ResidentName      = resident.ResidentName,
                 IsActive          = resident.IsActive,
                 RiskLevel         = latestStatus?.RiskLevel?.RiskLevelName,
@@ -356,22 +356,24 @@ namespace Slottet.Infrastructure.Services
                                         .OrderBy(n => n)
                                         .ToList() ?? new(),
                 MedicineSchedule  = resident.Medicines
-                                        .Where(m => m.MedicineTime.Date == today)
-                                        .OrderBy(m => m.MedicineTime)
-                                        .Select(m => new MedicineScheduleItemDto
+                                        .OrderBy(m => m.ScheduledTime)
+                                        .Select(m =>
                                         {
-                                            Label   = m.MedicineTime.ToString("HH:mm"),
-                                            Time    = TimeOnly.FromDateTime(m.MedicineTime),
-                                            IsGiven = m.MedicineGivenTime != null
+                                            var log = m.MedicineLogs.FirstOrDefault(ml => ml.Date == today);
+                                            return new MedicineScheduleItemDto
+                                            {
+                                                Label   = m.ScheduledTime.ToString("HH:mm"),
+                                                Time    = m.ScheduledTime,
+                                                IsGiven = log?.GivenTime != null
+                                            };
                                         })
                                         .ToList(),
                 PNEntries         = resident.PNs
-                                        .Where(pn => pn.PNGivenTime.Date == today)
                                         .OrderBy(pn => pn.PNGivenTime)
                                         .Select(pn => new PNEntryDto
                                         {
                                             TimeOfAdministration = pn.PNGivenTime.ToString("HH:mm"),
-                                            Medication           = string.Empty,
+                                            Medication           = pn.MedicationName,
                                             Reason               = pn.PNReason,
                                             IssuedBy             = pn.StaffPNs
                                                                        .Select(spn => spn.Staff.StaffName)

@@ -100,7 +100,8 @@
 
 /* ── Medicin ── */
 .bkv-medicin-section {
-    grid-column: 1 / -1;
+    grid-column: 1;
+    grid-row: 1;
 }
 
 .bkv-medicin-slots {
@@ -170,6 +171,7 @@
 /* ── PN ── */
 .bkv-pn-section {
     grid-column: 1;
+    grid-row: 2;
 }
 
 .bkv-pn-entry {
@@ -188,6 +190,8 @@
     padding: 6px 8px;
     background-color: var(--color-bg-card);
     border: 1px solid var(--color-primary-lighter);
+    border-bottom: 1px solid var(--color-primary-lighter);
+    margin-bottom: 0;
     transition: background-color 0.12s, border-color 0.12s;
 }
 
@@ -232,6 +236,7 @@
 /* ── Personale ── */
 .bkv-personale-section {
     grid-column: 2;
+    grid-row: 1;
 }
 
 .bkv-pills {
@@ -308,7 +313,8 @@
 
 /* ── Handledag + Betaling ── */
 .bkv-praktisk-section {
-    grid-column: 1 / -1;
+    grid-column: 2;
+    grid-row: 2;
 }
 
 .bkv-praktisk-row {

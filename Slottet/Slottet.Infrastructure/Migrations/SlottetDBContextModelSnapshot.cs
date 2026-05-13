@@ -325,14 +325,8 @@ namespace Slottet.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("MedicineGivenTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("MedicineRegisteredTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("MedicineTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("ScheduledTime")
+                        .HasColumnType("time");
 
                     b.Property<Guid>("ResidentID")
                         .HasColumnType("uniqueidentifier");
@@ -344,11 +338,41 @@ namespace Slottet.Infrastructure.Migrations
                     b.ToTable("Medicines");
                 });
 
+            modelBuilder.Entity("Slottet.Domain.Entities.MedicineLog", b =>
+                {
+                    b.Property<Guid>("MedicineLogID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime?>("GivenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RegisteredTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("MedicineID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("MedicineLogID");
+
+                    b.HasIndex("MedicineID");
+
+                    b.ToTable("MedicineLogs");
+                });
+
             modelBuilder.Entity("Slottet.Domain.Entities.PN", b =>
                 {
                     b.Property<Guid>("PNID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MedicationName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("PNGivenTime")
                         .HasColumnType("datetime2");
@@ -737,6 +761,17 @@ namespace Slottet.Infrastructure.Migrations
                     b.Navigation("Resident");
                 });
 
+            modelBuilder.Entity("Slottet.Domain.Entities.MedicineLog", b =>
+                {
+                    b.HasOne("Slottet.Domain.Entities.Medicine", "Medicine")
+                        .WithMany("MedicineLogs")
+                        .HasForeignKey("MedicineID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Medicine");
+                });
+
             modelBuilder.Entity("Slottet.Domain.Entities.PN", b =>
                 {
                     b.HasOne("Slottet.Domain.Entities.Resident", "Resident")
@@ -933,6 +968,11 @@ namespace Slottet.Infrastructure.Migrations
                     b.Navigation("Phones");
 
                     b.Navigation("Staffs");
+                });
+
+            modelBuilder.Entity("Slottet.Domain.Entities.Medicine", b =>
+                {
+                    b.Navigation("MedicineLogs");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.GroceryDay", b =>

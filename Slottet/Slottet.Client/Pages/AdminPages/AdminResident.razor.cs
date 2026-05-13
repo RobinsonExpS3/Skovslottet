@@ -154,7 +154,7 @@ namespace Slottet.Client.Pages.AdminPages
                     ResidentName = residentNameInput!.Trim(),
                     GroceryDayID = selectedGroceryDayID!.Value,
                     PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
-                    MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
+                    MedicineTimes = medicineTimes.Select(t => t.Time).ToList(),
                     IsActive = isActiveInput
                 };
                 var response = await Http.PostAsJsonAsync("api/Resident", dto);
@@ -175,7 +175,7 @@ namespace Slottet.Client.Pages.AdminPages
                     ResidentName = residentNameInput ?? string.Empty,
                     GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
                     PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
-                    MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
+                    MedicineTimes = medicineTimes.Select(t => t.Time).ToList(),
                     IsActive = isActiveInput
                 };
                 var response = await Http.PutAsJsonAsync($"api/Resident/{SelectedResident.ResidentID}", dto);

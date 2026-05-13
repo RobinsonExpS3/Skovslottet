@@ -14,6 +14,10 @@ namespace Slottet.Infrastructure.Data.Configurations
         {
             entity.HasKey(p => p.PNID);
 
+            entity.Property(p => p.MedicationName)
+                .IsRequired()
+                .HasMaxLength(100);
+
             entity.Property(p => p.PNGivenTime)
                 .IsRequired();
 

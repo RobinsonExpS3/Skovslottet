@@ -254,6 +254,8 @@ namespace Slottet.Infrastructure.Services
         /// <returns>Returns a list of active Resident objects.</returns>
         private async Task<List<Resident>> GetActiveResidentsAsync(CancellationToken ct)
         {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
             return await _context.Residents
                 .AsNoTracking()
                 .Where(r => r.IsActive)
@@ -261,7 +263,8 @@ namespace Slottet.Infrastructure.Services
                 .ThenBy(r => r.ResidentID)
                 .Include(r => r.GroceryDay)
                 .Include(r => r.Medicines)
-                .Include(r => r.PNs)
+                    .ThenInclude(m => m.MedicineLogs.Where(ml => ml.Date == today))
+                .Include(r => r.PNs.Where(pn => pn.PNGivenTime.Date == DateTime.Today))
                     .ThenInclude(pn => pn.StaffPNs)
                         .ThenInclude(spn => spn.Staff)
                 .Include(r => r.ResidentPaymentMethods)
@@ -316,14 +319,19 @@ namespace Slottet.Infrastructure.Services
         /// <returns>Returns a list of MedicineScheduleItemDto objects.</returns>
         private static List<MedicineScheduleItemDto> MapMedicineSchedule(Resident resident, DateTime date)
         {
+            var today = DateOnly.FromDateTime(date);
+
             return resident.Medicines
-                .Where(medicine => medicine.MedicineTime.Date == date)
-                .OrderBy(medicine => medicine.MedicineTime)
-                .Select(medicine => new MedicineScheduleItemDto
+                .OrderBy(m => m.ScheduledTime)
+                .Select(m =>
                 {
-                    Label = medicine.MedicineTime.ToString("HH:mm"),
-                    Time = TimeOnly.FromDateTime(medicine.MedicineTime),
-                    IsGiven = medicine.MedicineGivenTime != null
+                    var log = m.MedicineLogs.FirstOrDefault(ml => ml.Date == today);
+                    return new MedicineScheduleItemDto
+                    {
+                        Label   = m.ScheduledTime.ToString("HH:mm"),
+                        Time    = m.ScheduledTime,
+                        IsGiven = log?.GivenTime != null
+                    };
                 })
                 .ToList();
         }
@@ -337,16 +345,16 @@ namespace Slottet.Infrastructure.Services
         private static List<PNEntryDto> MapPNEntries(Resident resident, DateTime date)
         {
             return resident.PNs
-                .Where(pn => pn.PNGivenTime.Date == date)
+                .Where(pn => pn.PNGivenTime.Date == date.Date)
                 .OrderBy(pn => pn.PNGivenTime)
                 .Select(pn => new PNEntryDto
                 {
                     TimeOfAdministration = pn.PNGivenTime.ToString("HH:mm"),
-                    Medication = string.Empty,
-                    Reason = pn.PNReason,
-                    IssuedBy = pn.StaffPNs
-                        .Select(spn => spn.Staff.StaffName)
-                        .FirstOrDefault() ?? string.Empty
+                    Medication           = pn.MedicationName,
+                    Reason               = pn.PNReason,
+                    IssuedBy             = pn.StaffPNs
+                                              .Select(spn => spn.Staff.StaffName)
+                                              .FirstOrDefault() ?? string.Empty
                 })
                 .ToList();
         }

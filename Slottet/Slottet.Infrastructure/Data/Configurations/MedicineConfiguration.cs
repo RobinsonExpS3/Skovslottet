@@ -9,21 +9,21 @@ namespace Slottet.Infrastructure.Data.Configurations {
         /// </summary>
         /// <param name="entity">The builder used to configure the Medicine entity.</param>
         public void Configure(EntityTypeBuilder<Medicine> entity) {
-            entity.HasKey(m => new { m.MedicineID });
+            entity.HasKey(m => m.MedicineID);
 
-            entity.Property(m => m.MedicineTime)
-                .IsRequired();
+            entity.Property(m => m.ScheduledTime)
+                .IsRequired()
+                .HasColumnType("time");
 
-            entity.Property(m => m.MedicineGivenTime)
-                .IsRequired();
-
-            entity.Property(m => m.MedicineRegisteredTime)
-                .IsRequired();
-
-            entity.HasOne(r => r.Resident)
-                .WithMany(m => m.Medicines)
-                .HasForeignKey(r => r.ResidentID)
+            entity.HasOne(m => m.Resident)
+                .WithMany(r => r.Medicines)
+                .HasForeignKey(m => m.ResidentID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasMany(m => m.MedicineLogs)
+                .WithOne(ml => ml.Medicine)
+                .HasForeignKey(ml => ml.MedicineID)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

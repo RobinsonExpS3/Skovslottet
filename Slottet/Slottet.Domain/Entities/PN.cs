@@ -3,6 +3,7 @@
     public class PN
     {
         public Guid PNID { get; set; }
+        public string MedicationName { get; set; } = string.Empty;
         public DateTime PNGivenTime { get; set; }
         public string PNReason { get; set; }
         public DateTime PNRegisteredTime { get; set; }
