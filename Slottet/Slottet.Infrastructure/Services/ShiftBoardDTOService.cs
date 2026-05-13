@@ -71,7 +71,8 @@ namespace Slottet.Infrastructure.Services
                 ? null
                 : await GetDepartmentAsync(departmentId, ct);
 
-            var residents = await GetActiveResidentsAsync(ct);
+            var shiftDate = DateOnly.FromDateTime(shiftBoard.StartDateTime);
+            var residents = await GetActiveResidentsAsync(shiftDate, ct);
 
             return new ShiftBoardDTO
             {
@@ -99,7 +100,7 @@ namespace Slottet.Infrastructure.Services
                     .ToList() ?? new(),
 
                 ResidentCards = residents
-                    .Select(MapResidentCard)
+                    .Select(r => MapResidentCard(r, shiftDate))
                     .ToList()
             };
         }
@@ -252,9 +253,9 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="ct">Cancellation token used to cancel the database query.</param>
         /// <returns>Returns a list of active Resident objects.</returns>
-        private async Task<List<Resident>> GetActiveResidentsAsync(CancellationToken ct)
+        private async Task<List<Resident>> GetActiveResidentsAsync(DateOnly date, CancellationToken ct)
         {
-            var today = DateOnly.FromDateTime(DateTime.Today);
+            var dateAsDateTime = date.ToDateTime(TimeOnly.MinValue);
 
             return await _context.Residents
                 .AsNoTracking()
@@ -263,8 +264,8 @@ namespace Slottet.Infrastructure.Services
                 .ThenBy(r => r.ResidentID)
                 .Include(r => r.GroceryDay)
                 .Include(r => r.Medicines)
-                    .ThenInclude(m => m.MedicineLogs.Where(ml => ml.Date == today))
-                .Include(r => r.PNs.Where(pn => pn.PNGivenTime.Date == DateTime.Today))
+                    .ThenInclude(m => m.MedicineLogs.Where(ml => ml.Date == date))
+                .Include(r => r.PNs.Where(pn => pn.PNGivenTime.Date == dateAsDateTime.Date))
                     .ThenInclude(pn => pn.StaffPNs)
                         .ThenInclude(spn => spn.Staff)
                 .Include(r => r.ResidentPaymentMethods)
@@ -282,32 +283,35 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="resident">The Resident entity to map from. Cannot be null.</param>
         /// <returns>A ResidentCardDto containing the mapped values from the specified Resident entity.</returns>
-        private static ResidentCardDto MapResidentCard(Resident resident)
+        private static ResidentCardDto MapResidentCard(Resident resident, DateOnly shiftDate)
         {
-            var today = DateTime.Today;
-            var latestStatus = resident.ResidentStatuses
-                .OrderByDescending(status => status.Date)
+            var shiftDateTime = shiftDate.ToDateTime(TimeOnly.MinValue);
+
+            // Find den status der var aktiv på vagtens dato — dvs. nyeste status oprettet på eller før datoen.
+            var statusAtShift = resident.ResidentStatuses
+                .Where(s => DateOnly.FromDateTime(s.Date) <= shiftDate)
+                .OrderByDescending(s => s.Date)
                 .FirstOrDefault();
 
             return new ResidentCardDto
             {
-                ResidentStatusID = latestStatus?.ResidentStatusID ?? Guid.Empty,
+                ResidentStatusID = statusAtShift?.ResidentStatusID ?? Guid.Empty,
                 ResidentID = resident.ResidentID,
-                Date = today,
+                Date = shiftDateTime,
                 ResidentName = resident.ResidentName,
                 IsActive = resident.IsActive,
-                RiskLevel = latestStatus?.RiskLevel?.RiskLevelName,
-                LatestStatusNote = latestStatus?.Status,
+                RiskLevel = statusAtShift?.RiskLevel?.RiskLevelName,
+                LatestStatusNote = statusAtShift?.Status,
                 GroceryDay = resident.GroceryDay?.GroceryDayName,
                 PaymentMethod = resident.ResidentPaymentMethods
                     .Select(rpm => rpm.PaymentMethod?.PaymentMethodName)
                     .FirstOrDefault(),
-                AssignedStaff = latestStatus?.StaffResidentStatuses
+                AssignedStaff = statusAtShift?.StaffResidentStatuses
                     .Select(srs => srs.Staff.StaffName)
                     .OrderBy(name => name)
                     .ToList() ?? new(),
-                MedicineSchedule = MapMedicineSchedule(resident, today),
-                PNEntries = MapPNEntries(resident, today)
+                MedicineSchedule = MapMedicineSchedule(resident, shiftDateTime),
+                PNEntries = MapPNEntries(resident, shiftDateTime)
             };
         }
 
