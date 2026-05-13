@@ -11,40 +11,45 @@ namespace Slottet.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // ── 1. Ryd eksisterende Medicine-data (dato-specifik format udskiftes) ──
-            migrationBuilder.Sql("DELETE FROM Medicines");
+            // ── 1. Drop den gamle Medicines tabel helt (dato-baseret design) ──────
+            //    FK fra Medicines → Residents droppes automatisk med tabellen.
+            migrationBuilder.DropTable(name: "Medicines");
 
-            // ── 2. Fjern gamle datetime-kolonner fra Medicines ────────────────────
-            migrationBuilder.DropColumn(
-                name: "MedicineGivenTime",
-                table: "Medicines");
+            // ── 2. Opret ny Medicines tabel med ScheduledTime (TimeOnly) ──────────
+            migrationBuilder.CreateTable(
+                name: "Medicines",
+                columns: table => new
+                {
+                    MedicineID    = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ScheduledTime = table.Column<TimeOnly>(type: "time", nullable: false),
+                    ResidentID    = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Medicines", x => x.MedicineID);
+                    table.ForeignKey(
+                        name: "FK_Medicines_Residents_ResidentID",
+                        column: x => x.ResidentID,
+                        principalTable: "Residents",
+                        principalColumn: "ResidentID",
+                        onDelete: ReferentialAction.Restrict);
+                });
 
-            migrationBuilder.DropColumn(
-                name: "MedicineRegisteredTime",
-                table: "Medicines");
-
-            migrationBuilder.DropColumn(
-                name: "MedicineTime",
-                table: "Medicines");
-
-            // ── 3. Tilføj ScheduledTime (time) til Medicines ──────────────────────
-            migrationBuilder.AddColumn<TimeOnly>(
-                name: "ScheduledTime",
+            migrationBuilder.CreateIndex(
+                name: "IX_Medicines_ResidentID",
                 table: "Medicines",
-                type: "time",
-                nullable: false,
-                defaultValue: new TimeOnly(0, 0, 0));
+                column: "ResidentID");
 
-            // ── 4. Opret MedicineLogs tabel ───────────────────────────────────────
+            // ── 3. Opret MedicineLogs tabel ───────────────────────────────────────
             migrationBuilder.CreateTable(
                 name: "MedicineLogs",
                 columns: table => new
                 {
-                    MedicineLogID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Date = table.Column<DateOnly>(type: "date", nullable: false),
-                    GivenTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    MedicineLogID  = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Date           = table.Column<DateOnly>(type: "date", nullable: false),
+                    GivenTime      = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RegisteredTime = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    MedicineID = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    MedicineID     = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -62,7 +67,7 @@ namespace Slottet.Infrastructure.Migrations
                 table: "MedicineLogs",
                 column: "MedicineID");
 
-            // ── 5. Tilføj MedicationName til PNs ─────────────────────────────────
+            // ── 4. Tilføj MedicationName til PNs ─────────────────────────────────
             migrationBuilder.AddColumn<string>(
                 name: "MedicationName",
                 table: "PNs",
@@ -75,34 +80,30 @@ namespace Slottet.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            // ── Fjern MedicineLogs ────────────────────────────────────────────────
             migrationBuilder.DropTable(name: "MedicineLogs");
+            migrationBuilder.DropTable(name: "Medicines");
 
-            // ── Gendan Medicine kolonner ──────────────────────────────────────────
-            migrationBuilder.DropColumn(name: "ScheduledTime", table: "Medicines");
+            migrationBuilder.CreateTable(
+                name: "Medicines",
+                columns: table => new
+                {
+                    MedicineID             = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MedicineTime           = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MedicineGivenTime      = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    MedicineRegisteredTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ResidentID             = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Medicines", x => x.MedicineID);
+                    table.ForeignKey(
+                        name: "FK_Medicines_Residents_ResidentID",
+                        column: x => x.ResidentID,
+                        principalTable: "Residents",
+                        principalColumn: "ResidentID",
+                        onDelete: ReferentialAction.Restrict);
+                });
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "MedicineTime",
-                table: "Medicines",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-
-            migrationBuilder.AddColumn<DateTime>(
-                name: "MedicineGivenTime",
-                table: "Medicines",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-
-            migrationBuilder.AddColumn<DateTime>(
-                name: "MedicineRegisteredTime",
-                table: "Medicines",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
-
-            // ── Fjern MedicationName fra PNs ──────────────────────────────────────
             migrationBuilder.DropColumn(name: "MedicationName", table: "PNs");
         }
     }
