@@ -221,7 +221,7 @@ namespace Slottet.Client.Pages.ShiftBoard
             ActivePanel = OverlayPanel.None;
         }
 
-        protected void OnResidentSaved() => CloseOverlay();
+        protected void OnResidentSaved(EditResidentDTO dto) => CloseOverlay();
     }
 
     public enum OverlayPanel { None, PhoneList, DepartmentTasks, SpecialResponsibilities }

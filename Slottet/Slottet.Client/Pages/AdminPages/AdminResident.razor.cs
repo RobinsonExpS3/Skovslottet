@@ -136,9 +136,9 @@ namespace Slottet.Client.Pages.AdminPages
 
         protected void CloseOverlay() => SelectedResident = null;
 
-        protected async Task OnResidentSaved()
+        protected async Task OnResidentSaved(EditResidentDTO dto)
         {
-            await UpdateAsync();
+            await UpdateAsync(dto);
         }
 
         // ── Creation CRUD ─────────────────────────────────────────────────
@@ -162,22 +162,34 @@ namespace Slottet.Client.Pages.AdminPages
             finally { isBusy = false; }
         }
 
-        private async Task UpdateAsync()
+        private async Task UpdateAsync(EditResidentDTO dto)
         {
             if (!CanUpdate) return;
             isBusy = true;
             try
             {
-                var dto = new EditResidentDTO
+                dto.ResidentID = SelectedResident!.ResidentID;
+                dto.GroceryDayID = dto.GroceryDayID != Guid.Empty
+                    ? dto.GroceryDayID
+                    : groceryDays.FirstOrDefault(g => g.Name == dto.GroceryDay)?.ID ?? Guid.Empty;
+
+                if (dto.PaymentMethodIDs.Count == 0 && !string.IsNullOrWhiteSpace(dto.PaymentMethod))
                 {
-                    ResidentID = SelectedResident!.ResidentID,
-                    ResidentName = residentNameInput ?? string.Empty,
-                    GroceryDayID = selectedGroceryDayID ?? Guid.Empty,
-                    PaymentMethodIDs = selectedPaymentMethodIDs.ToList(),
-                    MedicineTimes = medicineTimes.Select(t => DateTime.Today.Add(t.Time.ToTimeSpan())).ToList(),
-                    IsActive = isActiveInput
-                };
-                var response = await Http.PutAsJsonAsync($"api/Resident/{SelectedResident.ResidentID}", dto);
+                    var paymentMethodID = paymentMethods.FirstOrDefault(p => p.Name == dto.PaymentMethod)?.ID;
+                    if (paymentMethodID is not null)
+                    {
+                        dto.PaymentMethodIDs.Add(paymentMethodID.Value);
+                    }
+                }
+
+                if (dto.MedicineTimes.Count == 0)
+                {
+                    dto.MedicineTimes = dto.MedicineSchedule
+                        .Select(m => DateTime.Today.Add(m.Time.ToTimeSpan()))
+                        .ToList();
+                }
+
+                var response = await Http.PutAsJsonAsync($"api/Resident/{dto.ResidentID}", dto);
                 if (response.IsSuccessStatusCode)
                 {
                     ClearForm();

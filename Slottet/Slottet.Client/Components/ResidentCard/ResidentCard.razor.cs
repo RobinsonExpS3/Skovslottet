@@ -8,7 +8,7 @@ namespace Slottet.Client.Components.ResidentCard
         // ── Parameters ────────────────────────────────────────────────────
         [Parameter, EditorRequired] public ResidentCardDto Resident { get; set; } = default!;
         [Parameter]                 public List<string>    AllStaff { get; set; } = new();
-        [Parameter]                 public EventCallback   OnSaved  { get; set; }
+        [Parameter]                 public EventCallback<EditResidentDTO> OnSaved  { get; set; }
 
         // ── Private PN row wrapper ────────────────────────────────────────
         private class PnRow
@@ -128,7 +128,7 @@ namespace Slottet.Client.Components.ResidentCard
                 .Select(r => r.Entry)
                 .ToList();
 
-            await OnSaved.InvokeAsync();
+            await OnSaved.InvokeAsync(ToEditResidentDto(Resident));
         }
 
         // ── Time helpers ──────────────────────────────────────────────────
@@ -175,6 +175,27 @@ namespace Slottet.Client.Components.ResidentCard
             AssignedStaff    = new List<string>(src.AssignedStaff),
             MedicineSchedule = src.MedicineSchedule
                 .Select(m => new MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
+                .ToList(),
+            PNEntries = src.PNEntries.Select(ClonePN).ToList(),
+        };
+
+        private static EditResidentDTO ToEditResidentDto(ResidentCardDto src) => new()
+        {
+            ResidentStatusID = src.ResidentStatusID,
+            ResidentID       = src.ResidentID,
+            Date             = src.Date,
+            ResidentName     = src.ResidentName,
+            IsActive         = src.IsActive,
+            RiskLevel        = src.RiskLevel,
+            LatestStatusNote = src.LatestStatusNote,
+            GroceryDay       = src.GroceryDay,
+            PaymentMethod    = src.PaymentMethod,
+            AssignedStaff    = new List<string>(src.AssignedStaff),
+            MedicineSchedule = src.MedicineSchedule
+                .Select(m => new MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
+                .ToList(),
+            MedicineTimes = src.MedicineSchedule
+                .Select(m => DateTime.Today.Add(m.Time.ToTimeSpan()))
                 .ToList(),
             PNEntries = src.PNEntries.Select(ClonePN).ToList(),
         };

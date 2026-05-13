@@ -152,6 +152,8 @@ namespace Slottet.Infrastructure.Services
             _context.Medicines.RemoveRange(existingMedicines);
             AddMedicines(id, dto.MedicineTimes);
 
+            await UpdateResidentStatusAsync(id, dto);
+
             await _context.SaveChangesAsync();
             return true;
         }
@@ -260,6 +262,100 @@ namespace Slottet.Infrastructure.Services
                 });
 
             _context.ResidentPaymentMethods.AddRange(relationRows);
+        }
+
+        private async Task UpdateResidentStatusAsync(Guid residentID, EditResidentDTO dto)
+        {
+            var hasStatusUpdate =
+                dto.ResidentStatusID != Guid.Empty ||
+                !string.IsNullOrWhiteSpace(dto.RiskLevel) ||
+                dto.LatestStatusNote is not null ||
+                dto.AssignedStaff.Count > 0;
+
+            if (!hasStatusUpdate)
+            {
+                return;
+            }
+
+            var riskLevelID = Guid.Empty;
+            if (!string.IsNullOrWhiteSpace(dto.RiskLevel))
+            {
+                riskLevelID = await _context.RiskLevels
+                    .Where(r => r.RiskLevelName == dto.RiskLevel)
+                    .Select(r => r.RiskLevelID)
+                    .FirstOrDefaultAsync();
+            }
+
+            var status = dto.ResidentStatusID != Guid.Empty
+                ? await _context.ResidentStatuses.FirstOrDefaultAsync(rs => rs.ResidentStatusID == dto.ResidentStatusID)
+                : await _context.ResidentStatuses
+                    .Where(rs => rs.ResidentID == residentID)
+                    .OrderByDescending(rs => rs.Date)
+                    .FirstOrDefaultAsync();
+
+            if (status is null)
+            {
+                if (riskLevelID == Guid.Empty)
+                {
+                    return;
+                }
+
+                status = new ResidentStatus
+                {
+                    ResidentStatusID = Guid.NewGuid(),
+                    ResidentID = residentID,
+                    Date = dto.Date == default ? DateTime.Today : dto.Date,
+                    Status = dto.LatestStatusNote ?? string.Empty,
+                    RiskLevelID = riskLevelID
+                };
+
+                _context.ResidentStatuses.Add(status);
+            }
+            else
+            {
+                status.Status = dto.LatestStatusNote ?? status.Status;
+                status.Date = dto.Date == default ? status.Date : dto.Date;
+                if (riskLevelID != Guid.Empty)
+                {
+                    status.RiskLevelID = riskLevelID;
+                }
+            }
+
+            await UpdateAssignedStaffAsync(status.ResidentStatusID, dto.AssignedStaff);
+        }
+
+        private async Task UpdateAssignedStaffAsync(Guid residentStatusID, List<string> assignedStaff)
+        {
+            var existingLinks = await _context.StaffResidentStatuses
+                .Where(srs => srs.ResidentStatusID == residentStatusID && !srs.IsDeleted)
+                .ToListAsync();
+
+            foreach (var link in existingLinks)
+            {
+                link.IsDeleted = true;
+            }
+
+            var staffNames = assignedStaff
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .Distinct()
+                .ToList();
+
+            if (staffNames.Count == 0)
+            {
+                return;
+            }
+
+            var staffIDs = await _context.Staffs
+                .Where(staff => staffNames.Contains(staff.StaffName))
+                .Select(staff => staff.StaffID)
+                .ToListAsync();
+
+            _context.StaffResidentStatuses.AddRange(staffIDs.Select(staffID => new StaffResidentStatus
+            {
+                StaffID = staffID,
+                ResidentStatusID = residentStatusID,
+                IsDeleted = false
+            }));
         }
 
         /// <summary>
