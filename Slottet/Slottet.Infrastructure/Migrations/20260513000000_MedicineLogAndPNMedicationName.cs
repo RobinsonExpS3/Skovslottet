@@ -1,11 +1,14 @@
 using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Slottet.Infrastructure.Data;
 
 #nullable disable
 
 namespace Slottet.Infrastructure.Migrations
 {
     /// <inheritdoc />
+    [Microsoft.EntityFrameworkCore.Infrastructure.DbContext(typeof(SlottetDBContext))]
+    [Migration("20260513000000_MedicineLogAndPNMedicationName")]
     public partial class MedicineLogAndPNMedicationName : Migration
     {
         /// <inheritdoc />
