@@ -448,8 +448,7 @@ namespace Slottet.Infrastructure.Services
                                         .Select(rpm => rpm.PaymentMethod?.PaymentMethodName)
                                         .FirstOrDefault(),
                 AssignedStaff     = latestStatus?.StaffResidentStatuses
-                                        .Where(srs => !srs.IsDeleted && srs.Staff != null)
-                                        .Select(srs => srs.Staff!.StaffName)
+                                        .Select(srs => srs.Staff.StaffName)
                                         .OrderBy(n => n)
                                         .ToList() ?? new(),
                 MedicineSchedule  = resident.Medicines
@@ -471,8 +470,7 @@ namespace Slottet.Infrastructure.Services
                                             Medication           = string.Empty,
                                             Reason               = pn.PNReason,
                                             IssuedBy             = pn.StaffPNs
-                                                                       .Where(spn => !spn.IsDeleted && spn.Staff != null)
-                                                                       .Select(spn => spn.Staff!.StaffName)
+                                                                       .Select(spn => spn.Staff.StaffName)
                                                                        .FirstOrDefault() ?? string.Empty
                                         })
                                         .ToList()

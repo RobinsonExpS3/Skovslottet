@@ -540,8 +540,10 @@ namespace Slottet.Infrastructure.Migrations
 
             modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibilityStaff", b =>
                 {
-                    b.Property<Guid>("SpecialResponsibilityStaffID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("SpecialResponsibilityID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("StaffID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("AssignedAt")
@@ -550,24 +552,13 @@ namespace Slottet.Infrastructure.Migrations
                     b.Property<Guid>("DepartmentID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("SpecialResponsibilityID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("SpecialResponsibilityStaffID");
+                    b.HasKey("SpecialResponsibilityID", "StaffID", "AssignedAt");
 
                     b.HasIndex("DepartmentID");
 
-                    b.HasIndex("SpecialResponsibilityID");
-
                     b.HasIndex("StaffID");
 
-                    b.ToTable("SpecialResponsibilityStaff", (string)null);
+                    b.ToTable("SpecialResponsibilityStaff");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
@@ -603,97 +594,61 @@ namespace Slottet.Infrastructure.Migrations
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffPN", b =>
                 {
-                    b.Property<Guid>("StaffPNID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("StaffID")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<Guid>("PNID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StaffPNID");
+                    b.HasKey("StaffID", "PNID");
 
                     b.HasIndex("PNID");
-
-                    b.HasIndex("StaffID");
 
                     b.ToTable("StaffPNs");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffPhone", b =>
                 {
-                    b.Property<Guid>("StaffPhoneID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("StaffID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PhoneID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("AssignedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("PhoneID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StaffPhoneID");
+                    b.HasKey("StaffID", "PhoneID", "AssignedAt");
 
                     b.HasIndex("PhoneID");
-
-                    b.HasIndex("StaffID");
 
                     b.ToTable("StaffPhones");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffResidentStatus", b =>
                 {
-                    b.Property<Guid>("StaffResidentStatusID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("StaffID")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<Guid>("ResidentStatusID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("StaffID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("StaffResidentStatusID");
+                    b.HasKey("StaffID", "ResidentStatusID");
 
                     b.HasIndex("ResidentStatusID");
-
-                    b.HasIndex("StaffID");
 
                     b.ToTable("StaffResidentStatuses");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.StaffShift", b =>
                 {
-                    b.Property<Guid>("StaffShiftID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<Guid>("ShiftBoardID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("StaffID")
+                    b.Property<Guid>("StaffID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("StaffShiftID");
-
-                    b.HasIndex("ShiftBoardID");
+                    b.HasKey("ShiftBoardID", "StaffID");
 
                     b.HasIndex("StaffID");
 
@@ -874,7 +829,8 @@ namespace Slottet.Infrastructure.Migrations
                     b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
                         .WithMany()
                         .HasForeignKey("StaffID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Department");
 
@@ -905,7 +861,8 @@ namespace Slottet.Infrastructure.Migrations
                     b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
                         .WithMany("StaffPNs")
                         .HasForeignKey("StaffID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("PN");
 
@@ -923,7 +880,8 @@ namespace Slottet.Infrastructure.Migrations
                     b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
                         .WithMany("StaffPhones")
                         .HasForeignKey("StaffID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Phone");
 
@@ -941,7 +899,8 @@ namespace Slottet.Infrastructure.Migrations
                     b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
                         .WithMany("StaffResidentStatuses")
                         .HasForeignKey("StaffID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("ResidentStatus");
 
@@ -959,7 +918,8 @@ namespace Slottet.Infrastructure.Migrations
                     b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
                         .WithMany("StaffShifts")
                         .HasForeignKey("StaffID")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("ShiftBoard");
 

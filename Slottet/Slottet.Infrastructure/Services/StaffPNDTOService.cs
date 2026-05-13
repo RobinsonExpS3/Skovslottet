@@ -24,7 +24,6 @@ namespace Slottet.Infrastructure.Services
         {
             return await _context.StaffPNs
                 .AsNoTracking()
-                .Where(sp => !sp.IsDeleted)
                 .Select(MapToDtoExpression())
                 .OrderBy(p => p.StaffName)
                 .ToListAsync();
@@ -65,8 +64,8 @@ namespace Slottet.Infrastructure.Services
         {
             return sp => new StaffPNDTO
             {
-                StaffID = sp.StaffID ?? Guid.Empty,
-                StaffName = sp.Staff != null ? sp.Staff.StaffName : null,
+                StaffID = sp.StaffID,
+                StaffName = sp.Staff.StaffName,
                 PNID = sp.PNID,
                 PNName = sp.PN.PNReason
             };

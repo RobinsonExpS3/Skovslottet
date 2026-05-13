@@ -72,15 +72,13 @@ namespace Slottet.Infrastructure.Services
                 PhoneNumber = phone.PhoneNumber,
 
                 StaffID = phone.StaffPhones
-                    .Where(sp => !sp.IsDeleted && sp.StaffID != null)
                     .OrderByDescending(sp => sp.AssignedAt)
-                    .Select(sp => sp.StaffID!.Value)
+                    .Select(sp => sp.StaffID)
                     .FirstOrDefault(),
 
                 StaffName = phone.StaffPhones
-                    .Where(sp => !sp.IsDeleted && sp.Staff != null)
                     .OrderByDescending(sp => sp.AssignedAt)
-                    .Select(sp => sp.Staff!.StaffName)
+                    .Select(sp => sp.Staff.StaffName)
                     .FirstOrDefault(),
 
                 AssignedAt = phone.StaffPhones

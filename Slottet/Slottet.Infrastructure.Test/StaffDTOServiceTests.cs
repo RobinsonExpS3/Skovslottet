@@ -223,42 +223,6 @@ namespace Slottet.Infrastructure.Test {
         }
 
         [TestMethod]
-        public async Task DeleteStaffAsync_SoftDeletesStaffResidentStatuses_WhenStaffHasStatusLinks() {
-            using var context = CreateContext();
-
-            context.Departments.Add(ValidDepartment());
-
-            var staff = ValidStaff();
-            var residentStatus = new ResidentStatus {
-                ResidentStatusID = Guid.NewGuid(),
-                Status = "Aktiv",
-                Date = DateTime.UtcNow,
-                ResidentID = Guid.NewGuid(),
-                RiskLevelID = Guid.NewGuid()
-            };
-
-            context.Staffs.Add(staff);
-            context.ResidentStatuses.Add(residentStatus);
-            context.StaffResidentStatuses.Add(new StaffResidentStatus {
-                StaffID = staff.StaffID,
-                ResidentStatusID = residentStatus.ResidentStatusID
-            });
-
-            await context.SaveChangesAsync();
-
-            var service = new StaffDTOService(context);
-
-            var result = await service.DeleteStaffAsync(staff.StaffID);
-
-            Assert.IsTrue(result);
-            Assert.IsFalse(context.Staffs.Any(s => s.StaffID == staff.StaffID));
-
-            var statusLink = context.StaffResidentStatuses.Single(srs => srs.ResidentStatusID == residentStatus.ResidentStatusID);
-            Assert.IsTrue(statusLink.IsDeleted);
-            Assert.IsNull(statusLink.StaffID);
-        }
-
-        [TestMethod]
         public async Task DeleteStaffAsync_ReturnsFalse_WhenStaffMissing() {
             using var context = CreateContext();
 

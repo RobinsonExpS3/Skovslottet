@@ -12,15 +12,12 @@ namespace Slottet.Infrastructure.Data.Configurations
         /// <param name="entity">The builder used to configure the StaffPN entity.</param>
         public void Configure(EntityTypeBuilder<StaffPN> entity)
         {
-            entity.HasKey(spn => spn.StaffPNID);
-
-            entity.Property(spn => spn.IsDeleted)
-                .IsRequired();
+            entity.HasKey(spn => new { spn.StaffID, spn.PNID });
 
             entity.HasOne(spn => spn.Staff)
                 .WithMany(spn => spn.StaffPNs)
                 .HasForeignKey(spn => spn.StaffID)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(spn => spn.PN)
                 .WithMany(spn => spn.StaffPNs)

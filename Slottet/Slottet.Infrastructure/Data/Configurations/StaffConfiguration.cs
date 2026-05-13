@@ -34,12 +34,12 @@ namespace Slottet.Infrastructure.Data.Configurations
             entity.HasMany(ss => ss.StaffShifts)
                 .WithOne(s => s.Staff)
                 .HasForeignKey(s => s.StaffID)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasMany(srs => srs.StaffResidentStatuses)
                 .WithOne(s => s.Staff)
                 .HasForeignKey(s => s.StaffID)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
