@@ -15,6 +15,17 @@ namespace Slottet.Infrastructure.Data.Seed
             var startDate = DateTime.Today.AddDays(-30);
             var endDate = startDate.AddDays(60);
 
+            // Backfill existing ShiftBoards that were created before DepartmentID was added
+            var shiftsWithoutDepartment = await context.ShiftBoards
+                .Where(s => s.DepartmentID == null)
+                .ToListAsync();
+
+            foreach (var shift in shiftsWithoutDepartment)
+                shift.DepartmentID = defaultDepartment?.DepartmentID;
+
+            if (shiftsWithoutDepartment.Count > 0)
+                await context.SaveChangesAsync();
+
             var shiftsToAdd = new List<ShiftBoard>();
 
             for (var day = startDate; day < endDate; day = day.AddDays(1))

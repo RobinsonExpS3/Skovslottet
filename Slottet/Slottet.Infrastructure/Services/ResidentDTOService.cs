@@ -206,6 +206,23 @@ namespace Slottet.Infrastructure.Services
         }
 
         /// <summary>
+        /// Soft-deletes a resident by setting IsActive = false.
+        /// Leaves all related data (PNs, statuses etc.) intact.
+        /// </summary>
+        public async Task<bool> DeactivateResidentAsync(Guid id, CancellationToken ct = default)
+        {
+            var resident = await _context.Residents
+                .FirstOrDefaultAsync(r => r.ResidentID == id, ct);
+
+            if (resident == null)
+                return false;
+
+            resident.IsActive = false;
+            await _context.SaveChangesAsync(ct);
+            return true;
+        }
+
+        /// <summary>
         /// Gets all grocery day lookup values and maps them to ResidentLookupDTO objects.
         /// </summary>
         /// <returns>Returns a list of ResidentLookupDTO objects.</returns>
@@ -305,6 +322,18 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
+        public async Task<bool> UpdateGroceryDayAsync(Guid residentId, Guid groceryDayId, CancellationToken ct = default)
+        {
+            var resident = await _context.Residents
+                .FirstOrDefaultAsync(r => r.ResidentID == residentId, ct);
+
+            if (resident is null) return false;
+
+            resident.GroceryDayID = groceryDayId;
+            await _context.SaveChangesAsync(ct);
+            return true;
+        }
+
         public async Task<bool> UpdateMedicineTimesAsync(Guid residentId, List<TimeOnly> times, CancellationToken ct = default)
         {
             var exists = await _context.Residents.AnyAsync(r => r.ResidentID == residentId, ct);
@@ -324,6 +353,22 @@ namespace Slottet.Infrastructure.Services
             var existingTimes = existing.Select(m => m.ScheduledTime).ToHashSet();
             var toAdd = times.Where(t => !existingTimes.Contains(t)).ToList();
             AddMedicines(residentId, toAdd);
+
+            await _context.SaveChangesAsync(ct);
+            return true;
+        }
+
+        public async Task<bool> UpdatePaymentMethodsAsync(Guid residentId, List<Guid> paymentMethodIds, CancellationToken ct = default)
+        {
+            var exists = await _context.Residents.AnyAsync(r => r.ResidentID == residentId, ct);
+            if (!exists) return false;
+
+            var existing = await _context.ResidentPaymentMethods
+                .Where(rpm => rpm.ResidentID == residentId)
+                .ToListAsync(ct);
+
+            _context.ResidentPaymentMethods.RemoveRange(existing);
+            AddPaymentMethods(residentId, paymentMethodIds);
 
             await _context.SaveChangesAsync(ct);
             return true;
@@ -375,6 +420,9 @@ namespace Slottet.Infrastructure.Services
                 PaymentMethod     = resident.ResidentPaymentMethods
                                         .Select(rpm => rpm.PaymentMethod?.PaymentMethodName)
                                         .FirstOrDefault(),
+                PaymentMethodIDs  = resident.ResidentPaymentMethods
+                                        .Select(rpm => rpm.PaymentMethodID)
+                                        .ToList(),
                 AssignedStaff     = latestStatus?.StaffResidentStatuses
                                         .Select(srs => srs.Staff.StaffName)
                                         .OrderBy(n => n)

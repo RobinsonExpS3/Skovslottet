@@ -3,7 +3,17 @@
     @* ── HEADER: Navn + Risk dropdown ── *@
     <header class="bkv-header @_draft.RiskCssClass">
         @* Beboernavn *@
-        <span class="bkv-navn">@_draft.ResidentName</span>
+        @if (IsNew)
+        {
+            <input class="bkv-navn-input"
+                   @bind="_draft.ResidentName"
+                   @bind:event="oninput"
+                   placeholder="Navn på borger…" />
+        }
+        else
+        {
+            <span class="bkv-navn">@_draft.ResidentName</span>
+        }
         @* Risikoniveau *@
         <select class="bkv-risk-select" @bind="_draft.RiskLevel">
             <option value="Grøn">Grøn</option>
@@ -198,7 +208,21 @@
                     <div class="bkv-praktisk-felt">
                         @* Betalingsmetode *@
                         <span class="bkv-label">Betaling</span>
-                        <span class="bkv-betaling-tekst">@(_draft.PaymentMethod ?? "–")</span>
+                        @if (IsAdmin && !ViewOnly && PaymentMethods.Count > 0)
+                        {
+                            <select class="bkv-select bkv-select--multi" multiple @onchange="OnPaymentMethodsChanged">
+                                @foreach (var method in PaymentMethods)
+                                {
+                                    <option value="@method.ID" selected="@_draftPaymentMethodIDs.Contains(method.ID)">
+                                        @method.Name
+                                    </option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <span class="bkv-betaling-tekst">@(_draft.PaymentMethod ?? "–")</span>
+                        }
                     </div>
                 </div>
             </section>
@@ -208,9 +232,30 @@
 
     @* ── GEM ÆNDRINGER ── *@
     <div class="bkv-save-bar">
-        @* Gem-knap *@
-        <button type="button" class="bkv-btn-gem" @onclick="SaveChanges">
-            Gem ændringer
+
+        @* Slet borger (kun admin) *@
+        @if (IsAdmin && !IsNew)
+        {
+            @if (_showDeleteConfirm)
+            {
+                <div class="bkv-delete-confirm">
+                    <span class="bkv-delete-confirm-text">Bekræft sletning af @_draft.ResidentName</span>
+                    <button type="button" class="bkv-btn-delete-confirm" @onclick="ConfirmDelete">Slet</button>
+                    <button type="button" class="bkv-btn-annuller" @onclick="() => _showDeleteConfirm = false">Annuller</button>
+                </div>
+            }
+            else
+            {
+                <button type="button" class="bkv-btn-slet" @onclick="() => _showDeleteConfirm = true">
+                    Slet borger
+                </button>
+            }
+        }
+
+        @* Gem / Opret knap *@
+        <button type="button" class="bkv-btn-gem" @onclick="SaveChanges"
+                disabled="@(IsNew && string.IsNullOrWhiteSpace(_draft.ResidentName))">
+            @(IsNew ? "Opret borger" : "Gem ændringer")
         </button>
     </div>
 

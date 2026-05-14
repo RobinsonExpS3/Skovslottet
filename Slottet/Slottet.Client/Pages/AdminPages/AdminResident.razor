@@ -168,8 +168,17 @@
                         }
                         else
                         {
-                            @* Blankt kort *@
-                            <article class="resident-card resident-card--empty"></article>
+                            @* Blankt kort med tilføj-knap *@
+                            var emptyCardId = "admin-tom-slot-" + s;
+                            <article class="resident-card resident-card--empty resident-card--add"
+                                     id="@emptyCardId"
+                                     @onclick:stopPropagation
+                                     @onclick="() => OpenNewResident(emptyCardId)">
+                                <div class="resident-add-content">
+                                    <button type="button" class="resident-add-btn" tabindex="-1">+</button>
+                                    <span class="resident-add-label">Tilføj borger</span>
+                                </div>
+                            </article>
                         }
                     }
                 </div>
@@ -263,6 +272,6 @@
              OnClose="CloseOverlay"
              Size="lg"
              PanelId="overlay-panel-admin-borger">
-        <ResidentCard Resident="SelectedResident" AllStaff="AllStaff" OnSaved="OnResidentSaved" />
+        <ResidentCard Resident="SelectedResident" AllStaff="AllStaff" PaymentMethods="paymentMethods" OnSaved="OnResidentSaved" OnDelete="OnResidentDeleted" IsAdmin="true" IsNew="_isNewResident" />
     </Overlay>
 }

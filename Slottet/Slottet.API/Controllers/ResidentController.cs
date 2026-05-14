@@ -128,10 +128,37 @@ namespace Slottet.API.Controllers
             return swapped ? NoContent() : NotFound();
         }
 
+        /// <summary>
+        /// Deactivates a resident (soft-delete) by setting IsActive = false.
+        /// </summary>
+        [HttpPatch("{id}/deactivate")]
+        public async Task<ActionResult> DeactivateResidentAsync(Guid id, CancellationToken ct)
+        {
+            var deactivated = await _residentService.DeactivateResidentAsync(id, ct);
+            return deactivated ? NoContent() : NotFound();
+        }
+
         [HttpPatch("{id}/medicine-times")]
         public async Task<ActionResult> PatchMedicineTimesAsync(Guid id, [FromBody] List<TimeOnly> times, CancellationToken ct)
         {
             var updated = await _residentService.UpdateMedicineTimesAsync(id, times, ct);
+            return updated ? NoContent() : NotFound();
+        }
+
+        [HttpPatch("{id}/payment-methods")]
+        public async Task<ActionResult> PatchPaymentMethodsAsync(Guid id, [FromBody] List<Guid> paymentMethodIds, CancellationToken ct)
+        {
+            var updated = await _residentService.UpdatePaymentMethodsAsync(id, paymentMethodIds, ct);
+            return updated ? NoContent() : NotFound();
+        }
+
+        [HttpPatch("{id}/grocery-day")]
+        public async Task<ActionResult> PatchGroceryDayAsync(Guid id, [FromBody] Guid groceryDayId, CancellationToken ct)
+        {
+            if (groceryDayId == Guid.Empty)
+                return BadRequest();
+
+            var updated = await _residentService.UpdateGroceryDayAsync(id, groceryDayId, ct);
             return updated ? NoContent() : NotFound();
         }
 

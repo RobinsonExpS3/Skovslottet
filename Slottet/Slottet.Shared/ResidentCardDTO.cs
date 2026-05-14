@@ -18,6 +18,7 @@ namespace Slottet.Shared
 
         public string? GroceryDay { get; set; }
         public string? PaymentMethod { get; set; }
+        public List<Guid> PaymentMethodIDs { get; set; } = new();
 
         public string RiskCssClass => RiskLevel switch
         {

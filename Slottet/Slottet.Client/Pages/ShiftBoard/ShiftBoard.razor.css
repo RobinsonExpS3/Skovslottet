@@ -122,6 +122,14 @@
     font-size: 0.9rem;
 }
 
+/* ── Tom slot ── */
+.resident-card--empty {
+    background-color: rgba(255,255,255,0.15);
+    border: 1px dashed rgba(0,0,0,0.10);
+    cursor: default;
+    pointer-events: none;
+}
+
 /* ── Read-only kort ── */
 .resident-card--readonly {
     opacity: 0.75;

@@ -90,6 +90,9 @@ namespace Slottet.Infrastructure.Services
                 DepartmentTasks = department?.DepartmentTasks
                     .Select(task => task.DepartmentTaskName)
                     .ToList() ?? new(),
+                SpecialResponsibilities = department is not null
+                    ? await GetSpecialResponsibilitiesForDepartmentAsync(department.DepartmentID, ct)
+                    : new(),
                 AllStaff = department?.Staffs
                     .Select(staff => staff.StaffName)
                     .OrderBy(name => name)
@@ -242,6 +245,33 @@ namespace Slottet.Infrastructure.Services
                     .ThenInclude(p => p.StaffPhones)
                         .ThenInclude(sp => sp.Staff)
                 .FirstOrDefaultAsync(d => d.DepartmentID == id, ct);
+        }
+
+        /// <summary>
+        /// Gets all special responsibilities assigned to a department.
+        /// </summary>
+        private async Task<List<SpecialResponsibilityEntryDto>> GetSpecialResponsibilitiesForDepartmentAsync(Guid departmentId, CancellationToken ct)
+        {
+            return await _context.SpecialResponsibilities
+                .AsNoTracking()
+                .Where(sr => sr.SpecialResponsibilityStaffs.Any(srs => srs.DepartmentID == departmentId))
+                .OrderBy(sr => sr.TaskName)
+                .Select(sr => new SpecialResponsibilityEntryDto
+                {
+                    SpecialResponsibilityID = sr.SpecialResponsibilityID,
+                    Description = sr.TaskName,
+                    StaffName = sr.SpecialResponsibilityStaffs
+                        .Where(srs => srs.DepartmentID == departmentId)
+                        .OrderByDescending(srs => srs.AssignedAt)
+                        .Select(srs => srs.Staff.StaffName)
+                        .FirstOrDefault() ?? string.Empty,
+                    StaffInitials = sr.SpecialResponsibilityStaffs
+                        .Where(srs => srs.DepartmentID == departmentId)
+                        .OrderByDescending(srs => srs.AssignedAt)
+                        .Select(srs => srs.Staff.Initials)
+                        .FirstOrDefault() ?? string.Empty
+                })
+                .ToListAsync(ct);
         }
 
         /// <summary>

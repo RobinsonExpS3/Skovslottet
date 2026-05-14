@@ -21,6 +21,7 @@ namespace Slottet.Client.Pages.AdminPages
         protected ResidentCardDto? SelectedResident { get; set; }
         private AdminBoundingRect? _cardRect;
         private bool _pendingFlyIn;
+        private bool _isNewResident;
 
         // ── Drag & drop ───────────────────────────────────────────────────
         private int _dragSourceSlot = -1;
@@ -129,15 +130,60 @@ namespace Slottet.Client.Pages.AdminPages
         // ── Overlay ───────────────────────────────────────────────────────
         protected async Task OpenResident(ResidentCardDto resident, string cardId)
         {
-            _cardRect = await JS.InvokeAsync<AdminBoundingRect>("overlayHelpers.getRect", cardId);
+            _cardRect        = await JS.InvokeAsync<AdminBoundingRect>("overlayHelpers.getRect", cardId);
             SelectedResident = resident;
-            _pendingFlyIn = true;
+            _isNewResident   = false;
+            _pendingFlyIn    = true;
         }
 
-        protected void CloseOverlay() => SelectedResident = null;
+        protected async Task OpenNewResident(string cardId)
+        {
+            _cardRect = await JS.InvokeAsync<AdminBoundingRect>("overlayHelpers.getRect", cardId);
+            SelectedResident = new ResidentCardDto
+            {
+                ResidentID       = Guid.Empty,
+                ResidentName     = string.Empty,
+                GroceryDay       = string.Empty,
+                IsActive         = true,
+                MedicineSchedule = new(),
+                PNEntries        = new(),
+                AssignedStaff    = new(),
+            };
+            _isNewResident = true;
+            _pendingFlyIn  = true;
+        }
+
+        protected void CloseOverlay()
+        {
+            SelectedResident = null;
+            _isNewResident   = false;
+        }
+
+        protected async Task OnResidentDeleted()
+        {
+            if (SelectedResident is not null)
+            {
+                isBusy = true;
+                try
+                {
+                    await Http.PatchAsync(
+                        $"api/Resident/{SelectedResident.ResidentID}/deactivate",
+                        content: null);
+                }
+                finally { isBusy = false; }
+            }
+            CloseOverlay();
+            await LoadDataAsync();
+        }
 
         protected async Task OnResidentSaved()
         {
+            if (_isNewResident)
+            {
+                await CreateFromCardAsync();
+                return;
+            }
+
             if (SelectedResident is not null)
             {
                 var times = SelectedResident.MedicineSchedule
@@ -147,10 +193,54 @@ namespace Slottet.Client.Pages.AdminPages
                 await Http.PatchAsJsonAsync(
                     $"api/Resident/{SelectedResident.ResidentID}/medicine-times",
                     times);
+
+                var groceryDayId = groceryDays
+                    .FirstOrDefault(g => g.Name == SelectedResident.GroceryDay)?.ID;
+
+                if (groceryDayId.HasValue && groceryDayId.Value != Guid.Empty)
+                {
+                    await Http.PatchAsJsonAsync(
+                        $"api/Resident/{SelectedResident.ResidentID}/grocery-day",
+                        groceryDayId.Value);
+                }
+
+                await Http.PatchAsJsonAsync(
+                    $"api/Resident/{SelectedResident.ResidentID}/payment-methods",
+                    SelectedResident.PaymentMethodIDs);
             }
 
             CloseOverlay();
             await LoadDataAsync();
+        }
+
+        private async Task CreateFromCardAsync()
+        {
+            if (SelectedResident is null) return;
+
+            var groceryDayId = groceryDays
+                .FirstOrDefault(g => g.Name == SelectedResident.GroceryDay)?.ID
+                ?? Guid.Empty;
+
+            var dto = new EditResidentDTO
+            {
+                ResidentName     = SelectedResident.ResidentName.Trim(),
+                GroceryDayID     = groceryDayId,
+                PaymentMethodIDs = SelectedResident.PaymentMethodIDs.ToList(),
+                MedicineTimes    = SelectedResident.MedicineSchedule.Select(m => m.Time).ToList(),
+                IsActive         = true,
+            };
+
+            isBusy = true;
+            try
+            {
+                var response = await Http.PostAsJsonAsync("api/Resident", dto);
+                if (response.IsSuccessStatusCode)
+                {
+                    CloseOverlay();
+                    await LoadDataAsync();
+                }
+            }
+            finally { isBusy = false; }
         }
 
         // ── Creation CRUD ─────────────────────────────────────────────────

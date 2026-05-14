@@ -41,8 +41,15 @@ else
 
         <main class="left-panel">
         <div class="resident-card-grid">
-            @foreach (var resident in Model.ResidentCards.Take(12))
+            @for (int slot = 0; slot < 12; slot++)
             {
+                if (slot >= Model.ResidentCards.Count)
+                {
+                    @* Blankt kort — ingen indhold *@
+                    <article class="resident-card resident-card--empty"></article>
+                    continue;
+                }
+                var resident = Model.ResidentCards[slot];
                 var displayedMeds = resident.MedicineSchedule.Take(6).ToList();
                 var cardId        = "kort-" + resident.ResidentStatusID;
                 var todayDanish   = DateTime.Today.DayOfWeek switch

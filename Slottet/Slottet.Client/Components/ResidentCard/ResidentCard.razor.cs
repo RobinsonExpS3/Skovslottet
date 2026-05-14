@@ -6,10 +6,14 @@ namespace Slottet.Client.Components.ResidentCard
     public partial class ResidentCard
     {
         // ── Parameters ────────────────────────────────────────────────────
-        [Parameter, EditorRequired] public ResidentCardDto Resident { get; set; } = default!;
-        [Parameter]                 public List<string>    AllStaff { get; set; } = new();
-        [Parameter]                 public EventCallback   OnSaved  { get; set; }
-        [Parameter]                 public bool            ViewOnly { get; set; } = false;
+        [Parameter, EditorRequired] public ResidentCardDto          Resident       { get; set; } = default!;
+        [Parameter]                 public List<string>             AllStaff       { get; set; } = new();
+        [Parameter]                 public List<ResidentLookupDTO>  PaymentMethods { get; set; } = new();
+        [Parameter]                 public EventCallback            OnSaved        { get; set; }
+        [Parameter]                 public EventCallback            OnDelete       { get; set; }
+        [Parameter]                 public bool                     ViewOnly       { get; set; } = false;
+        [Parameter]                 public bool                     IsAdmin        { get; set; } = false;
+        [Parameter]                 public bool                     IsNew          { get; set; } = false;
 
         // ── Private PN row wrapper ────────────────────────────────────────
         private class PnRow
@@ -27,15 +31,18 @@ namespace Slottet.Client.Components.ResidentCard
         ];
 
         // ── Draft state ───────────────────────────────────────────────────
-        private ResidentCardDto _draft               = default!;
-        private List<PnRow>     _pnRows              = new();
-        private bool            _showNewMedicineForm = false;
-        private string          _newMedicineLabel    = string.Empty;
-        private bool            _showStaffPicker     = false;
+        private ResidentCardDto _draft                    = default!;
+        private List<PnRow>     _pnRows                   = new();
+        private List<Guid>      _draftPaymentMethodIDs    = new();
+        private bool            _showNewMedicineForm      = false;
+        private string          _newMedicineLabel         = string.Empty;
+        private bool            _showStaffPicker          = false;
+        private bool            _showDeleteConfirm        = false;
 
         protected override void OnParametersSet()
         {
             _draft  = DeepCopy(Resident);
+            _draftPaymentMethodIDs = new List<Guid>(Resident.PaymentMethodIDs);
             _pnRows = _draft.PNEntries
                 .OrderBy(p => ParseTime(p.TimeOfAdministration))
                 .Select(p => new PnRow { Entry = p, IsEditing = false, Snapshot = ClonePN(p) })
@@ -44,6 +51,7 @@ namespace Slottet.Client.Components.ResidentCard
             _showNewMedicineForm = false;
             _newMedicineLabel    = string.Empty;
             _showStaffPicker     = false;
+            _showDeleteConfirm   = false;
         }
 
         // ── Medicine ──────────────────────────────────────────────────────
@@ -119,12 +127,30 @@ namespace Slottet.Client.Components.ResidentCard
             _draft.AssignedStaff.Remove(staffMember);
         }
 
+        // ── Payment methods ───────────────────────────────────────────────
+        private void OnPaymentMethodsChanged(ChangeEventArgs e)
+        {
+            _draftPaymentMethodIDs.Clear();
+            if (e.Value is string[] arr)
+                foreach (var v in arr)
+                    if (Guid.TryParse(v, out var id)) _draftPaymentMethodIDs.Add(id);
+        }
+
+        // ── Delete ───────────────────────────────────────────────────────
+        private async Task ConfirmDelete()
+        {
+            _showDeleteConfirm = false;
+            await OnDelete.InvokeAsync();
+        }
+
         // ── Save ─────────────────────────────────────────────────────────
         private async Task SaveChanges()
         {
+            Resident.ResidentName     = _draft.ResidentName;
             Resident.RiskLevel        = _draft.RiskLevel;
             Resident.LatestStatusNote = _draft.LatestStatusNote;
             Resident.GroceryDay       = _draft.GroceryDay;
+            Resident.PaymentMethodIDs = new List<Guid>(_draftPaymentMethodIDs);
             Resident.AssignedStaff    = new List<string>(_draft.AssignedStaff);
             Resident.MedicineSchedule = _draft.MedicineSchedule
                 .Select(m => new MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
@@ -177,6 +203,7 @@ namespace Slottet.Client.Components.ResidentCard
             RiskLevel        = src.RiskLevel,
             LatestStatusNote = src.LatestStatusNote,
             PaymentMethod    = src.PaymentMethod,
+            PaymentMethodIDs = new List<Guid>(src.PaymentMethodIDs),
             GroceryDay       = src.GroceryDay,
             AssignedStaff    = new List<string>(src.AssignedStaff),
             MedicineSchedule = src.MedicineSchedule

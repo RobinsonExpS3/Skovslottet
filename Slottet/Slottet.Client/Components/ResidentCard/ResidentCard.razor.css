@@ -22,6 +22,30 @@
     color: var(--color-text-heading);
 }
 
+.bkv-navn-input {
+    flex: 1;
+    background: rgba(255,255,255,0.35);
+    border: 1.5px solid rgba(255,255,255,0.6);
+    border-radius: var(--radius-section);
+    padding: 4px 10px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text-heading);
+    font-family: inherit;
+    min-width: 0;
+}
+
+.bkv-navn-input::placeholder {
+    color: rgba(0,0,0,0.3);
+    font-weight: 400;
+}
+
+.bkv-navn-input:focus {
+    outline: none;
+    border-color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.5);
+}
+
 .bkv-risk-select {
     padding: 4px 10px;
     border: 1.5px solid rgba(0,0,0,0.2);
@@ -386,6 +410,7 @@
 .bkv-input        { width: 100%; }
 .bkv-input-small  { width: 80px; }
 .bkv-select       { min-width: 130px; }
+.bkv-select--multi { min-height: 80px; width: 100%; }
 
 .bkv-input:focus,
 .bkv-input-small:focus,
@@ -434,8 +459,51 @@
     padding: 12px 20px;
     border-top: 1.5px solid var(--color-primary-lighter);
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
 }
+
+/* ── Slet borger ── */
+.bkv-btn-slet {
+    padding: 8px 18px;
+    background-color: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-section);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.bkv-btn-slet:hover { background-color: #b91c1c; }
+
+.bkv-delete-confirm {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bkv-delete-confirm-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #dc2626;
+}
+
+.bkv-btn-delete-confirm {
+    padding: 6px 14px;
+    background-color: #dc2626;
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-section);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.bkv-btn-delete-confirm:hover { background-color: #b91c1c; }
 
 .bkv-btn-gem {
     padding: 8px 24px;

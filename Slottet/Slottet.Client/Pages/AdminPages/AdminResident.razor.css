@@ -52,6 +52,53 @@
     cursor: default;
 }
 
+.resident-card--add {
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.resident-card--add:hover {
+    background-color: rgba(255,255,255,0.45);
+    border-color: var(--color-primary-light);
+}
+
+.resident-add-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.resident-add-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-section);
+    border: 2px dashed var(--color-primary-light);
+    background: none;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+
+.resident-card--add:hover .resident-add-btn {
+    background-color: var(--color-bg-section-header);
+    border-color: var(--color-primary);
+}
+
+.resident-add-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-align: center;
+}
+
 .resident-card[draggable="true"] { cursor: grab; }
 .resident-card[draggable="true"]:active { cursor: grabbing; }
 
