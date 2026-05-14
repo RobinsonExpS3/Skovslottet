@@ -76,7 +76,6 @@ namespace Slottet.Infrastructure.Services {
                 "Medicines" => await ResolveMedicineSubjectAsync(keyValues),
                 "PNs" => await ResolvePnSubjectAsync(keyValues),
                 "ResidentStatuses" => await ResolveResidentStatusSubjectAsync(keyValues),
-                "StaffShifts" => await ResolveStaffShiftSubjectAsync(keyValues),
                 "StaffResidentStatuses" => await ResolveStaffResidentStatusSubjectAsync(keyValues),
                 "ResidentPaymentMethods" => await ResolveResidentPaymentMethodSubjectAsync(keyValues),
                 "SpecialResponsibilities" => await ResolveSpecialResponsibilitySubjectAsync(keyValues),
@@ -154,13 +153,6 @@ namespace Slottet.Infrastructure.Services {
 
         private async Task<string> ResolveRiskLevelSubjectAsync(IReadOnlyDictionary<string, string?> keyValues) =>
             await ResolveSingleKeySubjectAsync(keyValues, "RiskLevelID", ResolveRiskLevelNameAsync);
-
-        private async Task<string> ResolveStaffShiftSubjectAsync(IReadOnlyDictionary<string, string?> keyValues) {
-            var staffName = await ResolveKeyValueAsync(keyValues, "StaffID", ResolveStaffNameAsync);
-            var shiftBoardName = await ResolveKeyValueAsync(keyValues, "ShiftBoardID", ResolveShiftBoardNameAsync);
-
-            return JoinSubjectParts(staffName, shiftBoardName);
-        }
 
         private async Task<string> ResolveStaffResidentStatusSubjectAsync(IReadOnlyDictionary<string, string?> keyValues) {
             var staffName = await ResolveKeyValueAsync(keyValues, "StaffID", ResolveStaffNameAsync);

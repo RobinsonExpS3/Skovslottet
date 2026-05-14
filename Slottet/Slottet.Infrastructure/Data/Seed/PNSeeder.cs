@@ -41,7 +41,7 @@ namespace Slottet.Infrastructure.Data.Seed
                 {
                     PNID               = Guid.NewGuid(),
                     ResidentID         = resident.ResidentID,
-                    MedicationName     = medication,
+                    PNMedication       = medication,
                     PNReason           = reason,
                     PNGivenTime        = today.AddHours(-hoursAgo),
                     PNRegisteredTime   = now,

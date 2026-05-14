@@ -25,7 +25,6 @@ namespace Slottet.Infrastructure.Data
             await MedicineSeeder.SeedAsync(context);
             await PNSeeder.SeedAsync(context);
             await PhoneSeeder.SeedAsync(context);
-            await StaffShiftSeeder.SeedAsync(context);
 
             // ── Tier 4: FK → Tier 3 ──────────────────────────────────────
             await StaffResidentStatusSeeder.SeedAsync(context);

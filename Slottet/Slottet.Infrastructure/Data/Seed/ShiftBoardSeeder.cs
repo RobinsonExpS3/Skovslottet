@@ -1,4 +1,5 @@
-﻿using Slottet.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Slottet.Domain.Entities;
 
 namespace Slottet.Infrastructure.Data.Seed
 {
@@ -6,6 +7,11 @@ namespace Slottet.Infrastructure.Data.Seed
     {
         public static async Task SeedAsync(SlottetDBContext context)
         {
+            var defaultDepartment = await context.Departments
+                .Where(d => d.DepartmentName == "Skoven")
+                .FirstOrDefaultAsync()
+                ?? await context.Departments.FirstOrDefaultAsync();
+
             var startDate = DateTime.Today.AddDays(-30);
             var endDate = startDate.AddDays(60);
 
@@ -23,26 +29,29 @@ namespace Slottet.Infrastructure.Data.Seed
 
                 shiftsToAdd.Add(new ShiftBoard
                 {
-                    ShiftBoardID = Guid.NewGuid(),
-                    ShiftType = "Dag",
+                    ShiftBoardID  = Guid.NewGuid(),
+                    ShiftType     = "Dag",
                     StartDateTime = day.AddHours(7),
-                    EndDateTime = day.AddHours(15)
+                    EndDateTime   = day.AddHours(15),
+                    DepartmentID  = defaultDepartment?.DepartmentID
                 });
 
                 shiftsToAdd.Add(new ShiftBoard
                 {
-                    ShiftBoardID = Guid.NewGuid(),
-                    ShiftType = "Aften",
+                    ShiftBoardID  = Guid.NewGuid(),
+                    ShiftType     = "Aften",
                     StartDateTime = day.AddHours(15),
-                    EndDateTime = day.AddHours(23)
+                    EndDateTime   = day.AddHours(23),
+                    DepartmentID  = defaultDepartment?.DepartmentID
                 });
 
                 shiftsToAdd.Add(new ShiftBoard
                 {
-                    ShiftBoardID = Guid.NewGuid(),
-                    ShiftType = "Nat",
+                    ShiftBoardID  = Guid.NewGuid(),
+                    ShiftType     = "Nat",
                     StartDateTime = day.AddHours(23),
-                    EndDateTime = nextDay.AddHours(7)
+                    EndDateTime   = nextDay.AddHours(7),
+                    DepartmentID  = defaultDepartment?.DepartmentID
                 });
             }
 

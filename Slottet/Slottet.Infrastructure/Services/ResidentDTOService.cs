@@ -373,7 +373,7 @@ namespace Slottet.Infrastructure.Services
                                         .Select(pn => new PNEntryDto
                                         {
                                             TimeOfAdministration = pn.PNGivenTime.ToString("HH:mm"),
-                                            Medication           = pn.MedicationName,
+                                            Medication           = pn.PNMedication,
                                             Reason               = pn.PNReason,
                                             IssuedBy             = pn.StaffPNs
                                                                        .Select(spn => spn.Staff.StaffName)

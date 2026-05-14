@@ -10,7 +10,6 @@
         public Guid DepartmentID { get; set; }
         public Department Department { get; set; }
 
-        public ICollection<StaffShift> StaffShifts { get; set; }
         public ICollection<StaffResidentStatus> StaffResidentStatuses { get; set; }
 
         public ICollection<StaffPhone> StaffPhones { get; set; } = new List<StaffPhone>();

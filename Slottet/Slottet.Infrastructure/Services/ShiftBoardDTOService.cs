@@ -63,13 +63,9 @@ namespace Slottet.Infrastructure.Services
                 return null;
             }
 
-            var departmentId = shiftBoard.StaffShifts
-                .Select(ss => ss.Staff.DepartmentID)
-                .FirstOrDefault();
-
-            var department = departmentId == Guid.Empty
-                ? null
-                : await GetDepartmentAsync(departmentId, ct);
+            var department = shiftBoard.DepartmentID.HasValue
+                ? await GetDepartmentAsync(shiftBoard.DepartmentID.Value, ct)
+                : null;
 
             var shiftDate = DateOnly.FromDateTime(shiftBoard.StartDateTime);
             var residents = await GetActiveResidentsAsync(shiftDate, ct);
@@ -156,10 +152,11 @@ namespace Slottet.Infrastructure.Services
         {
             var shiftBoard = new ShiftBoard
             {
-                ShiftBoardID = dto.ShiftBoardID == Guid.Empty ? Guid.NewGuid() : dto.ShiftBoardID,
-                ShiftType = dto.ShiftType,
+                ShiftBoardID  = dto.ShiftBoardID == Guid.Empty ? Guid.NewGuid() : dto.ShiftBoardID,
+                ShiftType     = dto.ShiftType,
                 StartDateTime = dto.StartDateTime,
-                EndDateTime = dto.EndDateTime
+                EndDateTime   = dto.EndDateTime,
+                DepartmentID  = dto.DepartmentID
             };
 
             _context.ShiftBoards.Add(shiftBoard);
@@ -186,9 +183,10 @@ namespace Slottet.Infrastructure.Services
                 return false;
             }
 
-            existingShiftBoard.ShiftType = dto.ShiftType;
+            existingShiftBoard.ShiftType     = dto.ShiftType;
             existingShiftBoard.StartDateTime = dto.StartDateTime;
-            existingShiftBoard.EndDateTime = dto.EndDateTime;
+            existingShiftBoard.EndDateTime   = dto.EndDateTime;
+            existingShiftBoard.DepartmentID  = dto.DepartmentID;
 
             await _context.SaveChangesAsync(ct);
             return true;
@@ -225,8 +223,6 @@ namespace Slottet.Infrastructure.Services
         {
             return await _context.ShiftBoards
                 .AsNoTracking()
-                .Include(sb => sb.StaffShifts)
-                    .ThenInclude(ss => ss.Staff)
                 .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
         }
 
@@ -354,7 +350,7 @@ namespace Slottet.Infrastructure.Services
                 .Select(pn => new PNEntryDto
                 {
                     TimeOfAdministration = pn.PNGivenTime.ToString("HH:mm"),
-                    Medication           = pn.MedicationName,
+                    Medication           = pn.PNMedication,
                     Reason               = pn.PNReason,
                     IssuedBy             = pn.StaffPNs
                                               .Select(spn => spn.Staff.StaffName)

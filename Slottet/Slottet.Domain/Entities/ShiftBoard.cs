@@ -7,6 +7,7 @@
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
 
-        public ICollection<StaffShift> StaffShifts { get; set; }
+        public Guid? DepartmentID { get; set; }
+        public Department Department { get; set; }
     }
 }

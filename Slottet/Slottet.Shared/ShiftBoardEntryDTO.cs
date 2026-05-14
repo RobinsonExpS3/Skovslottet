@@ -6,5 +6,6 @@ namespace Slottet.Shared
         public string ShiftType { get; set; } = string.Empty;
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
+        public Guid? DepartmentID { get; set; }
     }
 }

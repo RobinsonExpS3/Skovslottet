@@ -23,9 +23,9 @@ namespace Slottet.Infrastructure.Data.Configurations
             entity.Property(sb => sb.EndDateTime)
                 .IsRequired();
 
-            entity.HasMany(ss => ss.StaffShifts)
-                .WithOne(sb => sb.ShiftBoard)
-                .HasForeignKey(ss => ss.ShiftBoardID)
+            entity.HasOne(sb => sb.Department)
+                .WithMany()
+                .HasForeignKey(sb => sb.DepartmentID)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
