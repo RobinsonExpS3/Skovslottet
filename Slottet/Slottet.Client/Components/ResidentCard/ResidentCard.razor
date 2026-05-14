@@ -34,12 +34,22 @@
                     @* Medicin-knapper: toggle givet/ikke givet *@
                     @foreach (var med in _draft.MedicineSchedule)
                     {
-                        <button type="button"
-                                class="bkv-med-slot @(med.IsGiven ? "bkv-med-given" : "bkv-med-not-given")"
-                                @onclick="() => med.IsGiven = !med.IsGiven">
-                            <span class="bkv-med-tid">@med.Label</span>
-                            <span class="bkv-med-ikon">@(med.IsGiven ? "💊" : "·")</span>
-                        </button>
+                        <div class="bkv-med-slot-wrapper">
+                            <button type="button"
+                                    class="bkv-med-slot @(med.IsGiven ? "bkv-med-given" : "bkv-med-not-given")"
+                                    @onclick="() => med.IsGiven = !med.IsGiven">
+                                <span class="bkv-med-tid">@med.Label</span>
+                                <span class="bkv-med-ikon">@(med.IsGiven ? "💊" : "·")</span>
+                            </button>
+                            @if (!ViewOnly)
+                            {
+                                <button type="button"
+                                        class="bkv-med-delete"
+                                        title="Slet medicin-tid"
+                                        @onclick:stopPropagation="true"
+                                        @onclick="() => RemoveMedicine(med)">✕</button>
+                            }
+                        </div>
                     }
 
                     @if (!ViewOnly)

@@ -68,6 +68,11 @@ namespace Slottet.Client.Components.ResidentCard
             _showNewMedicineForm = false;
         }
 
+        private void RemoveMedicine(MedicineScheduleItemDto med)
+        {
+            _draft.MedicineSchedule.Remove(med);
+        }
+
         // ── PN ────────────────────────────────────────────────────────────
         private void AddPN()
         {

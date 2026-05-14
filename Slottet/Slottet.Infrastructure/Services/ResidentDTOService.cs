@@ -305,6 +305,30 @@ namespace Slottet.Infrastructure.Services
             return true;
         }
 
+        public async Task<bool> UpdateMedicineTimesAsync(Guid residentId, List<TimeOnly> times, CancellationToken ct = default)
+        {
+            var exists = await _context.Residents.AnyAsync(r => r.ResidentID == residentId, ct);
+            if (!exists) return false;
+
+            var existing = await _context.Medicines
+                .Where(m => m.ResidentID == residentId)
+                .ToListAsync(ct);
+
+            // Slet kun de tider der ikke længere er i listen (bevar MedicineLogs på de øvrige)
+            var toRemove = existing
+                .Where(m => !times.Contains(m.ScheduledTime))
+                .ToList();
+            _context.Medicines.RemoveRange(toRemove);
+
+            // Tilføj kun de nye tider der ikke allerede eksisterer
+            var existingTimes = existing.Select(m => m.ScheduledTime).ToHashSet();
+            var toAdd = times.Where(t => !existingTimes.Contains(t)).ToList();
+            AddMedicines(residentId, toAdd);
+
+            await _context.SaveChangesAsync(ct);
+            return true;
+        }
+
         public async Task<List<ResidentCardDto>> GetResidentCardsAsync(CancellationToken ct = default)
         {
             var today = DateOnly.FromDateTime(DateTime.Today);

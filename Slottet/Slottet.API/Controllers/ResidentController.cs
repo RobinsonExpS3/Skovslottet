@@ -128,6 +128,13 @@ namespace Slottet.API.Controllers
             return swapped ? NoContent() : NotFound();
         }
 
+        [HttpPatch("{id}/medicine-times")]
+        public async Task<ActionResult> PatchMedicineTimesAsync(Guid id, [FromBody] List<TimeOnly> times, CancellationToken ct)
+        {
+            var updated = await _residentService.UpdateMedicineTimesAsync(id, times, ct);
+            return updated ? NoContent() : NotFound();
+        }
+
         [HttpGet("cards")]
         public async Task<ActionResult<List<ResidentCardDto>>> GetResidentCardsAsync(CancellationToken ct)
         {

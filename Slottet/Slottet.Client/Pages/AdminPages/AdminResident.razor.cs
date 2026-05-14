@@ -138,6 +138,17 @@ namespace Slottet.Client.Pages.AdminPages
 
         protected async Task OnResidentSaved()
         {
+            if (SelectedResident is not null)
+            {
+                var times = SelectedResident.MedicineSchedule
+                    .Select(m => m.Time)
+                    .ToList();
+
+                await Http.PatchAsJsonAsync(
+                    $"api/Resident/{SelectedResident.ResidentID}/medicine-times",
+                    times);
+            }
+
             CloseOverlay();
             await LoadDataAsync();
         }
