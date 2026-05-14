@@ -179,14 +179,21 @@
                     <div class="bkv-praktisk-felt">
                         @* Handledag *@
                         <span class="bkv-label">Handledag</span>
-                        <select class="bkv-select" @bind="_draft.GroceryDay">
-                            <option value="">–</option>
-                            @* Handledage *@
-                            @foreach (var day in GroceryDays)
-                            {
-                                <option>@day</option>
-                            }
-                        </select>
+                        @if (ViewOnly)
+                        {
+                            <span class="bkv-betaling-tekst">@(_draft.GroceryDay is { Length: > 0 } g ? g : "–")</span>
+                        }
+                        else
+                        {
+                            <select class="bkv-select" @bind="_draft.GroceryDay">
+                                <option value="">–</option>
+                                @* Handledage *@
+                                @foreach (var day in GroceryDays)
+                                {
+                                    <option>@day</option>
+                                }
+                            </select>
+                        }
                     </div>
                     <div class="bkv-praktisk-felt">
                         @* Betalingsmetode *@
