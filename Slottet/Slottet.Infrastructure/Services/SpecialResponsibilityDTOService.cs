@@ -60,6 +60,7 @@ namespace Slottet.Infrastructure.Services
                     ? Guid.NewGuid()
                     : dto.SpecialResponsibilityID,
                 TaskName = dto.Description,
+                DepartmentID = dto.DepartmentID,
             };
 
             _context.SpecialResponsibilities.Add(specialResponsibility);
@@ -132,6 +133,7 @@ namespace Slottet.Infrastructure.Services
             return specialResponsibility => new SpecialResponsibilityEntryDto
             {
                 SpecialResponsibilityID = specialResponsibility.SpecialResponsibilityID,
+                DepartmentID = specialResponsibility.DepartmentID,
                 Description = specialResponsibility.TaskName,
                 StaffName = specialResponsibility.SpecialResponsibilityStaffs
                     .OrderByDescending(srs => srs.AssignedAt)

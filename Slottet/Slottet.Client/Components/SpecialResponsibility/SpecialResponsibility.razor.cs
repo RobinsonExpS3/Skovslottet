@@ -16,12 +16,18 @@ namespace Slottet.Client.Components.SpecialResponsibility
 
         protected override void OnParametersSet()
         {
-            _editItems = Items.Select(s => new SpecialResponsibilityEntryDto { Description = s.Description, StaffName = s.StaffName }).ToList();
+            _editItems = Items.Select(s => new SpecialResponsibilityEntryDto
+            {
+                SpecialResponsibilityID = s.SpecialResponsibilityID,
+                DepartmentID            = s.DepartmentID,
+                Description             = s.Description,
+                StaffName               = s.StaffName,
+                StaffInitials           = s.StaffInitials,
+            }).ToList();
             _saved     = false;
         }
 
         // ── List mutations ────────────────────────────────────────────────
-        private void AddItem()         => _editItems.Add(new SpecialResponsibilityEntryDto());
         private void RemoveItem(int i) => _editItems.RemoveAt(i);
 
         // ── Save ──────────────────────────────────────────────────────────

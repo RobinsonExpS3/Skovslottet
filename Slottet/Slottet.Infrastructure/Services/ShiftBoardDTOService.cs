@@ -341,11 +341,11 @@ namespace Slottet.Infrastructure.Services
         {
             return await _context.SpecialResponsibilities
                 .AsNoTracking()
-                .Where(sr => sr.DepartmentID == departmentId)
                 .OrderBy(sr => sr.TaskName)
                 .Select(sr => new SpecialResponsibilityEntryDto
                 {
                     SpecialResponsibilityID = sr.SpecialResponsibilityID,
+                    DepartmentID = sr.DepartmentID,
                     Description = sr.TaskName,
                     StaffName = sr.SpecialResponsibilityStaffs
                         .Where(srs => srs.ShiftBoardID == shiftBoardId)

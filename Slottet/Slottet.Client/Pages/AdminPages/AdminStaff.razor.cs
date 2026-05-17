@@ -306,6 +306,7 @@ namespace Slottet.Client.Pages.AdminPages
                 var newItem = new SpecialResponsibilityEntryDto
                 {
                     SpecialResponsibilityID = Guid.NewGuid(),
+                    DepartmentID = GetDepartmentSkoven(),
                     Description = srDescriptionInput
                 };
                 var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
