@@ -7,6 +7,7 @@ namespace Slottet.Shared
     public class SwapPhoneDTO
     {
         public Guid PhoneID { get; set; }
+        public Guid ShiftBoardID { get; set; }
         public string? PhoneNumber { get; set; }
         public Guid StaffID { get; set; }
         public string? StaffName { get; set; }

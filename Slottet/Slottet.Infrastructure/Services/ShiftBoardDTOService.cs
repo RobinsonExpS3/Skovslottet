@@ -166,6 +166,7 @@ namespace Slottet.Infrastructure.Services
                 PhoneNumbers = department?.Phones
                     .Select(phone => new PhoneEntryDto
                     {
+                        PhoneID = phone.PhoneID,
                         Number = phone.PhoneNumber,
                         StaffName = phone.StaffPhones
                             .Where(sp => sp.ShiftBoardID == shiftBoard.ShiftBoardID)
@@ -357,6 +358,37 @@ namespace Slottet.Infrastructure.Services
                         .FirstOrDefault() ?? string.Empty
                 })
                 .ToListAsync(ct);
+        }
+
+        public async Task<bool> UpdatePhoneAssignmentAsync(SwapPhoneDTO dto, CancellationToken ct = default)
+        {
+            if (dto.PhoneID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
+                return false;
+
+            var existing = await _context.StaffPhones
+                .Where(sp => sp.PhoneID == dto.PhoneID && sp.ShiftBoardID == dto.ShiftBoardID)
+                .ToListAsync(ct);
+
+            _context.StaffPhones.RemoveRange(existing);
+
+            if (!string.IsNullOrWhiteSpace(dto.StaffName))
+            {
+                var staff = await _context.Staffs
+                    .FirstOrDefaultAsync(s => s.StaffName == dto.StaffName, ct);
+
+                if (staff is null) return false;
+
+                _context.StaffPhones.Add(new StaffPhone
+                {
+                    PhoneID      = dto.PhoneID,
+                    StaffID      = staff.StaffID,
+                    ShiftBoardID = dto.ShiftBoardID,
+                    AssignedAt   = DateTime.Now
+                });
+            }
+
+            await _context.SaveChangesAsync(ct);
+            return true;
         }
 
         public async Task<bool> UpdateSpecialResponsibilityAssignmentAsync(SpecialResponsibilityAssignmentDto dto, CancellationToken ct = default)

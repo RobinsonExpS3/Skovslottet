@@ -194,6 +194,19 @@ namespace Slottet.API.Controllers
             return NoContent();
         }
 
+        [HttpPatch("phone-assignment")]
+        public async Task<IActionResult> PatchPhoneAssignmentAsync(
+            [FromBody] SwapPhoneDTO dto,
+            CancellationToken ct)
+        {
+            if (dto is null || dto.PhoneID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
+                return BadRequest();
+
+            var updated = await _shiftBoardService.UpdatePhoneAssignmentAsync(dto, ct);
+            if (!updated) return NotFound();
+            return NoContent();
+        }
+
         /// <summary>
         /// Saves staff-facing edits on a resident card:
         /// status note, risk level, assigned staff, medicine IsGiven toggles, and new PN entries.

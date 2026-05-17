@@ -38,25 +38,30 @@ namespace Slottet.Infrastructure.Services
         /// <returns>Returns true if the update is successful, otherwise false.</returns>
         public async Task<bool> PostSwapPhoneAsync(SwapPhoneDTO dto)
         {
+            if (dto.PhoneID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
+                return false;
 
             var phoneExists = await _context.Phones.AnyAsync(p => p.PhoneID == dto.PhoneID);
             var staffExists = await _context.Staffs.AnyAsync(p => p.StaffID == dto.StaffID);
 
             if (!phoneExists || !staffExists)
-            {
                 return false;
-            }
 
-            var assignment = new StaffPhone
+            var existing = await _context.StaffPhones
+                .Where(sp => sp.PhoneID == dto.PhoneID && sp.ShiftBoardID == dto.ShiftBoardID)
+                .ToListAsync();
+
+            _context.StaffPhones.RemoveRange(existing);
+
+            _context.StaffPhones.Add(new StaffPhone
             {
-                PhoneID = dto.PhoneID,
-                StaffID = dto.StaffID,
-                AssignedAt = DateTime.Now
-            };
+                PhoneID      = dto.PhoneID,
+                StaffID      = dto.StaffID,
+                ShiftBoardID = dto.ShiftBoardID,
+                AssignedAt   = DateTime.Now
+            });
 
-            _context.StaffPhones.Add(assignment);
             await _context.SaveChangesAsync();
-
             return true;
         }
 

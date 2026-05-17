@@ -16,6 +16,7 @@ namespace Slottet.Application.Interfaces
         Task<bool> PutShiftBoardAsync(Guid id, ShiftBoardEntryDTO dto, CancellationToken ct = default);
         Task<bool> DeleteShiftBoardAsync(Guid id, CancellationToken ct = default);
         Task<bool> UpdateResidentCardAsync(ResidentCardDto dto, CancellationToken ct = default);
+        Task<bool> UpdatePhoneAssignmentAsync(SwapPhoneDTO dto, CancellationToken ct = default);
         Task<bool> UpdateSpecialResponsibilityAssignmentAsync(SpecialResponsibilityAssignmentDto dto, CancellationToken ct = default);
     }
 }
