@@ -176,26 +176,6 @@ namespace Slottet.API.Controllers
             return NoContent();
         }
 
-        /// <summary>
-        /// Deletes a shift board by ID.
-        /// </summary>
-        /// <param name="id">The ID of the shift board to delete.</param>
-        /// <param name="ct">Cancellation token used to cancel the request.</param>
-        /// <returns>Returns NoContent if the deletion succeeds, otherwise NotFound.</returns>
-        [HttpDelete("{id:guid}")]
-        [Authorize(Policy = "AdminOnly")]
-        public async Task<IActionResult> DeleteShiftBoardAsync(Guid id, CancellationToken ct)
-        {
-            var deleted = await _shiftBoardService.DeleteShiftBoardAsync(id, ct);
-
-            if (!deleted)
-            {
-                return NotFound();
-            }
-
-            return NoContent();
-        }
-
         [HttpPatch("phone-assignment")]
         public async Task<IActionResult> PatchPhoneAssignmentAsync(
             [FromBody] SwapPhoneDTO dto,

@@ -284,27 +284,6 @@ namespace Slottet.Infrastructure.Services
         }
 
         /// <summary>
-        /// Deletes a shift board object from the database based on the given ID.
-        /// </summary>
-        /// <param name="id">The ID of the shift board to delete.</param>
-        /// <param name="ct">Cancellation token used to cancel the database operation.</param>
-        /// <returns>Returns true if the deletion is successful, otherwise false.</returns>
-        public async Task<bool> DeleteShiftBoardAsync(Guid id, CancellationToken ct = default)
-        {
-            var shiftBoard = await _context.ShiftBoards
-                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == id, ct);
-
-            if (shiftBoard == null)
-            {
-                return false;
-            }
-
-            _context.ShiftBoards.Remove(shiftBoard);
-            await _context.SaveChangesAsync(ct);
-            return true;
-        }
-
-        /// <summary>
         /// Gets a shift board with the related staff shift and staff data needed for DTO mapping.
         /// </summary>
         /// <param name="id">The ID of the shift board to retrieve.</param>
