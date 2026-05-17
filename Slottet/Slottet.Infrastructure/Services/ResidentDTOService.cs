@@ -161,56 +161,14 @@ namespace Slottet.Infrastructure.Services
         }
 
         /// <summary>
-        /// Deletes a resident object and related resident data from the database based on the given ID.
+        /// Soft-deletes a resident based on the given ID. Bevarer al relateret data
+        /// (PNs, Medicines, ResidentStatuses) for sporbarhed og dokumentationskrav.
         /// </summary>
         /// <param name="id">The ID of the resident to delete.</param>
         /// <returns>Returns true if the deletion is successful, otherwise false.</returns>
         public async Task<bool> DeleteResidentAsync(Guid id)
         {
-            var existingResident = await _context.Residents
-                .FirstOrDefaultAsync(r => r.ResidentID == id);
-
-            if (existingResident == null)
-            {
-                return false;
-            }
-
-            var residentStatusIDs = await _context.ResidentStatuses
-                .Where(rs => rs.ResidentID == id)
-                .Select(rs => rs.ResidentStatusID)
-                .ToListAsync();
-
-            if (residentStatusIDs.Count > 0)
-            {
-                var staffResidentStatuses = await _context.StaffResidentStatuses
-                    .Where(srs => residentStatusIDs.Contains(srs.ResidentStatusID))
-                    .ToListAsync();
-                _context.StaffResidentStatuses.RemoveRange(staffResidentStatuses);
-            }
-
-            var residentStatuses = await _context.ResidentStatuses
-                .Where(rs => rs.ResidentID == id)
-                .ToListAsync();
-            _context.ResidentStatuses.RemoveRange(residentStatuses);
-
-            var residentPaymentMethods = await _context.ResidentPaymentMethods
-                .Where(rpm => rpm.ResidentID == id)
-                .ToListAsync();
-            _context.ResidentPaymentMethods.RemoveRange(residentPaymentMethods);
-
-            // Soft delete alle medicin-rækker — bevarer MedicineLog historik.
-            var medicines = await _context.Medicines
-                .Where(m => m.ResidentID == id)
-                .ToListAsync();
-            foreach (var medicine in medicines)
-            {
-                medicine.IsActive = false;
-            }
-
-            _context.Residents.Remove(existingResident);
-
-            await _context.SaveChangesAsync();
-            return true;
+            return await DeactivateResidentAsync(id);
         }
 
         /// <summary>
