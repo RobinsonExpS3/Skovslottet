@@ -12,10 +12,13 @@ namespace Slottet.Components.Layout {
         protected override async Task OnInitializedAsync() {
             try {
                 var user = await Http.GetFromJsonAsync<CurrentUser>("api/Auth/me");
-                canSeeAdminMenu = user?.Roles.Contains("Admin", StringComparer.OrdinalIgnoreCase) == true;
+                canSeeAdminMenu = user?.Roles.Any(r =>
+                    r.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
+                    r.Equals("Developer", StringComparison.OrdinalIgnoreCase)) == true;
             } catch {
                 canSeeAdminMenu = false;
             }
+            StateHasChanged();
         }
 
         private void ToggleAdminMenu() {
