@@ -27,6 +27,7 @@ namespace Slottet.Infrastructure.Data
         public DbSet<RiskLevel> RiskLevels => Set<RiskLevel>();
         public DbSet<ShiftBoard> ShiftBoards => Set<ShiftBoard>();
         public DbSet<SpecialResponsibility> SpecialResponsibilities => Set<SpecialResponsibility>();
+        public DbSet<SpecialResponsibilityStaff> SpecialResponsibilityStaffs => Set<SpecialResponsibilityStaff>();
         public DbSet<Staff> Staffs => Set<Staff>();
         public DbSet<StaffResidentStatus> StaffResidentStatuses => Set<StaffResidentStatus>();
         public DbSet<StaffPhone> StaffPhones => Set<StaffPhone>();

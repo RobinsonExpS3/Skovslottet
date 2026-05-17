@@ -68,7 +68,7 @@ namespace Slottet.Infrastructure.Data.Seed
                     ResidentID = residents[i].ResidentID,
                     RiskLevelID = Risk(risks[i]),
                     Status = statuses[i],
-                    Date = DateTime.Today,
+                    Date = new DateTime(2020, 1, 1),
                 });
             }
 

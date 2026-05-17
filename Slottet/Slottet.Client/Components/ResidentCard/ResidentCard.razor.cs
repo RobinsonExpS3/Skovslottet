@@ -41,6 +41,12 @@ namespace Slottet.Client.Components.ResidentCard
 
         protected override void OnParametersSet()
         {
+            // Only re-initialise when a *different* resident card is opened.
+            // Skipping re-init when the parent re-renders with the same resident
+            // prevents the draft (and any in-progress edits) from being wiped.
+            if (_draft is not null && _draft.ResidentID == Resident.ResidentID)
+                return;
+
             _draft  = DeepCopy(Resident);
             _draftPaymentMethodIDs = new List<Guid>(Resident.PaymentMethodIDs);
             _pnRows = _draft.PNEntries
@@ -153,7 +159,7 @@ namespace Slottet.Client.Components.ResidentCard
             Resident.PaymentMethodIDs = new List<Guid>(_draftPaymentMethodIDs);
             Resident.AssignedStaff    = new List<string>(_draft.AssignedStaff);
             Resident.MedicineSchedule = _draft.MedicineSchedule
-                .Select(m => new MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
+                .Select(m => new MedicineScheduleItemDto { MedicineID = m.MedicineID, Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
                 .ToList();
             Resident.PNEntries = _pnRows
                 .OrderBy(r => ParseTime(r.Entry.TimeOfAdministration))
@@ -197,6 +203,7 @@ namespace Slottet.Client.Components.ResidentCard
         {
             ResidentStatusID = src.ResidentStatusID,
             ResidentID       = src.ResidentID,
+            ShiftBoardID     = src.ShiftBoardID,
             Date             = src.Date,
             ResidentName     = src.ResidentName,
             IsActive         = src.IsActive,
@@ -207,7 +214,7 @@ namespace Slottet.Client.Components.ResidentCard
             GroceryDay       = src.GroceryDay,
             AssignedStaff    = new List<string>(src.AssignedStaff),
             MedicineSchedule = src.MedicineSchedule
-                .Select(m => new MedicineScheduleItemDto { Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
+                .Select(m => new MedicineScheduleItemDto { MedicineID = m.MedicineID, Label = m.Label, Time = m.Time, IsGiven = m.IsGiven })
                 .ToList(),
             PNEntries = src.PNEntries.Select(ClonePN).ToList(),
         };

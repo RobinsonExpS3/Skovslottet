@@ -4,6 +4,7 @@ namespace Slottet.Shared
     {
         public Guid ResidentStatusID { get; set; }
         public Guid ResidentID { get; set; }
+        public Guid ShiftBoardID { get; set; }
         public DateTime Date { get; set; }
 
         public string ResidentName { get; set; } = string.Empty;

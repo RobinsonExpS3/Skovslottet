@@ -6,11 +6,13 @@ namespace Slottet.Domain.Entities {
     public class SpecialResponsibilityStaff {
         public Guid SpecialResponsibilityID { get; set; }
         public Guid StaffID { get; set; }
+        public Guid ShiftBoardID { get; set; }
         public DateTime AssignedAt { get; set; } = DateTime.Now;
         public Guid DepartmentID { get; set; }
 
         public Staff Staff { get; set; }
         public SpecialResponsibility SpecialResponsibility { get; set; }
         public Department Department { get; set; }
+        public ShiftBoard ShiftBoard { get; set; }
     }
 }

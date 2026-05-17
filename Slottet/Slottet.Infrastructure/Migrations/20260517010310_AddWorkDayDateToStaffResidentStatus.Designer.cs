@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Slottet.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using Slottet.Infrastructure.Data;
 namespace Slottet.Infrastructure.Migrations
 {
     [DbContext(typeof(SlottetDBContext))]
-    partial class SlottetDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260517010310_AddWorkDayDateToStaffResidentStatus")]
+    partial class AddWorkDayDateToStaffResidentStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -557,17 +560,12 @@ namespace Slottet.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("DepartmentID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("TaskName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("SpecialResponsibilityID");
-
-                    b.HasIndex("DepartmentID");
 
                     b.ToTable("SpecialResponsibilities");
                 });
@@ -580,24 +578,19 @@ namespace Slottet.Infrastructure.Migrations
                     b.Property<Guid>("StaffID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ShiftBoardID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("AssignedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("DepartmentID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("SpecialResponsibilityID", "StaffID", "ShiftBoardID");
+                    b.HasKey("SpecialResponsibilityID", "StaffID", "AssignedAt");
 
                     b.HasIndex("DepartmentID");
 
-                    b.HasIndex("ShiftBoardID");
-
                     b.HasIndex("StaffID");
 
-                    b.ToTable("SpecialResponsibilityStaffs");
+                    b.ToTable("SpecialResponsibilityStaff");
                 });
 
             modelBuilder.Entity("Slottet.Domain.Entities.Staff", b =>
@@ -654,17 +647,12 @@ namespace Slottet.Infrastructure.Migrations
                     b.Property<Guid>("PhoneID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ShiftBoardID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("AssignedAt")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("StaffID", "PhoneID", "ShiftBoardID");
+                    b.HasKey("StaffID", "PhoneID", "AssignedAt");
 
                     b.HasIndex("PhoneID");
-
-                    b.HasIndex("ShiftBoardID");
 
                     b.ToTable("StaffPhones");
                 });
@@ -677,17 +665,12 @@ namespace Slottet.Infrastructure.Migrations
                     b.Property<Guid>("ResidentStatusID")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ShiftBoardID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<DateOnly>("WorkDayDate")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime>("AssignedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("StaffID", "ResidentStatusID", "ShiftBoardID");
+                    b.HasKey("StaffID", "ResidentStatusID", "WorkDayDate");
 
                     b.HasIndex("ResidentStatusID");
-
-                    b.HasIndex("ShiftBoardID");
 
                     b.ToTable("StaffResidentStatuses");
                 });
@@ -870,29 +853,12 @@ namespace Slottet.Infrastructure.Migrations
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibility", b =>
-                {
-                    b.HasOne("Slottet.Domain.Entities.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Department");
-                });
-
             modelBuilder.Entity("Slottet.Domain.Entities.SpecialResponsibilityStaff", b =>
                 {
                     b.HasOne("Slottet.Domain.Entities.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentID")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Slottet.Domain.Entities.ShiftBoard", "ShiftBoard")
-                        .WithMany()
-                        .HasForeignKey("ShiftBoardID")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Slottet.Domain.Entities.SpecialResponsibility", "SpecialResponsibility")
@@ -908,8 +874,6 @@ namespace Slottet.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
-
-                    b.Navigation("ShiftBoard");
 
                     b.Navigation("SpecialResponsibility");
 
@@ -954,12 +918,6 @@ namespace Slottet.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Slottet.Domain.Entities.ShiftBoard", "ShiftBoard")
-                        .WithMany()
-                        .HasForeignKey("ShiftBoardID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
                         .WithMany("StaffPhones")
                         .HasForeignKey("StaffID")
@@ -967,8 +925,6 @@ namespace Slottet.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Phone");
-
-                    b.Navigation("ShiftBoard");
 
                     b.Navigation("Staff");
                 });
@@ -981,12 +937,6 @@ namespace Slottet.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Slottet.Domain.Entities.ShiftBoard", "ShiftBoard")
-                        .WithMany()
-                        .HasForeignKey("ShiftBoardID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Slottet.Domain.Entities.Staff", "Staff")
                         .WithMany("StaffResidentStatuses")
                         .HasForeignKey("StaffID")
@@ -994,8 +944,6 @@ namespace Slottet.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("ResidentStatus");
-
-                    b.Navigation("ShiftBoard");
 
                     b.Navigation("Staff");
                 });

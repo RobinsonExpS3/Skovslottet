@@ -49,6 +49,30 @@ namespace Slottet.API.Controllers
             return Ok(dto);
         }
 
+        [HttpGet("{id:guid}/previous")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetPreviousShiftBoardAsync(Guid id, CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetPreviousShiftBoardAsync(id, ct);
+            if (dto == null) return NotFound();
+            return Ok(dto);
+        }
+
+        [HttpGet("{id:guid}/next")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetNextShiftBoardAsync(Guid id, CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetNextShiftBoardAsync(id, ct);
+            if (dto == null) return NotFound();
+            return Ok(dto);
+        }
+
+        [HttpGet("{id:guid}/next-or-create")]
+        public async Task<ActionResult<ShiftBoardDTO>> GetOrCreateNextShiftBoardAsync(Guid id, CancellationToken ct)
+        {
+            var dto = await _shiftBoardService.GetOrCreateNextShiftBoardAsync(id, ct);
+            if (dto == null) return NotFound();
+            return Ok(dto);
+        }
+
         /// <summary>
         /// Gets a shift board DTO by ID.
         /// </summary>
@@ -166,6 +190,39 @@ namespace Slottet.API.Controllers
             {
                 return NotFound();
             }
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Saves staff-facing edits on a resident card:
+        /// status note, risk level, assigned staff, medicine IsGiven toggles, and new PN entries.
+        /// </summary>
+        [HttpPatch("special-responsibility")]
+        public async Task<IActionResult> PatchSpecialResponsibilityAsync(
+            [FromBody] SpecialResponsibilityAssignmentDto dto,
+            CancellationToken ct)
+        {
+            if (dto is null || dto.SpecialResponsibilityID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
+                return BadRequest();
+
+            var updated = await _shiftBoardService.UpdateSpecialResponsibilityAssignmentAsync(dto, ct);
+            if (!updated) return NotFound();
+            return NoContent();
+        }
+
+        [HttpPatch("resident-card")]
+        public async Task<IActionResult> PatchResidentCardAsync(
+            [FromBody] ResidentCardDto dto,
+            CancellationToken ct)
+        {
+            if (dto is null || dto.ResidentStatusID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
+                return BadRequest();
+
+            var updated = await _shiftBoardService.UpdateResidentCardAsync(dto, ct);
+
+            if (!updated)
+                return NotFound();
 
             return NoContent();
         }

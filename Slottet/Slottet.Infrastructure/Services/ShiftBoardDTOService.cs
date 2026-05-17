@@ -36,6 +36,92 @@ namespace Slottet.Infrastructure.Services
             return id == Guid.Empty ? null : await GetShiftBoardDtoByIdAsync(id, ct);
         }
 
+        public async Task<ShiftBoardDTO?> GetPreviousShiftBoardAsync(Guid currentId, CancellationToken ct = default)
+        {
+            var current = await _context.ShiftBoards
+                .AsNoTracking()
+                .Where(sb => sb.ShiftBoardID == currentId)
+                .Select(sb => sb.StartDateTime)
+                .FirstOrDefaultAsync(ct);
+
+            if (current == default) return null;
+
+            var prevId = await _context.ShiftBoards
+                .AsNoTracking()
+                .Where(sb => sb.StartDateTime < current)
+                .OrderByDescending(sb => sb.StartDateTime)
+                .Select(sb => sb.ShiftBoardID)
+                .FirstOrDefaultAsync(ct);
+
+            return prevId == Guid.Empty ? null : await GetShiftBoardDtoByIdAsync(prevId, ct);
+        }
+
+        public async Task<ShiftBoardDTO?> GetNextShiftBoardAsync(Guid currentId, CancellationToken ct = default)
+        {
+            var current = await _context.ShiftBoards
+                .AsNoTracking()
+                .Where(sb => sb.ShiftBoardID == currentId)
+                .Select(sb => sb.StartDateTime)
+                .FirstOrDefaultAsync(ct);
+
+            if (current == default) return null;
+
+            var nextId = await _context.ShiftBoards
+                .AsNoTracking()
+                .Where(sb => sb.StartDateTime > current)
+                .OrderBy(sb => sb.StartDateTime)
+                .Select(sb => sb.ShiftBoardID)
+                .FirstOrDefaultAsync(ct);
+
+            return nextId == Guid.Empty ? null : await GetShiftBoardDtoByIdAsync(nextId, ct);
+        }
+
+        public async Task<ShiftBoardDTO?> GetOrCreateNextShiftBoardAsync(Guid currentId, CancellationToken ct = default)
+        {
+            var current = await _context.ShiftBoards
+                .AsNoTracking()
+                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == currentId, ct);
+
+            if (current is null) return null;
+
+            // Find existing next board
+            var nextId = await _context.ShiftBoards
+                .AsNoTracking()
+                .Where(sb => sb.StartDateTime > current.StartDateTime)
+                .OrderBy(sb => sb.StartDateTime)
+                .Select(sb => sb.ShiftBoardID)
+                .FirstOrDefaultAsync(ct);
+
+            if (nextId != Guid.Empty)
+                return await GetShiftBoardDtoByIdAsync(nextId, ct);
+
+            // None exists — create the next shift slot from current's EndDateTime
+            var nextStart = current.EndDateTime;
+            var nextType  = nextStart.Hour switch
+            {
+                >= 7 and < 15  => "Dag",
+                >= 15 and < 23 => "Aften",
+                _              => "Nat"
+            };
+            var nextEnd = nextType == "Nat"
+                ? nextStart.Date.AddDays(1).AddHours(7)
+                : nextStart.AddHours(8);
+
+            var newBoard = new ShiftBoard
+            {
+                ShiftBoardID  = Guid.NewGuid(),
+                ShiftType     = nextType,
+                StartDateTime = nextStart,
+                EndDateTime   = nextEnd,
+                DepartmentID  = current.DepartmentID
+            };
+
+            _context.ShiftBoards.Add(newBoard);
+            await _context.SaveChangesAsync(ct);
+
+            return await GetShiftBoardDtoByIdAsync(newBoard.ShiftBoardID, ct);
+        }
+
         public async Task<ShiftBoardDTO?> GetCurrentShiftBoardAsync(CancellationToken ct = default)
         {
             var latestId = await _context.ShiftBoards
@@ -67,8 +153,8 @@ namespace Slottet.Infrastructure.Services
                 ? await GetDepartmentAsync(shiftBoard.DepartmentID.Value, ct)
                 : null;
 
-            var shiftDate = DateOnly.FromDateTime(shiftBoard.StartDateTime);
-            var residents = await GetActiveResidentsAsync(shiftDate, ct);
+            var shiftDate = WorkDayDate(shiftBoard.StartDateTime);
+            var residents = await GetActiveResidentsAsync(shiftDate, shiftBoard.ShiftBoardID, ct);
 
             return new ShiftBoardDTO
             {
@@ -82,7 +168,7 @@ namespace Slottet.Infrastructure.Services
                     {
                         Number = phone.PhoneNumber,
                         StaffName = phone.StaffPhones
-                            .OrderByDescending(sp => sp.AssignedAt)
+                            .Where(sp => sp.ShiftBoardID == shiftBoard.ShiftBoardID)
                             .Select(sp => sp.Staff.StaffName)
                             .FirstOrDefault() ?? string.Empty
                     })
@@ -91,15 +177,16 @@ namespace Slottet.Infrastructure.Services
                     .Select(task => task.DepartmentTaskName)
                     .ToList() ?? new(),
                 SpecialResponsibilities = department is not null
-                    ? await GetSpecialResponsibilitiesForDepartmentAsync(department.DepartmentID, ct)
+                    ? await GetSpecialResponsibilitiesForShiftBoardAsync(department.DepartmentID, shiftBoard.ShiftBoardID, ct)
                     : new(),
-                AllStaff = department?.Staffs
-                    .Select(staff => staff.StaffName)
-                    .OrderBy(name => name)
-                    .ToList() ?? new(),
+                AllStaff = await _context.Staffs
+                    .AsNoTracking()
+                    .OrderBy(s => s.StaffName)
+                    .Select(s => s.StaffName)
+                    .ToListAsync(ct),
 
                 ResidentCards = residents
-                    .Select(r => MapResidentCard(r, shiftDate))
+                    .Select(r => MapResidentCard(r, shiftBoard.StartDateTime, shiftBoard.ShiftBoardID))
                     .ToList()
             };
         }
@@ -250,28 +337,59 @@ namespace Slottet.Infrastructure.Services
         /// <summary>
         /// Gets all special responsibilities assigned to a department.
         /// </summary>
-        private async Task<List<SpecialResponsibilityEntryDto>> GetSpecialResponsibilitiesForDepartmentAsync(Guid departmentId, CancellationToken ct)
+        private async Task<List<SpecialResponsibilityEntryDto>> GetSpecialResponsibilitiesForShiftBoardAsync(Guid departmentId, Guid shiftBoardId, CancellationToken ct)
         {
             return await _context.SpecialResponsibilities
                 .AsNoTracking()
-                .Where(sr => sr.SpecialResponsibilityStaffs.Any(srs => srs.DepartmentID == departmentId))
+                .Where(sr => sr.DepartmentID == departmentId)
                 .OrderBy(sr => sr.TaskName)
                 .Select(sr => new SpecialResponsibilityEntryDto
                 {
                     SpecialResponsibilityID = sr.SpecialResponsibilityID,
                     Description = sr.TaskName,
                     StaffName = sr.SpecialResponsibilityStaffs
-                        .Where(srs => srs.DepartmentID == departmentId)
-                        .OrderByDescending(srs => srs.AssignedAt)
+                        .Where(srs => srs.ShiftBoardID == shiftBoardId)
                         .Select(srs => srs.Staff.StaffName)
                         .FirstOrDefault() ?? string.Empty,
                     StaffInitials = sr.SpecialResponsibilityStaffs
-                        .Where(srs => srs.DepartmentID == departmentId)
-                        .OrderByDescending(srs => srs.AssignedAt)
+                        .Where(srs => srs.ShiftBoardID == shiftBoardId)
                         .Select(srs => srs.Staff.Initials)
                         .FirstOrDefault() ?? string.Empty
                 })
                 .ToListAsync(ct);
+        }
+
+        public async Task<bool> UpdateSpecialResponsibilityAssignmentAsync(SpecialResponsibilityAssignmentDto dto, CancellationToken ct = default)
+        {
+            if (dto.SpecialResponsibilityID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
+                return false;
+
+            var existing = await _context.SpecialResponsibilityStaffs
+                .Where(srs => srs.SpecialResponsibilityID == dto.SpecialResponsibilityID
+                           && srs.ShiftBoardID == dto.ShiftBoardID)
+                .ToListAsync(ct);
+
+            _context.SpecialResponsibilityStaffs.RemoveRange(existing);
+
+            if (!string.IsNullOrWhiteSpace(dto.StaffName))
+            {
+                var staff = await _context.Staffs
+                    .FirstOrDefaultAsync(s => s.StaffName == dto.StaffName, ct);
+
+                if (staff is null) return false;
+
+                _context.SpecialResponsibilityStaffs.Add(new SpecialResponsibilityStaff
+                {
+                    SpecialResponsibilityID = dto.SpecialResponsibilityID,
+                    StaffID                 = staff.StaffID,
+                    ShiftBoardID            = dto.ShiftBoardID,
+                    DepartmentID            = dto.DepartmentID,
+                    AssignedAt              = DateTime.Now
+                });
+            }
+
+            await _context.SaveChangesAsync(ct);
+            return true;
         }
 
         /// <summary>
@@ -279,10 +397,8 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="ct">Cancellation token used to cancel the database query.</param>
         /// <returns>Returns a list of active Resident objects.</returns>
-        private async Task<List<Resident>> GetActiveResidentsAsync(DateOnly date, CancellationToken ct)
+        private async Task<List<Resident>> GetActiveResidentsAsync(DateOnly date, Guid shiftBoardId, CancellationToken ct)
         {
-            var dateAsDateTime = date.ToDateTime(TimeOnly.MinValue);
-
             return await _context.Residents
                 .AsNoTracking()
                 .Where(r => r.IsActive)
@@ -291,7 +407,7 @@ namespace Slottet.Infrastructure.Services
                 .Include(r => r.GroceryDay)
                 .Include(r => r.Medicines)
                     .ThenInclude(m => m.MedicineLogs.Where(ml => ml.Date == date))
-                .Include(r => r.PNs.Where(pn => pn.PNGivenTime.Date == dateAsDateTime.Date))
+                .Include(r => r.PNs)
                     .ThenInclude(pn => pn.StaffPNs)
                         .ThenInclude(spn => spn.Staff)
                 .Include(r => r.ResidentPaymentMethods)
@@ -299,7 +415,7 @@ namespace Slottet.Infrastructure.Services
                 .Include(r => r.ResidentStatuses)
                     .ThenInclude(rs => rs.RiskLevel)
                 .Include(r => r.ResidentStatuses)
-                    .ThenInclude(rs => rs.StaffResidentStatuses)
+                    .ThenInclude(rs => rs.StaffResidentStatuses.Where(srs => srs.ShiftBoardID == shiftBoardId))
                         .ThenInclude(srs => srs.Staff)
                 .ToListAsync(ct);
         }
@@ -309,9 +425,9 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="resident">The Resident entity to map from. Cannot be null.</param>
         /// <returns>A ResidentCardDto containing the mapped values from the specified Resident entity.</returns>
-        private static ResidentCardDto MapResidentCard(Resident resident, DateOnly shiftDate)
+        private static ResidentCardDto MapResidentCard(Resident resident, DateTime startDateTime, Guid shiftBoardId)
         {
-            var shiftDateTime = shiftDate.ToDateTime(TimeOnly.MinValue);
+            var shiftDate = WorkDayDate(startDateTime);
 
             // Find den status der var aktiv på vagtens dato — dvs. nyeste status oprettet på eller før datoen.
             var statusAtShift = resident.ResidentStatuses
@@ -323,7 +439,8 @@ namespace Slottet.Infrastructure.Services
             {
                 ResidentStatusID = statusAtShift?.ResidentStatusID ?? Guid.Empty,
                 ResidentID = resident.ResidentID,
-                Date = shiftDateTime,
+                ShiftBoardID = shiftBoardId,
+                Date = startDateTime,
                 ResidentName = resident.ResidentName,
                 IsActive = resident.IsActive,
                 RiskLevel = statusAtShift?.RiskLevel?.RiskLevelName,
@@ -336,8 +453,8 @@ namespace Slottet.Infrastructure.Services
                     .Select(srs => srs.Staff.StaffName)
                     .OrderBy(name => name)
                     .ToList() ?? new(),
-                MedicineSchedule = MapMedicineSchedule(resident, shiftDateTime),
-                PNEntries = MapPNEntries(resident, shiftDateTime)
+                MedicineSchedule = MapMedicineSchedule(resident, startDateTime),
+                PNEntries = MapPNEntries(resident, startDateTime)
             };
         }
 
@@ -349,22 +466,35 @@ namespace Slottet.Infrastructure.Services
         /// <returns>Returns a list of MedicineScheduleItemDto objects.</returns>
         private static List<MedicineScheduleItemDto> MapMedicineSchedule(Resident resident, DateTime date)
         {
-            var today = DateOnly.FromDateTime(date);
+            var today = WorkDayDate(date);
 
             return resident.Medicines
-                .OrderBy(m => m.ScheduledTime)
+                .OrderBy(m => m.ScheduledTime.Hour < 7 ? m.ScheduledTime.Hour + 24 : m.ScheduledTime.Hour)
+                .ThenBy(m => m.ScheduledTime.Minute)
                 .Select(m =>
                 {
                     var log = m.MedicineLogs.FirstOrDefault(ml => ml.Date == today);
                     return new MedicineScheduleItemDto
                     {
-                        Label   = m.ScheduledTime.ToString("HH:mm"),
-                        Time    = m.ScheduledTime,
-                        IsGiven = log?.GivenTime != null
+                        MedicineID = m.MedicineID,
+                        Label      = m.ScheduledTime.ToString("HH:mm"),
+                        Time       = m.ScheduledTime,
+                        IsGiven    = log?.GivenTime != null
                     };
                 })
                 .ToList();
         }
+
+        /// <summary>
+        /// Returns the "work day" date for a given datetime.
+        /// A work day starts at 07:00 — so anything before 07:00 belongs to the previous calendar day.
+        /// Dag (07–15), Aften (15–23), and Nat (23–07) all share the same work day date,
+        /// and IsGiven resets at the start of each new Dag shift.
+        /// </summary>
+        private static DateOnly WorkDayDate(DateTime dt) =>
+            dt.Hour < 7
+                ? DateOnly.FromDateTime(dt.AddDays(-1))
+                : DateOnly.FromDateTime(dt);
 
         /// <summary>
         /// Creates PN entry DTO objects for a resident on the specified date.
@@ -375,7 +505,7 @@ namespace Slottet.Infrastructure.Services
         private static List<PNEntryDto> MapPNEntries(Resident resident, DateTime date)
         {
             return resident.PNs
-                .Where(pn => pn.PNGivenTime.Date == date.Date)
+                .Where(pn => WorkDayDate(pn.PNGivenTime) == WorkDayDate(date))
                 .OrderBy(pn => pn.PNGivenTime)
                 .Select(pn => new PNEntryDto
                 {
@@ -387,6 +517,163 @@ namespace Slottet.Infrastructure.Services
                                               .FirstOrDefault() ?? string.Empty
                 })
                 .ToList();
+        }
+
+        // ── Shiftboard resident-card update ───────────────────────────────────────
+
+        /// <summary>
+        /// Persists the five editable fields on a resident card:
+        ///   Status note, Risk level, Assigned staff, Medicine IsGiven toggles, and new PN entries.
+        /// Called from the /shiftboard_viewonly page when staff save a card.
+        /// </summary>
+        public async Task<bool> UpdateResidentCardAsync(ResidentCardDto dto, CancellationToken ct = default)
+        {
+            // Guard: we need at least a valid ResidentID to do anything useful
+            if (dto.ResidentID == Guid.Empty || dto.ShiftBoardID == Guid.Empty) return false;
+
+            // ── 1. Status note + Risk level (only when a status record exists) ──
+            if (dto.ResidentStatusID != Guid.Empty)
+            {
+                var status = await _context.ResidentStatuses
+                    .Include(rs => rs.StaffResidentStatuses)
+                    .FirstOrDefaultAsync(rs => rs.ResidentStatusID == dto.ResidentStatusID, ct);
+
+                if (status is not null)
+                {
+                    status.Status = dto.LatestStatusNote ?? string.Empty;
+
+                    if (!string.IsNullOrWhiteSpace(dto.RiskLevel))
+                    {
+                        var riskLevel = await _context.RiskLevels
+                            .FirstOrDefaultAsync(rl => rl.RiskLevelName == dto.RiskLevel, ct);
+                        if (riskLevel is not null)
+                            status.RiskLevelID = riskLevel.RiskLevelID;
+                    }
+
+                    // ── 2. Assigned staff (scoped to shiftboard) ──
+                    // EF propagates composite-PK FK values from the navigation property, not the raw FK field.
+                    // Load ShiftBoard with tracking and set it explicitly on each new entity.
+                    var shiftBoard = await _context.ShiftBoards
+                        .FirstOrDefaultAsync(sb => sb.ShiftBoardID == dto.ShiftBoardID, ct);
+                    if (shiftBoard is null) return false;
+
+                    var existingStaffIds = status.StaffResidentStatuses
+                        .Where(srs => srs.ShiftBoardID == dto.ShiftBoardID)
+                        .Select(srs => srs.StaffID)
+                        .ToHashSet();
+
+                    var incomingStaff = dto.AssignedStaff.Count > 0
+                        ? await _context.Staffs
+                            .Where(s => dto.AssignedStaff.Contains(s.StaffName))
+                            .ToListAsync(ct)
+                        : new List<Staff>();
+
+                    var incomingStaffIds = incomingStaff.Select(s => s.StaffID).ToHashSet();
+
+                    var toRemove = status.StaffResidentStatuses
+                        .Where(srs => srs.ShiftBoardID == dto.ShiftBoardID && !incomingStaffIds.Contains(srs.StaffID))
+                        .ToList();
+                    _context.StaffResidentStatuses.RemoveRange(toRemove);
+
+                    foreach (var staff in incomingStaff.Where(s => !existingStaffIds.Contains(s.StaffID)))
+                    {
+                        _context.StaffResidentStatuses.Add(new StaffResidentStatus
+                        {
+                            StaffID          = staff.StaffID,
+                            ResidentStatusID = status.ResidentStatusID,
+                            ShiftBoard       = shiftBoard,
+                            AssignedAt       = DateTime.Now
+                        });
+                    }
+                }
+            }
+
+            // ── 3. Medicine IsGiven toggles (always runs, independent of status) ──
+            var shiftDate = WorkDayDate(dto.Date);
+
+            foreach (var medDto in dto.MedicineSchedule)
+            {
+                var medicine = await _context.Medicines
+                    .Include(m => m.MedicineLogs.Where(ml => ml.Date == shiftDate))
+                    .FirstOrDefaultAsync(m => m.MedicineID == medDto.MedicineID, ct);
+
+                if (medicine is null) continue;
+
+                var log = medicine.MedicineLogs.FirstOrDefault(ml => ml.Date == shiftDate);
+
+                if (medDto.IsGiven && log is null)
+                {
+                    _context.MedicineLogs.Add(new MedicineLog
+                    {
+                        MedicineLogID    = Guid.NewGuid(),
+                        Date             = shiftDate,
+                        GivenTime        = DateTime.Now,
+                        RegisteredTime   = DateTime.Now,
+                        MedicineID       = medicine.MedicineID
+                    });
+                }
+                else if (!medDto.IsGiven && log is not null)
+                {
+                    _context.MedicineLogs.Remove(log);
+                }
+            }
+
+            // ── 4. New PN entries (append-only, deduplicated by time+med+reason) ──
+            var workDayStart = shiftDate.ToDateTime(new TimeOnly(7, 0));
+            var workDayEnd   = shiftDate.AddDays(1).ToDateTime(new TimeOnly(7, 0));
+            var existingPNs = await _context.PNs
+                .Where(pn => pn.ResidentID == dto.ResidentID
+                          && pn.PNGivenTime >= workDayStart
+                          && pn.PNGivenTime < workDayEnd)
+                .ToListAsync(ct);
+
+            foreach (var pnDto in dto.PNEntries)
+            {
+                var givenTime = ParsePNDateTime(pnDto.TimeOfAdministration, dto.Date);
+
+                var alreadyExists = existingPNs.Any(pn =>
+                    pn.PNGivenTime.Hour   == givenTime.Hour   &&
+                    pn.PNGivenTime.Minute == givenTime.Minute &&
+                    pn.PNMedication       == pnDto.Medication &&
+                    pn.PNReason           == pnDto.Reason);
+
+                if (alreadyExists) continue;
+
+                var newPN = new PN
+                {
+                    PNID              = Guid.NewGuid(),
+                    PNMedication      = pnDto.Medication,
+                    PNGivenTime       = givenTime,
+                    PNReason          = pnDto.Reason,
+                    PNRegisteredTime  = DateTime.Now,
+                    ResidentID        = dto.ResidentID
+                };
+                _context.PNs.Add(newPN);
+
+                if (!string.IsNullOrWhiteSpace(pnDto.IssuedBy))
+                {
+                    var staff = await _context.Staffs
+                        .FirstOrDefaultAsync(s => s.StaffName == pnDto.IssuedBy, ct);
+                    if (staff is not null)
+                    {
+                        _context.StaffPNs.Add(new StaffPN
+                        {
+                            StaffID = staff.StaffID,
+                            PNID    = newPN.PNID
+                        });
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync(ct);
+            return true;
+        }
+
+        private static DateTime ParsePNDateTime(string timeStr, DateTime date)
+        {
+            if (TimeOnly.TryParse(timeStr, out var t))
+                return date.Date.AddHours(t.Hour).AddMinutes(t.Minute);
+            return date.Date;
         }
     }
 }

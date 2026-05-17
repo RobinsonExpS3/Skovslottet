@@ -18,6 +18,14 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
+            entity.Property(sr => sr.DepartmentID)
+                .IsRequired();
+
+            entity.HasOne(sr => sr.Department)
+                .WithMany()
+                .HasForeignKey(sr => sr.DepartmentID)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Slottet.Infrastructure.Data.Configurations
         /// <param name="entity">The builder used to configure the StaffPhone entity.</param>
         public void Configure (EntityTypeBuilder<StaffPhone> entity)
         {
-            entity.HasKey(sp => new { sp.StaffID, sp.PhoneID, sp.AssignedAt});
+            entity.HasKey(sp => new { sp.StaffID, sp.PhoneID, sp.ShiftBoardID });
 
             entity.HasOne(s => s.Staff)
                 .WithMany(sp => sp.StaffPhones)
@@ -26,6 +26,11 @@ namespace Slottet.Infrastructure.Data.Configurations
                 .WithMany(sp => sp.StaffPhones)
                 .HasForeignKey(p => p.PhoneID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(sp => sp.ShiftBoard)
+                .WithMany()
+                .HasForeignKey(sp => sp.ShiftBoardID)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
         }

@@ -160,7 +160,10 @@ namespace Slottet.Client.Pages.AdminPages
                 .Where(field => !string.IsNullOrWhiteSpace(field))
                 .ToList();
 
-            if (changedFields.Count == 0)
+            // Join tables (e.g. StaffResidentStatuses) have only PK columns — interceptor skips those,
+            // so old/new values are empty. Use a sentinel so we still emit one display row.
+            var noValueFields = changedFields.Count == 0;
+            if (noValueFields)
             {
                 changedFields.Add(string.Empty);
             }
@@ -172,9 +175,9 @@ namespace Slottet.Client.Pages.AdminPages
                     row.PerformedByStaffName,
                     FormatAction(row.Action),
                     row.TableName,
-                    string.IsNullOrWhiteSpace(row.Subject) ? "Ikke givet" : row.Subject,
-                    oldValues.GetValueOrDefault(field, "Ikke givet"),
-                    newValues.GetValueOrDefault(field, "Ikke givet"));
+                    string.IsNullOrWhiteSpace(row.Subject) ? "–" : row.Subject,
+                    noValueFields ? "–" : oldValues.GetValueOrDefault(field, "–"),
+                    noValueFields ? "–" : newValues.GetValueOrDefault(field, "–"));
             }
         }
 
@@ -243,8 +246,8 @@ namespace Slottet.Client.Pages.AdminPages
         {
             return value.ValueKind switch
             {
-                JsonValueKind.Null => "Ikke givet",
-                JsonValueKind.String => value.GetString() ?? "Ikke givet",
+                JsonValueKind.Null => "–",
+                JsonValueKind.String => value.GetString() ?? "–",
                 JsonValueKind.True => "Ja",
                 JsonValueKind.False => "Nej",
                 JsonValueKind.Number => value.GetRawText(),

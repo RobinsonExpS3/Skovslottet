@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Slottet.Client.Pages.AdminPages;
@@ -19,8 +20,6 @@ namespace Slottet.Client.Pages.ShiftBoard
         protected string? LoadError { get; set; }
 
         // ── Navigation ────────────────────────────────────────────────────
-        private static readonly string[] ShiftOrder = ["Dag", "Aften", "Nat"];
-
         private DateOnly _navDate;
         private string _navShift = string.Empty;
 
@@ -114,14 +113,14 @@ namespace Slottet.Client.Pages.ShiftBoard
         // ── Navigation ────────────────────────────────────────────────────
         protected async Task GoToPrev()
         {
-            (_navDate, _navShift) = StepBack(_navDate, _navShift);
-            await LoadShiftAsync();
+            if (Model is null) return;
+            await LoadShiftByUrlAsync($"api/shiftboard/{Model.ShiftBoardId}/previous");
         }
 
         protected async Task GoToNext()
         {
-            (_navDate, _navShift) = StepForward(_navDate, _navShift);
-            await LoadShiftAsync();
+            if (Model is null) return;
+            await LoadShiftByUrlAsync($"api/shiftboard/{Model.ShiftBoardId}/next-or-create");
         }
 
         protected async Task GoToToday()
@@ -136,6 +135,12 @@ namespace Slottet.Client.Pages.ShiftBoard
 
         private async Task LoadShiftAsync()
         {
+            var url = $"api/shiftboard/by-shift?date={_navDate:yyyy-MM-dd}&shiftType={_navShift}";
+            await LoadShiftByUrlAsync(url);
+        }
+
+        private async Task LoadShiftByUrlAsync(string url)
+        {
             IsLoading = true;
             LoadError = null;
             Model = null;
@@ -143,7 +148,6 @@ namespace Slottet.Client.Pages.ShiftBoard
 
             try
             {
-                var url = $"api/shiftboard/by-shift?date={_navDate:yyyy-MM-dd}&shiftType={_navShift}";
                 var result = await AdminHttp.GetJsonAsync<ShiftBoardDTO>(Http, url);
 
                 if (result.Failed)
@@ -152,6 +156,11 @@ namespace Slottet.Client.Pages.ShiftBoard
                     return;
                 }
                 Model = result.Value;
+                if (Model is not null)
+                {
+                    _navDate = DateOnly.FromDateTime(Model.StartDate);
+                    _navShift = Model.ShiftType;
+                }
             }
             finally
             {
@@ -181,22 +190,6 @@ namespace Slottet.Client.Pages.ShiftBoard
             };
         }
 
-        private static (DateOnly, string) StepBack(DateOnly date, string shift)
-        {
-            var idx = Array.IndexOf(ShiftOrder, shift);
-            return idx == 0
-                ? (date.AddDays(-1), ShiftOrder[^1])
-                : (date, ShiftOrder[idx - 1]);
-        }
-
-        private static (DateOnly, string) StepForward(DateOnly date, string shift)
-        {
-            var idx = Array.IndexOf(ShiftOrder, shift);
-            return idx == ShiftOrder.Length - 1
-                ? (date.AddDays(1), ShiftOrder[0])
-                : (date, ShiftOrder[idx + 1]);
-        }
-
         // ── Overlay handlers ──────────────────────────────────────────────
         protected async Task OpenResident(ResidentCardDto resident, string cardId)
         {
@@ -221,7 +214,23 @@ namespace Slottet.Client.Pages.ShiftBoard
             ActivePanel = OverlayPanel.None;
         }
 
-        protected void OnResidentSaved() => CloseOverlay();
+        protected async Task OnResidentSaved()
+        {
+            if (SelectedResident is not null)
+            {
+                try
+                {
+                    await Http.PatchAsJsonAsync("api/shiftboard/resident-card", SelectedResident);
+                }
+                catch
+                {
+                    // TODO: surface save error to user
+                }
+            }
+
+            CloseOverlay();
+            await LoadShiftAsync();
+        }
     }
 
     public enum OverlayPanel { None, PhoneList, DepartmentTasks, SpecialResponsibilities }
