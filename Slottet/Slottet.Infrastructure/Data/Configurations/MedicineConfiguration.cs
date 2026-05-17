@@ -15,15 +15,23 @@ namespace Slottet.Infrastructure.Data.Configurations {
                 .IsRequired()
                 .HasColumnType("time");
 
+            entity.Property(m => m.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
+
+            // Inaktive medicin-rækker er som standard skjult. Brug .IgnoreQueryFilters() for at se historik.
+            entity.HasQueryFilter(m => m.IsActive);
+
             entity.HasOne(m => m.Resident)
                 .WithMany(r => r.Medicines)
                 .HasForeignKey(m => m.ResidentID)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Restrict (ikke Cascade) — MedicineLogs må ikke forsvinde med Medicine.
             entity.HasMany(m => m.MedicineLogs)
                 .WithOne(ml => ml.Medicine)
                 .HasForeignKey(ml => ml.MedicineID)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -146,10 +146,14 @@ namespace Slottet.Infrastructure.Services
             _context.ResidentPaymentMethods.RemoveRange(existingPaymentMethods);
             AddPaymentMethods(id, dto.PaymentMethodIDs);
 
+            // Soft delete eksisterende medicin-tider (bevarer MedicineLog historik) og tilføj nye.
             var existingMedicines = await _context.Medicines
                 .Where(m => m.ResidentID == id)
                 .ToListAsync();
-            _context.Medicines.RemoveRange(existingMedicines);
+            foreach (var medicine in existingMedicines)
+            {
+                medicine.IsActive = false;
+            }
             AddMedicines(id, dto.MedicineTimes);
 
             await _context.SaveChangesAsync();
@@ -194,10 +198,14 @@ namespace Slottet.Infrastructure.Services
                 .ToListAsync();
             _context.ResidentPaymentMethods.RemoveRange(residentPaymentMethods);
 
+            // Soft delete alle medicin-rækker — bevarer MedicineLog historik.
             var medicines = await _context.Medicines
                 .Where(m => m.ResidentID == id)
                 .ToListAsync();
-            _context.Medicines.RemoveRange(medicines);
+            foreach (var medicine in medicines)
+            {
+                medicine.IsActive = false;
+            }
 
             _context.Residents.Remove(existingResident);
 
@@ -343,13 +351,13 @@ namespace Slottet.Infrastructure.Services
                 .Where(m => m.ResidentID == residentId)
                 .ToListAsync(ct);
 
-            // Slet kun de tider der ikke længere er i listen (bevar MedicineLogs på de øvrige)
-            var toRemove = existing
-                .Where(m => !times.Contains(m.ScheduledTime))
-                .ToList();
-            _context.Medicines.RemoveRange(toRemove);
+            // Soft delete tider der ikke længere er i listen (bevarer MedicineLog historik)
+            foreach (var medicine in existing.Where(m => !times.Contains(m.ScheduledTime)))
+            {
+                medicine.IsActive = false;
+            }
 
-            // Tilføj kun de nye tider der ikke allerede eksisterer
+            // Tilføj kun helt nye tider
             var existingTimes = existing.Select(m => m.ScheduledTime).ToHashSet();
             var toAdd = times.Where(t => !existingTimes.Contains(t)).ToList();
             AddMedicines(residentId, toAdd);
