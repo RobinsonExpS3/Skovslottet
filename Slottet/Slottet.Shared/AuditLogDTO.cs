@@ -18,5 +18,10 @@ namespace Slottet.Shared {
 
         public Guid PerformedByStaffID { get; set; }
         public string PerformedByStaffName { get; set; } = string.Empty;
+
+        public Guid? ShiftBoardID { get; set; }
+        public string ShiftBoardLabel { get; set; } = string.Empty;
+
+        public string DisplayAction { get; set; } = string.Empty;
     }
 }

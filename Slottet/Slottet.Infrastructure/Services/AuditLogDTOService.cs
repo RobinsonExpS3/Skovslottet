@@ -37,7 +37,8 @@ namespace Slottet.Infrastructure.Services {
         /// <param name="shift">The shift name to filter audit logs by, or null to include all shifts.</param>
         /// <returns>Returns a filtered list of AuditLogDTO objects.</returns>
         public async Task<IEnumerable<AuditLogDTO>> GetAllAuditLogsAsync(DateOnly? date, string? shift) {
-            IQueryable<AuditLog> query = _context.AuditLogs.AsNoTracking();
+            IQueryable<AuditLog> query = _context.AuditLogs.AsNoTracking()
+                .Where(log => log.PerformedByStaffID != null);
 
             if (date.HasValue) {
                 var from = date.Value.ToDateTime(TimeOnly.MinValue);
@@ -91,7 +92,8 @@ namespace Slottet.Infrastructure.Services {
                 OldValuesJson = auditLog.OldValuesJson,
                 NewValuesJson = auditLog.NewValuesJson,
                 PerformedByStaffID = auditLog.PerformedByStaffID ?? Guid.Empty,
-                PerformedByStaffName = auditLog.PerformedByStaffName ?? "Ukendt"
+                PerformedByStaffName = auditLog.PerformedByStaffName ?? "Ukendt",
+                ShiftBoardID = auditLog.ShiftBoardID
             };
         }
     }

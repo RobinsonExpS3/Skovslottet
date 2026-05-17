@@ -30,6 +30,10 @@ namespace Slottet.Infrastructure.Auditing {
         }
 
         private List<AuditLog> CreateAuditLogs(DbContext context) {
+            // Skip audit logging if no authenticated user (e.g. seeder/migrations)
+            if (_auditScope.PerformedByStaffID == null)
+                return new List<AuditLog>();
+
             var logs = new List<AuditLog>();
             var Now = DateTime.Now;
 
@@ -77,6 +81,7 @@ namespace Slottet.Infrastructure.Auditing {
                     PerformedByStaffID = _auditScope.PerformedByStaffID,
                     PerformedByStaffName = _auditScope.PerformedByStaffName,
                     PerformedAtTime = _auditScope.PerformedAtTime,
+                    ShiftBoardID = _auditScope.ShiftBoardID,
                 });
             }
 

@@ -48,13 +48,59 @@
     cursor: pointer;
 }
 
-/* ── Audit tabel ── */
+/* ── Audit panel ── */
 .audit-panel {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 16px;
 }
 
+/* ── Audit gruppe ── */
+.audit-group {
+    border: 1.5px solid var(--color-primary-light);
+    border-radius: var(--radius-section);
+    background-color: var(--color-bg-card);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.audit-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background-color: var(--color-bg-section-header);
+    border-bottom: var(--border-inner);
+}
+
+.audit-group-subject {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--color-text-heading);
+}
+
+.audit-group-badge {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background-color: var(--color-bg-section);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-primary-lighter);
+    white-space: nowrap;
+}
+
+.audit-group-meta {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+/* ── Audit tabel (inden i gruppe) ── */
 .audit-table {
     width: 100%;
     border-collapse: collapse;
@@ -62,18 +108,21 @@
 }
 
 .audit-table thead th {
-    padding: 8px 12px;
+    padding: 6px 12px;
     text-align: left;
-    font-weight: 700;
-    color: var(--color-text-heading);
-    background-color: var(--color-bg-section-header);
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    background-color: var(--color-bg-card);
     border-bottom: var(--border-inner);
-    position: sticky;
-    top: 0;
 }
 
 .audit-table tbody tr {
     border-bottom: 1px solid var(--color-primary-lighter);
+}
+
+.audit-table tbody tr:last-child {
+    border-bottom: none;
 }
 
 .audit-table tbody tr:hover {
@@ -81,9 +130,37 @@
 }
 
 .audit-table td {
-    padding: 8px 12px;
+    padding: 7px 12px;
     color: var(--color-text-dark);
-    vertical-align: top;
+    vertical-align: middle;
+}
+
+.audit-cell-muted {
+    color: var(--color-text-muted);
+}
+
+/* ── Action badges ── */
+.audit-action {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+.audit-action-add {
+    background-color: var(--color-success-bg, #e8f5e9);
+    color: var(--color-success-text, #2e7d32);
+}
+
+.audit-action-modify {
+    background-color: var(--color-info-bg, #e3f2fd);
+    color: var(--color-info-text, #1565c0);
+}
+
+.audit-action-remove {
+    background-color: var(--color-danger-bg, #fce4ec);
+    color: var(--color-danger-text, #b71c1c);
 }
 
 /* ── Resident cards panel ── */

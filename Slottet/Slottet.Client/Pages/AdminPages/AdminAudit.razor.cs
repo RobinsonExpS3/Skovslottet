@@ -13,9 +13,8 @@ namespace Slottet.Client.Pages.AdminPages
         private HttpClient httpClient { get; set; } = default!;
 
         protected List<AuditLogDTO> AuditRows { get; set; } = new();
-        protected IReadOnlyList<AuditDisplayRow> AuditDisplayRows => AuditRows
-            .SelectMany(CreateAuditDisplayRows)
-            .ToList();
+        private List<AuditDisplayRow> _allDisplayRows = new();
+        protected IReadOnlyList<AuditGroup> FilteredGroups { get; private set; } = new List<AuditGroup>();
         protected List<ResidentCardDto> ResidentCards { get; set; } = new();
         protected DateOnly SelectedDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
         protected string SelectedShift { get; set; } = string.Empty;
@@ -29,6 +28,7 @@ namespace Slottet.Client.Pages.AdminPages
         protected string SelectedDateText => SelectedDate.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
         private Guid? openCardId = null;
+        private CancellationTokenSource? _searchCts;
 
         protected override async Task OnInitializedAsync()
         {
@@ -91,16 +91,64 @@ namespace Slottet.Client.Pages.AdminPages
                 AuditRows = result.Value
                     .OrderByDescending(r => r.PerformedAtTime)
                     .ToList();
+
+                _allDisplayRows = AuditRows.SelectMany(CreateAuditDisplayRows).ToList();
+                ApplyFilter();
             }
             catch (Exception ex)
             {
                 ErrorMessage = $"Kunne ikke hente audit logs: {ex.Message}";
                 AuditRows = new();
+                _allDisplayRows = new();
+                FilteredGroups = new List<AuditGroup>();
             }
             finally
             {
                 IsLoading = false;
             }
+        }
+
+        // Subjects der altid grupperes uanset vagttavle
+        private static readonly HashSet<string> _fixedGroupSubjects = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Telefoner", "Særligt Ansvar", "Handledage", "Afdelinger", "Afdelingsopgaver", "Betalingsmetoder"
+        };
+
+        private void ApplyFilter()
+        {
+            var rows = string.IsNullOrWhiteSpace(SearchText)
+                ? _allDisplayRows
+                : _allDisplayRows.Where(r => MatchesSearch(r, SearchText)).ToList();
+
+            FilteredGroups = rows
+                .GroupBy(r =>
+                {
+                    var baseName = ExtractBaseName(r.Subject);
+                    var shiftKey = _fixedGroupSubjects.Contains(baseName) ? "–" : r.ShiftBoard;
+                    return (baseName, shiftKey);
+                })
+                .OrderByDescending(g => g.Max(r => r.Time))
+                .Select(g => new AuditGroup(
+                    g.Key.baseName,
+                    _fixedGroupSubjects.Contains(g.Key.baseName) ? "–" : g.Key.shiftKey,
+                    string.Join(", ", g.Select(r => r.PerformedBy).Distinct()),
+                    g.Max(r => r.Time),
+                    g.OrderByDescending(r => r.Time).ToList()))
+                .ToList();
+        }
+
+        protected static string ExtractBaseName(string subject)
+        {
+            var idx = subject.IndexOf(" - ", StringComparison.Ordinal);
+            return idx >= 0 ? subject[..idx] : subject;
+        }
+
+        protected static string ExtractDetail(string subject, string baseName)
+        {
+            if (subject.Length <= baseName.Length + 3) return string.Empty;
+            return subject.StartsWith(baseName + " - ", StringComparison.Ordinal)
+                ? subject[(baseName.Length + 3)..]
+                : string.Empty;
         }
 
         private async Task LoadResidentCardsAsync()
@@ -168,14 +216,20 @@ namespace Slottet.Client.Pages.AdminPages
                 changedFields.Add(string.Empty);
             }
 
+            var action = string.IsNullOrWhiteSpace(row.DisplayAction)
+                ? FormatAction(row.Action)
+                : row.DisplayAction;
+
             foreach (var field in changedFields)
             {
                 yield return new AuditDisplayRow(
                     row.PerformedAtTime,
                     row.PerformedByStaffName,
-                    FormatAction(row.Action),
-                    row.TableName,
+                    action,
+                    row.Category,
+                    string.IsNullOrWhiteSpace(row.ShiftBoardLabel) ? "–" : row.ShiftBoardLabel,
                     string.IsNullOrWhiteSpace(row.Subject) ? "–" : row.Subject,
+                    noValueFields ? "–" : TranslatePropertyName(field),
                     noValueFields ? "–" : oldValues.GetValueOrDefault(field, "–"),
                     noValueFields ? "–" : newValues.GetValueOrDefault(field, "–"));
             }
@@ -225,6 +279,47 @@ namespace Slottet.Client.Pages.AdminPages
             };
         }
 
+        private static string TranslatePropertyName(string name) {
+            return name switch {
+                "IsGiven"              => "Givet",
+                "GivenTime"            => "Givet kl.",
+                "MedicinStatus"        => "",
+                "PNDetaljer"           => "",
+                "AnsvarligtPersonale"  => "Ansvarligt personale",
+                "RegistreretAf"        => "",
+                "StaffName"        => "Navn",
+                "Initials"         => "Initialer",
+                "Role"             => "Rolle",
+                "DepartmentID"     => "Afdeling",
+                "StatusNote"       => "Status",
+                "RiskLevelID"      => "Risiko",
+                "PaymentMethodID"  => "Betalingsmetode",
+                "GroceryDayID"     => "Handledag",
+                "MedicationName"   => "Medicin",
+                "ScheduledTime"    => "Tidspunkt",
+                "ResidentName"     => "Navn",
+                "PhoneNumber"      => "Telefonnummer",
+                "TaskName"         => "Opgave",
+                "IsActive"         => "Aktiv",
+                "Description"      => "Beskrivelse",
+                "ShiftType"        => "Vagttype",
+                "StartDateTime"    => "Starttidspunkt",
+                "EndDateTime"      => "Sluttidspunkt",
+                "DepartmentName"   => "Afdelingsnavn",
+                "ResidentID"       => "Beboer",
+                "StaffID"          => "Medarbejder",
+                "SortOrder"        => "Sortering",
+                "AssignedAt"       => "Tildelt den",
+                "Date"             => "Dato",
+                "Status"           => "",
+                "PNGivenTime"      => "PN tidspunkt",
+                "Medication"       => "Medicin",
+                "Reason"           => "Årsag",
+                "IssuedBy"         => "Ordineret af",
+                _                  => FormatPropertyName(name)
+            };
+        }
+
         private static string FormatPropertyName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -244,11 +339,19 @@ namespace Slottet.Client.Pages.AdminPages
 
         private static string FormatJsonValue(JsonElement value)
         {
+            if (value.ValueKind == JsonValueKind.String)
+            {
+                var str = value.GetString();
+                if (str is null) return "–";
+                if (DateTimeOffset.TryParse(str, out var dto))
+                    return dto.ToString("dd-MM-yyyy HH:mm");
+                return str;
+            }
+
             return value.ValueKind switch
             {
-                JsonValueKind.Null => "–",
-                JsonValueKind.String => value.GetString() ?? "–",
-                JsonValueKind.True => "Ja",
+                JsonValueKind.Null  => "–",
+                JsonValueKind.True  => "Ja",
                 JsonValueKind.False => "Nej",
                 JsonValueKind.Number => value.GetRawText(),
                 _ => value.GetRawText()
@@ -259,17 +362,48 @@ namespace Slottet.Client.Pages.AdminPages
             DateTime Time,
             string PerformedBy,
             string Action,
-            string TableName,
+            string Category,
+            string ShiftBoard,
             string Subject,
+            string Field,
             string OldValue,
             string NewValue);
 
+        protected sealed record AuditGroup(
+            string Subject,
+            string ShiftBoard,
+            string Performers,
+            DateTime LatestTime,
+            IReadOnlyList<AuditDisplayRow> Rows);
+
+        protected static string GetActionCssClass(string action) => action switch
+        {
+            var a when a.StartsWith("Gav", StringComparison.OrdinalIgnoreCase)
+                    || a.StartsWith("Tildel", StringComparison.OrdinalIgnoreCase)
+                    || a.StartsWith("Oprette", StringComparison.OrdinalIgnoreCase)
+                    || a.StartsWith("Tilføje", StringComparison.OrdinalIgnoreCase)
+                    || a.StartsWith("Registre", StringComparison.OrdinalIgnoreCase) => "audit-action-add",
+            var a when a.StartsWith("Ændre", StringComparison.OrdinalIgnoreCase) => "audit-action-modify",
+            _ => "audit-action-remove"
+        };
+
         protected string SearchText { get; set; } = string.Empty;
 
-        protected IReadOnlyList<AuditDisplayRow> FilteredAuditDisplayRows =>
-            AuditDisplayRows
-                .Where(row => MatchesSearch(row, SearchText))
-                .ToList();
+        protected async Task OnSearchInput(ChangeEventArgs e)
+        {
+            SearchText = e.Value?.ToString() ?? string.Empty;
+
+            _searchCts?.Cancel();
+            _searchCts = new CancellationTokenSource();
+            var token = _searchCts.Token;
+
+            try
+            {
+                await Task.Delay(300, token);
+                ApplyFilter();
+            }
+            catch (OperationCanceledException) { }
+        }
 
         private static bool MatchesSearch(AuditDisplayRow row, string searchText)
         {
@@ -277,8 +411,10 @@ namespace Slottet.Client.Pages.AdminPages
 
             return Contains(row.PerformedBy, searchText)
                 || Contains(row.Action, searchText)
-                || Contains(row.TableName, searchText)
+                || Contains(row.Category, searchText)
+                || Contains(row.ShiftBoard, searchText)
                 || Contains(row.Subject, searchText)
+                || Contains(row.Field, searchText)
                 || Contains(row.OldValue, searchText)
                 || Contains(row.NewValue, searchText);
         }

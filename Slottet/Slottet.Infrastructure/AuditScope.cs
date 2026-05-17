@@ -8,5 +8,6 @@ namespace Slottet.Infrastructure {
         public Guid? PerformedByStaffID { get; set; }
         public string? PerformedByStaffName { get; set; }
         public DateTime? PerformedAtTime { get; set; }
+        public Guid? ShiftBoardID { get; set; }
     }
 }

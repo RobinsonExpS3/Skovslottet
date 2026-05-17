@@ -11,10 +11,12 @@ namespace Slottet.API.Controllers
     public class ShiftboardController : ControllerBase
     {
         private readonly IShiftBoardDTOService _shiftBoardService;
+        private readonly IAuditScope _auditScope;
 
-        public ShiftboardController(IShiftBoardDTOService shiftBoardService)
+        public ShiftboardController(IShiftBoardDTOService shiftBoardService, IAuditScope auditScope)
         {
             _shiftBoardService = shiftBoardService;
+            _auditScope = auditScope;
         }
 
         /// <summary>
@@ -202,6 +204,7 @@ namespace Slottet.API.Controllers
             if (dto is null || dto.PhoneID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
                 return BadRequest();
 
+            _auditScope.ShiftBoardID = dto.ShiftBoardID;
             var updated = await _shiftBoardService.UpdatePhoneAssignmentAsync(dto, ct);
             if (!updated) return NotFound();
             return NoContent();
@@ -219,6 +222,7 @@ namespace Slottet.API.Controllers
             if (dto is null || dto.SpecialResponsibilityID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
                 return BadRequest();
 
+            _auditScope.ShiftBoardID = dto.ShiftBoardID;
             var updated = await _shiftBoardService.UpdateSpecialResponsibilityAssignmentAsync(dto, ct);
             if (!updated) return NotFound();
             return NoContent();
@@ -232,6 +236,7 @@ namespace Slottet.API.Controllers
             if (dto is null || dto.ResidentStatusID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
                 return BadRequest();
 
+            _auditScope.ShiftBoardID = dto.ShiftBoardID;
             var updated = await _shiftBoardService.UpdateResidentCardAsync(dto, ct);
 
             if (!updated)

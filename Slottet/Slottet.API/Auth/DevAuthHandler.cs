@@ -20,6 +20,7 @@ public class DevAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, "dev-user"),
+            new Claim("StaffID", "00000000-0000-0000-0000-000000000001"),
             new Claim(ClaimTypes.Name, "Dev User"),
             new Claim(ClaimTypes.Role, "Admin"),
             new Claim("StaffName", "Dev User")
