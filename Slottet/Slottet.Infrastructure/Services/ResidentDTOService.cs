@@ -327,13 +327,9 @@ namespace Slottet.Infrastructure.Services
         private async Task UpdateAssignedStaffAsync(Guid residentStatusID, List<string> assignedStaff)
         {
             var existingLinks = await _context.StaffResidentStatuses
-                .Where(srs => srs.ResidentStatusID == residentStatusID && !srs.IsDeleted)
+                .Where(srs => srs.ResidentStatusID == residentStatusID)
                 .ToListAsync();
 
-            foreach (var link in existingLinks)
-            {
-                link.IsDeleted = true;
-            }
 
             var staffNames = assignedStaff
                 .Where(name => !string.IsNullOrWhiteSpace(name))
@@ -354,7 +350,6 @@ namespace Slottet.Infrastructure.Services
             {
                 StaffID = staffID,
                 ResidentStatusID = residentStatusID,
-                IsDeleted = false
             }));
         }
 
