@@ -11,7 +11,10 @@
         public Guid RiskLevelID { get; set; }
         public RiskLevel RiskLevel { get; set; }
 
-        public ICollection<StaffResidentStatus> StaffResidentStatuses { get; set; }
-        public ICollection<PN> PNs { get; set; }
+        public Guid? ShiftBoardID { get; set; }
+        public ShiftBoard? ShiftBoard { get; set; }
+
+        public ICollection<StaffResidentStatus> StaffResidentStatuses { get; set; } = new List<StaffResidentStatus>();
+        public ICollection<PN> PNs { get; set; } = new List<PN>();
     }
 }

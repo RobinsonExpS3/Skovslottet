@@ -461,11 +461,13 @@ namespace Slottet.Infrastructure.Services
         {
             var shiftDate = WorkDayDate(startDateTime);
 
-            // Find den status der var aktiv på vagtens dato — dvs. nyeste status oprettet på eller før datoen.
-            var statusAtShift = resident.ResidentStatuses
-                .Where(s => DateOnly.FromDateTime(s.Date) <= shiftDate)
-                .OrderByDescending(s => s.Date)
-                .FirstOrDefault();
+            // Find shiftboard-scoped status først, fallback til nyeste status oprettet før vagtens start.
+            var statusAtShift =
+                resident.ResidentStatuses.FirstOrDefault(s => s.ShiftBoardID == shiftBoardId)
+                ?? resident.ResidentStatuses
+                    .Where(s => s.ShiftBoardID == null && s.Date < startDateTime)
+                    .OrderByDescending(s => s.Date)
+                    .FirstOrDefault();
 
             return new ResidentCardDto
             {
@@ -563,62 +565,97 @@ namespace Slottet.Infrastructure.Services
             // Guard: we need at least a valid ResidentID to do anything useful
             if (dto.ResidentID == Guid.Empty || dto.ShiftBoardID == Guid.Empty) return false;
 
-            // ── 1. Status note + Risk level (only when a status record exists) ──
-            if (dto.ResidentStatusID != Guid.Empty)
+            // ── 1. Find ShiftBoard (required for all operations below) ──
+            var shiftBoard = await _context.ShiftBoards
+                .FirstOrDefaultAsync(sb => sb.ShiftBoardID == dto.ShiftBoardID, ct);
+            if (shiftBoard is null) return false;
+
+            // ── 2. Status note + Risk level — find-eller-opret scoped til dette shiftboard ──
+            var status = await _context.ResidentStatuses
+                .Include(rs => rs.StaffResidentStatuses)
+                .FirstOrDefaultAsync(rs => rs.ResidentID == dto.ResidentID
+                                        && rs.ShiftBoardID == dto.ShiftBoardID, ct);
+
+            if (status is null)
             {
-                var status = await _context.ResidentStatuses
-                    .Include(rs => rs.StaffResidentStatuses)
-                    .FirstOrDefaultAsync(rs => rs.ResidentStatusID == dto.ResidentStatusID, ct);
+                // Ingen scoped status endnu — find fallback-status for at arve RiskLevel
+                var fallback = await _context.ResidentStatuses
+                    .AsNoTracking()
+                    .Where(rs => rs.ResidentID == dto.ResidentID
+                              && rs.ShiftBoardID == null
+                              && rs.Date < shiftBoard.StartDateTime)
+                    .OrderByDescending(rs => rs.Date)
+                    .FirstOrDefaultAsync(ct);
 
-                if (status is not null)
+                var riskLevelID = fallback?.RiskLevelID;
+
+                if (!string.IsNullOrWhiteSpace(dto.RiskLevel))
                 {
-                    status.Status = dto.LatestStatusNote ?? string.Empty;
+                    var rl = await _context.RiskLevels
+                        .FirstOrDefaultAsync(r => r.RiskLevelName == dto.RiskLevel, ct);
+                    if (rl is not null) riskLevelID = rl.RiskLevelID;
+                }
 
-                    if (!string.IsNullOrWhiteSpace(dto.RiskLevel))
-                    {
-                        var riskLevel = await _context.RiskLevels
-                            .FirstOrDefaultAsync(rl => rl.RiskLevelName == dto.RiskLevel, ct);
-                        if (riskLevel is not null)
-                            status.RiskLevelID = riskLevel.RiskLevelID;
-                    }
+                // Kræver en gyldig RiskLevel — skip opret hvis ingen kan findes
+                if (riskLevelID is null) goto staffOnly;
 
-                    // ── 2. Assigned staff (scoped to shiftboard) ──
-                    // EF propagates composite-PK FK values from the navigation property, not the raw FK field.
-                    // Load ShiftBoard with tracking and set it explicitly on each new entity.
-                    var shiftBoard = await _context.ShiftBoards
-                        .FirstOrDefaultAsync(sb => sb.ShiftBoardID == dto.ShiftBoardID, ct);
-                    if (shiftBoard is null) return false;
+                status = new ResidentStatus
+                {
+                    ResidentStatusID = Guid.NewGuid(),
+                    ResidentID       = dto.ResidentID,
+                    ShiftBoardID     = dto.ShiftBoardID,
+                    Date             = DateTime.Now,
+                    Status           = dto.LatestStatusNote ?? string.Empty,
+                    RiskLevelID      = riskLevelID.Value,
+                };
+                _context.ResidentStatuses.Add(status);
+            }
+            else
+            {
+                status.Status = dto.LatestStatusNote ?? string.Empty;
 
-                    var existingStaffIds = status.StaffResidentStatuses
-                        .Where(srs => srs.ShiftBoardID == dto.ShiftBoardID)
-                        .Select(srs => srs.StaffID)
-                        .ToHashSet();
-
-                    var incomingStaff = dto.AssignedStaff.Count > 0
-                        ? await _context.Staffs
-                            .Where(s => dto.AssignedStaff.Contains(s.StaffName))
-                            .ToListAsync(ct)
-                        : new List<Staff>();
-
-                    var incomingStaffIds = incomingStaff.Select(s => s.StaffID).ToHashSet();
-
-                    var toRemove = status.StaffResidentStatuses
-                        .Where(srs => srs.ShiftBoardID == dto.ShiftBoardID && !incomingStaffIds.Contains(srs.StaffID))
-                        .ToList();
-                    _context.StaffResidentStatuses.RemoveRange(toRemove);
-
-                    foreach (var staff in incomingStaff.Where(s => !existingStaffIds.Contains(s.StaffID)))
-                    {
-                        _context.StaffResidentStatuses.Add(new StaffResidentStatus
-                        {
-                            StaffID          = staff.StaffID,
-                            ResidentStatusID = status.ResidentStatusID,
-                            ShiftBoard       = shiftBoard,
-                            AssignedAt       = DateTime.Now
-                        });
-                    }
+                if (!string.IsNullOrWhiteSpace(dto.RiskLevel))
+                {
+                    var riskLevel = await _context.RiskLevels
+                        .FirstOrDefaultAsync(rl => rl.RiskLevelName == dto.RiskLevel, ct);
+                    if (riskLevel is not null)
+                        status.RiskLevelID = riskLevel.RiskLevelID;
                 }
             }
+
+            // ── 3. Assigned staff (scoped to shiftboard) ──
+            {
+                var existingStaffIds = status.StaffResidentStatuses
+                    .Where(srs => srs.ShiftBoardID == dto.ShiftBoardID)
+                    .Select(srs => srs.StaffID)
+                    .ToHashSet();
+
+                var incomingStaff = dto.AssignedStaff.Count > 0
+                    ? await _context.Staffs
+                        .Where(s => dto.AssignedStaff.Contains(s.StaffName))
+                        .ToListAsync(ct)
+                    : new List<Staff>();
+
+                var incomingStaffIds = incomingStaff.Select(s => s.StaffID).ToHashSet();
+
+                var toRemove = status.StaffResidentStatuses
+                    .Where(srs => srs.ShiftBoardID == dto.ShiftBoardID && !incomingStaffIds.Contains(srs.StaffID))
+                    .ToList();
+                _context.StaffResidentStatuses.RemoveRange(toRemove);
+
+                foreach (var staff in incomingStaff.Where(s => !existingStaffIds.Contains(s.StaffID)))
+                {
+                    _context.StaffResidentStatuses.Add(new StaffResidentStatus
+                    {
+                        StaffID          = staff.StaffID,
+                        ResidentStatusID = status.ResidentStatusID,
+                        ShiftBoard       = shiftBoard,
+                        AssignedAt       = DateTime.Now
+                    });
+                }
+            }
+
+            staffOnly:
 
             // ── 3. Medicine IsGiven toggles (always runs, independent of status) ──
             var shiftDate = WorkDayDate(dto.Date);
