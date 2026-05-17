@@ -82,6 +82,21 @@ namespace Slottet.Infrastructure.Services {
                     lookups.Medicines[m.MedicineID] = $"{m.ResidentName} - Kl. {m.ScheduledTime:HH:mm}";
             }
 
+            // MedicineLogs — slå op via MedicineLogID (key) så Modified-entries (hvor
+            // kun GivenTime/RegisteredTime er i values) stadig kan vise korrekt subject.
+            if (guidsByProp.TryGetValue("MedicineLogID", out var mlIds) && mlIds.Count > 0) {
+                var rows = await _context.MedicineLogs.AsNoTracking()
+                    .Where(ml => mlIds.Contains(ml.MedicineLogID))
+                    .Select(ml => new {
+                        ml.MedicineLogID,
+                        ResidentName  = ml.Medicine.Resident.ResidentName,
+                        ScheduledTime = ml.Medicine.ScheduledTime
+                    })
+                    .ToListAsync();
+                foreach (var ml in rows)
+                    lookups.MedicineLogs[ml.MedicineLogID] = $"{ml.ResidentName} - Kl. {ml.ScheduledTime:HH:mm}";
+            }
+
             // PNs
             if (guidsByProp.TryGetValue("PNID", out var pnIds) && pnIds.Count > 0) {
                 var rows = await _context.PNs.AsNoTracking()
@@ -214,10 +229,13 @@ namespace Slottet.Infrastructure.Services {
                 var newVals = ParseAuditValues(auditLog.NewValuesJson);
                 var oldVals = ParseAuditValues(auditLog.OldValuesJson);
 
-                // Resolve subject via MedicineID in values
+                // Resolve subject via MedicineID i values (Added/Deleted), fallback til
+                // MedicineLogID i keyValues (Modified — kun GivenTime/RegisteredTime ændret).
                 var medicineIdStr = newVals.GetValueOrDefault("MedicineID") ?? oldVals.GetValueOrDefault("MedicineID");
                 if (medicineIdStr != null && Guid.TryParse(medicineIdStr, out var medicineGuid))
                     auditLog.Subject = lookups.Medicines.GetValueOrDefault(medicineGuid, "Ukendt medicin");
+                else if (keyValues.TryGetValue("MedicineLogID", out var logIdStr) && Guid.TryParse(logIdStr, out var logGuid))
+                    auditLog.Subject = lookups.MedicineLogs.GetValueOrDefault(logGuid, "Ukendt medicin");
 
                 // Determine action from GivenTime presence
                 newVals.TryGetValue("GivenTime", out var newGivenTime);
@@ -637,6 +655,7 @@ namespace Slottet.Infrastructure.Services {
             public Dictionary<Guid, string> Staff                    { get; } = new();
             public Dictionary<Guid, string> Residents                { get; } = new();
             public Dictionary<Guid, string> Medicines                { get; } = new();
+            public Dictionary<Guid, string> MedicineLogs             { get; } = new();
             public Dictionary<Guid, string> PNs                      { get; } = new();
             public Dictionary<Guid, string> ResidentStatusSubjects   { get; } = new();
             public Dictionary<Guid, string> ResidentStatusValues     { get; } = new();

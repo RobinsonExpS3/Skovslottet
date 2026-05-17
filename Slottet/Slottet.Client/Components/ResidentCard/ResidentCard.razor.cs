@@ -90,9 +90,11 @@ namespace Slottet.Client.Components.ResidentCard
         // ── PN ────────────────────────────────────────────────────────────
         private void AddPN()
         {
+            // IssuedBy efterlades tom — serveren binder den til den indloggede bruger
+            // via AuditScope ved gem. UI'et viser "Udstedt af: dig" som visning.
             _pnRows.Add(new PnRow
             {
-                Entry     = new PNEntryDto { IssuedBy = "Logged-in user" },
+                Entry     = new PNEntryDto { IssuedBy = string.Empty },
                 IsEditing = true,
                 Snapshot  = null
             });

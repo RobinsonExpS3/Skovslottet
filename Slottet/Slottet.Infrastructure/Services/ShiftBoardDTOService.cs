@@ -9,10 +9,12 @@ namespace Slottet.Infrastructure.Services
     public class ShiftBoardDTOService : IShiftBoardDTOService
     {
         private readonly SlottetDBContext _context;
+        private readonly IAuditScope      _auditScope;
 
-        public ShiftBoardDTOService(SlottetDBContext context)
+        public ShiftBoardDTOService(SlottetDBContext context, IAuditScope auditScope)
         {
-            _context = context;
+            _context    = context;
+            _auditScope = auditScope;
         }
 
         /// <summary>
@@ -557,14 +559,33 @@ namespace Slottet.Infrastructure.Services
 
             if (status is null)
             {
-                // Ingen scoped status endnu — find fallback-status for at arve RiskLevel
+                // Ingen scoped status endnu — find fallback for at sammenligne mod
+                // det brugeren ser i UI'et. Vi opretter KUN en ny scoped status
+                // hvis brugeren faktisk har ændret note, risiko eller personale —
+                // ellers ville hver medicin-ændring generere spurious "Oprettede"-
+                // entries i audit-loggen.
                 var fallback = await _context.ResidentStatuses
                     .AsNoTracking()
+                    .Include(rs => rs.RiskLevel)
                     .Where(rs => rs.ResidentID == dto.ResidentID
                               && rs.ShiftBoardID == null
                               && rs.Date < shiftBoard.StartDateTime)
                     .OrderByDescending(rs => rs.Date)
                     .FirstOrDefaultAsync(ct);
+
+                var incomingNote     = dto.LatestStatusNote ?? string.Empty;
+                var fallbackNote     = fallback?.Status ?? string.Empty;
+                var incomingRisk     = dto.RiskLevel ?? string.Empty;
+                var fallbackRisk     = fallback?.RiskLevel?.RiskLevelName ?? string.Empty;
+                var noteChanged      = !string.Equals(incomingNote, fallbackNote, StringComparison.Ordinal);
+                var riskChanged      = !string.IsNullOrWhiteSpace(incomingRisk)
+                                       && !string.Equals(incomingRisk, fallbackRisk, StringComparison.Ordinal);
+                var hasStaffToAssign = dto.AssignedStaff.Count > 0;
+
+                // Brugeren har ikke ændret status-relaterede felter — skip opret
+                // (medicin/PN-blokkene længere nede kører stadig).
+                if (!noteChanged && !riskChanged && !hasStaffToAssign)
+                    goto staffOnly;
 
                 var riskLevelID = fallback?.RiskLevelID;
 
@@ -584,7 +605,7 @@ namespace Slottet.Infrastructure.Services
                     ResidentID       = dto.ResidentID,
                     ShiftBoardID     = dto.ShiftBoardID,
                     Date             = DateTime.Now,
-                    Status           = dto.LatestStatusNote ?? string.Empty,
+                    Status           = incomingNote,
                     RiskLevelID      = riskLevelID.Value,
                 };
                 _context.ResidentStatuses.Add(status);
@@ -649,20 +670,37 @@ namespace Slottet.Infrastructure.Services
 
                 var log = medicine.MedicineLogs.FirstOrDefault(ml => ml.Date == shiftDate);
 
-                if (medDto.IsGiven && log is null)
+                if (medDto.IsGiven)
                 {
-                    _context.MedicineLogs.Add(new MedicineLog
+                    if (log is null)
                     {
-                        MedicineLogID    = Guid.NewGuid(),
-                        Date             = shiftDate,
-                        GivenTime        = DateTime.Now,
-                        RegisteredTime   = DateTime.Now,
-                        MedicineID       = medicine.MedicineID
-                    });
+                        // Ingen log endnu — opret en med GivenTime sat
+                        _context.MedicineLogs.Add(new MedicineLog
+                        {
+                            MedicineLogID    = Guid.NewGuid(),
+                            Date             = shiftDate,
+                            GivenTime        = DateTime.Now,
+                            RegisteredTime   = DateTime.Now,
+                            MedicineID       = medicine.MedicineID
+                        });
+                    }
+                    else if (log.GivenTime is null)
+                    {
+                        // Stub-log (seedet eller tidligere afmarkeret) — udfyld GivenTime
+                        log.GivenTime      = DateTime.Now;
+                        log.RegisteredTime = DateTime.Now;
+                    }
+                    // else: allerede givet — ingen ændring
                 }
-                else if (!medDto.IsGiven && log is not null)
+                else // !medDto.IsGiven
                 {
-                    _context.MedicineLogs.Remove(log);
+                    if (log is not null && log.GivenTime is not null)
+                    {
+                        // Afmarkér givet — behold log-rækken men nulstil tidspunkterne
+                        log.GivenTime      = null;
+                        log.RegisteredTime = null;
+                    }
+                    // else: ingen log eller allerede ikke-givet — ingen ændring
                 }
             }
 
@@ -698,18 +736,30 @@ namespace Slottet.Infrastructure.Services
                 };
                 _context.PNs.Add(newPN);
 
-                if (!string.IsNullOrWhiteSpace(pnDto.IssuedBy))
+                // Link til den indloggede staff via StaffPN. Vi stoler ikke på
+                // klient-DTO'ens IssuedBy — autoritativ kilde er AuditScope.
+                // Verificér at staff'en findes (PerformedByStaffID kan være Identity-
+                // bruger-ID hvis StaffID-claim mangler — falder tilbage til navn).
+                Guid? resolvedStaffId = null;
+                if (_auditScope.PerformedByStaffID is Guid candidateId && candidateId != Guid.Empty)
                 {
-                    var staff = await _context.Staffs
-                        .FirstOrDefaultAsync(s => s.StaffName == pnDto.IssuedBy, ct);
-                    if (staff is not null)
+                    var exists = await _context.Staffs.AnyAsync(s => s.StaffID == candidateId, ct);
+                    if (exists) resolvedStaffId = candidateId;
+                }
+                if (resolvedStaffId is null && !string.IsNullOrWhiteSpace(_auditScope.PerformedByStaffName))
+                {
+                    var staffByName = await _context.Staffs
+                        .FirstOrDefaultAsync(s => s.StaffName == _auditScope.PerformedByStaffName, ct);
+                    if (staffByName is not null) resolvedStaffId = staffByName.StaffID;
+                }
+
+                if (resolvedStaffId is Guid issuerId)
+                {
+                    _context.StaffPNs.Add(new StaffPN
                     {
-                        _context.StaffPNs.Add(new StaffPN
-                        {
-                            StaffID = staff.StaffID,
-                            PNID    = newPN.PNID
-                        });
-                    }
+                        StaffID = issuerId,
+                        PNID    = newPN.PNID
+                    });
                 }
             }
 

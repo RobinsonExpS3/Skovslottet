@@ -117,8 +117,8 @@
                                    value="@localRow.Entry.Reason"
                                    @onchange="e => localRow.Entry.Reason = e.Value?.ToString() ?? string.Empty"
                                    placeholder="Årsag" />
-                            @* Udstedt af *@
-                            <span class="bkv-pn-udstedt">Udstedt af: @localRow.Entry.IssuedBy</span>
+                            @* Udstedt af — bindes til indlogget bruger på serveren *@
+                            <span class="bkv-pn-udstedt">Udstedt af: @(string.IsNullOrWhiteSpace(localRow.Entry.IssuedBy) ? "dig" : localRow.Entry.IssuedBy)</span>
                             <div class="bkv-pn-actions">
                                 @* PN-OK-Knap *@
                                 <button type="button" class="bkv-btn-ok"

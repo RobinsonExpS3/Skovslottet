@@ -213,7 +213,9 @@ namespace Slottet.API.Controllers
             [FromBody] ResidentCardDto dto,
             CancellationToken ct)
         {
-            if (dto is null || dto.ResidentStatusID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
+            // Bemærk: ResidentStatusID må gerne være Guid.Empty — servicen opretter
+            // selv en scoped ResidentStatus hvis ingen findes endnu for vagten.
+            if (dto is null || dto.ResidentID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
                 return BadRequest();
 
             _auditScope.ShiftBoardID = dto.ShiftBoardID;

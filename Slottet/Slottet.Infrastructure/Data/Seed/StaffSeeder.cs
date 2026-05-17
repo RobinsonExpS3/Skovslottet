@@ -25,6 +25,9 @@ namespace Slottet.Infrastructure.Data.Seed
 
             var staffs = new List<Staff>
             {
+                // Dev-user staff — matcher DevAuthHandler så audit-scope + StaffPN
+                // har en gyldig FK at pege på. Kun til lokal udvikling.
+                new Staff { StaffID = Guid.Parse("00000000-0000-0000-0000-000000000001"), StaffName = "Dev User", DepartmentID = slottetDepartmentId, Initials = "DU", Role = "admin" },
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Hestemand Hestesen", DepartmentID = skovenDepartmentId, Initials = "HH", Role = "staff" },
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Søren Skovfis", DepartmentID = skovenDepartmentId, Initials = "SS", Role = "staff" },
                 new Staff { StaffID = Guid.NewGuid(), StaffName = "Lise Lægemand", DepartmentID = slottetDepartmentId, Initials = "LL", Role = "admin" },
