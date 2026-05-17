@@ -75,6 +75,21 @@
     padding: 10px 14px;
     background-color: var(--color-bg-section-header);
     border-bottom: var(--border-inner);
+    cursor: pointer;
+    user-select: none;
+}
+
+.audit-group-chevron {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    transition: transform 0.15s ease;
+    transform: rotate(0deg);
+    display: inline-block;
+    line-height: 1;
+}
+
+.audit-group-chevron.expanded {
+    transform: rotate(90deg);
 }
 
 .audit-group-subject {

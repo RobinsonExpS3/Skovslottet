@@ -29,6 +29,15 @@ namespace Slottet.Client.Pages.AdminPages
 
         private Guid? openCardId = null;
         private CancellationTokenSource? _searchCts;
+        private readonly HashSet<string> _expandedGroups = new();
+
+        protected void ToggleGroup(string key)
+        {
+            if (!_expandedGroups.Remove(key))
+                _expandedGroups.Add(key);
+        }
+
+        protected bool IsGroupExpanded(string key) => _expandedGroups.Contains(key);
 
         protected override async Task OnInitializedAsync()
         {

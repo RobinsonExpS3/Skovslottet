@@ -63,8 +63,11 @@ else
                         {
                             @foreach (var auditGroup in FilteredGroups)
                             {
+                                var groupKey = auditGroup.Subject + "|" + auditGroup.ShiftBoard;
+                                var expanded = IsGroupExpanded(groupKey);
                                 <div class="audit-group">
-                                    <div class="audit-group-header">
+                                    <div class="audit-group-header" @onclick="() => ToggleGroup(groupKey)">
+                                        <span class="audit-group-chevron @(expanded ? "expanded" : "")">›</span>
                                         <span class="audit-group-subject">@auditGroup.Subject</span>
                                         @if (auditGroup.ShiftBoard != "–" && !string.IsNullOrWhiteSpace(auditGroup.ShiftBoard))
                                         {
@@ -74,48 +77,49 @@ else
                                             @auditGroup.LatestTime.ToString("HH:mm") · @auditGroup.Performers · @auditGroup.Rows.Count hændelse@(auditGroup.Rows.Count == 1 ? "" : "r")
                                         </span>
                                     </div>
-                                    @{
+                                    @if (expanded)
+                                    {
                                         var hasDetails = auditGroup.Rows.Any(r =>
                                             !string.IsNullOrEmpty(ExtractDetail(r.Subject, auditGroup.Subject)));
-                                    }
-                                    <table class="audit-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Tid</th>
-                                                <th>Hvem</th>
-                                                <th>Handling</th>
-                                                <th>Kategori</th>
-                                                <th>Specificering</th>
-                                                <th>Ændret fra</th>
-                                                <th>Ændret til</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var row in auditGroup.Rows)
-                                            {
-                                                var detail = hasDetails ? ExtractDetail(row.Subject, auditGroup.Subject) : string.Empty;
-                                                var fieldLabel = row.Field == "–" ? string.Empty : row.Field;
-                                                var spec = (detail, fieldLabel) switch
-                                                {
-                                                    ({ Length: > 0 }, { Length: > 0 }) => $"{detail} · {fieldLabel}",
-                                                    ({ Length: > 0 }, _)              => detail,
-                                                    (_, { Length: > 0 })              => fieldLabel,
-                                                    _                                  => "–"
-                                                };
+                                        <table class="audit-table">
+                                            <thead>
                                                 <tr>
-                                                    <td>@row.Time.ToString("HH:mm")</td>
-                                                    <td class="audit-cell-muted">@row.PerformedBy</td>
-                                                    <td>
-                                                        <span class="audit-action @GetActionCssClass(row.Action)">@row.Action</span>
-                                                    </td>
-                                                    <td>@row.Category</td>
-                                                    <td class="@(spec == "–" ? "audit-cell-muted" : "")">@spec</td>
-                                                    <td class="@(row.OldValue == "–" ? "audit-cell-muted" : "")">@row.OldValue</td>
-                                                    <td class="@(row.NewValue == "–" ? "audit-cell-muted" : "")">@row.NewValue</td>
+                                                    <th>Tid</th>
+                                                    <th>Hvem</th>
+                                                    <th>Handling</th>
+                                                    <th>Kategori</th>
+                                                    <th>Specificering</th>
+                                                    <th>Ændret fra</th>
+                                                    <th>Ændret til</th>
                                                 </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var row in auditGroup.Rows)
+                                                {
+                                                    var detail = hasDetails ? ExtractDetail(row.Subject, auditGroup.Subject) : string.Empty;
+                                                    var fieldLabel = row.Field == "–" ? string.Empty : row.Field;
+                                                    var spec = (detail, fieldLabel) switch
+                                                    {
+                                                        ({ Length: > 0 }, { Length: > 0 }) => $"{detail} · {fieldLabel}",
+                                                        ({ Length: > 0 }, _)              => detail,
+                                                        (_, { Length: > 0 })              => fieldLabel,
+                                                        _                                  => "–"
+                                                    };
+                                                    <tr>
+                                                        <td>@row.Time.ToString("HH:mm")</td>
+                                                        <td class="audit-cell-muted">@row.PerformedBy</td>
+                                                        <td>
+                                                            <span class="audit-action @GetActionCssClass(row.Action)">@row.Action</span>
+                                                        </td>
+                                                        <td>@row.Category</td>
+                                                        <td class="@(spec == "–" ? "audit-cell-muted" : "")">@spec</td>
+                                                        <td class="@(row.OldValue == "–" ? "audit-cell-muted" : "")">@row.OldValue</td>
+                                                        <td class="@(row.NewValue == "–" ? "audit-cell-muted" : "")">@row.NewValue</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
                                 </div>
                             }
                         }
