@@ -599,7 +599,7 @@ th.placeholder-col {
 
 /* ── Sidebar: nummer + navn ── */
 .sidebar-nummer { font-size: 1rem; font-weight: 700; color: var(--color-text-dark); }
-.sidebar-navn   { font-size: 0.92rem; color: var(--color-text-label); margin-left: 6px; }
+.sidebar-navn   { font-size: 0.92rem; color: var(--color-text-label); margin-left: 6px; white-space: nowrap; }
 .sidebar-ansvar { font-size: 0.92rem; color: var(--color-text-muted); }
 
 /* ─────────────────────────────────────

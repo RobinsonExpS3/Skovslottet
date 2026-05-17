@@ -195,7 +195,8 @@ else
                 <ul class="sidebar-list--two-col">
                     @foreach (var phone in Model.PhoneNumbers)
                     {
-                        <li><span class="sidebar-nummer">@phone.Number</span><span class="sidebar-navn">@phone.StaffName</span></li>
+                        var phoneInitials = string.IsNullOrWhiteSpace(phone.StaffName) ? "" : string.Join(".", phone.StaffName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => char.ToUpper(w[0]))) + ".";
+                        <li><span class="sidebar-nummer">@phone.Number</span><span class="sidebar-navn">@phoneInitials</span></li>
                     }
                 </ul>
             </div>
@@ -205,7 +206,8 @@ else
                 <ul class="sidebar-list--two-col">
                     @foreach (var responsibility in Model.SpecialResponsibilities)
                     {
-                        <li><span class="sidebar-ansvar">@responsibility.Description</span><span class="sidebar-navn">@responsibility.StaffName</span></li>
+                        var respInitials = string.IsNullOrWhiteSpace(responsibility.StaffName) ? "" : string.Join(".", responsibility.StaffName.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(w => char.ToUpper(w[0]))) + ".";
+                        <li><span class="sidebar-ansvar">@responsibility.Description</span><span class="sidebar-navn">@respInitials</span></li>
                     }
                 </ul>
             </div>
