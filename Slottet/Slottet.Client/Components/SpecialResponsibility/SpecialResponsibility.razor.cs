@@ -10,10 +10,11 @@ namespace Slottet.Client.Components.SpecialResponsibility
         [Inject] private HttpClient Http { get; set; } = default!;
 
         // ── Parameters ────────────────────────────────────────────────────
-        [Parameter, EditorRequired] public List<SpecialResponsibilityEntryDto>               Items         { get; set; } = default!;
-        [Parameter]                 public List<string>                                      AllStaff      { get; set; } = new();
-        [Parameter]                 public Guid                                              ShiftBoardID  { get; set; }
-        [Parameter]                 public EventCallback<List<SpecialResponsibilityEntryDto>> OnSave       { get; set; }
+        [Parameter, EditorRequired] public List<SpecialResponsibilityEntryDto>               Items            { get; set; } = default!;
+        [Parameter]                 public List<string>                                      AllStaff         { get; set; } = new();
+        [Parameter]                 public Guid                                              ShiftBoardID     { get; set; }
+        [Parameter]                 public EventCallback<List<SpecialResponsibilityEntryDto>> OnSave           { get; set; }
+        [Parameter]                 public bool                                              HideStaffPicker  { get; set; } = false;
 
         // ── State ─────────────────────────────────────────────────────────
         private List<SpecialResponsibilityEntryDto> _editItems = new();

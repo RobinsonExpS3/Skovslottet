@@ -1,4 +1,4 @@
-<div class="bkv-card">
+<div class="bkv-card @(IsAdmin ? "bkv-card--admin" : "")">
 
     @* ── HEADER: Navn + Risk dropdown ── *@
     <header class="bkv-header @_draft.RiskCssClass">
@@ -14,25 +14,31 @@
         {
             <span class="bkv-navn">@_draft.ResidentName</span>
         }
-        @* Risikoniveau *@
-        <select class="bkv-risk-select" @bind="_draft.RiskLevel">
-            <option value="Grøn">Grøn</option>
-            <option value="Gul">Gul</option>
-            <option value="Rød">Rød</option>
-        </select>
+        @* Risikoniveau — kun i shift-kontekst, ikke i admin *@
+        @if (!IsAdmin)
+        {
+            <select class="bkv-risk-select" @bind="_draft.RiskLevel">
+                <option value="Grøn">Grøn</option>
+                <option value="Gul">Gul</option>
+                <option value="Rød">Rød</option>
+            </select>
+        }
     </header>
 
     <div class="bkv-body">
 
-        @* ── SENESTE STATUS ── *@
-        <section class="bkv-section bkv-status-section">
-            <span class="bkv-label bkv-label--center">Seneste Status</span>
-            @* Statusnotat *@
-            <textarea class="bkv-status-input"
-                      rows="2"
-                      @bind="_draft.LatestStatusNote"
-                      placeholder="Skriv seneste status…"></textarea>
-        </section>
+        @* ── SENESTE STATUS — kun i shift-kontekst ── *@
+        @if (!IsAdmin)
+        {
+            <section class="bkv-section bkv-status-section">
+                <span class="bkv-label bkv-label--center">Seneste Status</span>
+                @* Statusnotat *@
+                <textarea class="bkv-status-input"
+                          rows="2"
+                          @bind="_draft.LatestStatusNote"
+                          placeholder="Skriv seneste status…"></textarea>
+            </section>
+        }
 
         <div class="bkv-grid">
 
@@ -41,16 +47,25 @@
                 <span class="bkv-label">Medicin</span>
 
                 <div class="bkv-medicin-slots">
-                    @* Medicin-knapper: toggle givet/ikke givet *@
+                    @* Medicin: i admin vises kun tid (toggle givet/ikke givet er shift-kontekst) *@
                     @foreach (var med in _draft.MedicineSchedule)
                     {
                         <div class="bkv-med-slot-wrapper">
-                            <button type="button"
-                                    class="bkv-med-slot @(med.IsGiven ? "bkv-med-given" : "bkv-med-not-given")"
-                                    @onclick="() => med.IsGiven = !med.IsGiven">
-                                <span class="bkv-med-tid">@med.Label</span>
-                                <span class="bkv-med-ikon">@(med.IsGiven ? "💊" : "·")</span>
-                            </button>
+                            @if (IsAdmin)
+                            {
+                                <span class="bkv-med-slot bkv-med-not-given">
+                                    <span class="bkv-med-tid">@med.Label</span>
+                                </span>
+                            }
+                            else
+                            {
+                                <button type="button"
+                                        class="bkv-med-slot @(med.IsGiven ? "bkv-med-given" : "bkv-med-not-given")"
+                                        @onclick="() => med.IsGiven = !med.IsGiven">
+                                    <span class="bkv-med-tid">@med.Label</span>
+                                    <span class="bkv-med-ikon">@(med.IsGiven ? "💊" : "·")</span>
+                                </button>
+                            }
                             @if (!ViewOnly)
                             {
                                 <button type="button"
@@ -90,7 +105,9 @@
                 </div>
             </section>
 
-            @* ── PN ── *@
+            @* ── PN — kun i shift-kontekst ── *@
+            @if (!IsAdmin)
+            {
             <section class="bkv-section bkv-pn-section">
                 <span class="bkv-label">PN</span>
 
@@ -146,8 +163,11 @@
                 @* Tilføj ny PN *@
                 <button type="button" class="bkv-btn-tilfoej" @onclick="AddPN">+ Tilføj PN</button>
             </section>
+            }
 
-            @* ── ANSVARLIGT PERSONALE ── *@
+            @* ── ANSVARLIGT PERSONALE — kun i shift-kontekst ── *@
+            @if (!IsAdmin)
+            {
             <section class="bkv-section bkv-personale-section">
                 <span class="bkv-label">Ansvarligt personale</span>
 
@@ -182,6 +202,7 @@
                     </div>
                 }
             </section>
+            }
 
             @* ── HANDLEDAG + BETALING ── *@
             <section class="bkv-section bkv-praktisk-section">

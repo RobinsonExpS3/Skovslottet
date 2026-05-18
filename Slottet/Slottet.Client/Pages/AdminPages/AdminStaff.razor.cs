@@ -24,13 +24,6 @@ namespace Slottet.Client.Pages.AdminPages
         private bool isBusy = false;
         private bool loadFailed = false;
 
-        // ── Særligt Ansvar ────────────────────────────────────────────────
-        private List<SpecialResponsibilityEntryDto>? specialResponsibilities;
-        private SpecialResponsibilityEntryDto? selectedSr;
-        private string? srDescriptionInput;
-        private bool srLoadFailed = false;
-        private bool srBusy = false;
-
         // ── Init ──────────────────────────────────────────────────────────
         protected override async Task OnInitializedAsync()
         {
@@ -60,7 +53,7 @@ namespace Slottet.Client.Pages.AdminPages
             {
                 isBusy = false;
                 await LoadDepartments();
-                await Task.WhenAll(LoadStaff(), LoadSr());
+                await LoadStaff();
             }
         }
 
@@ -259,7 +252,6 @@ namespace Slottet.Client.Pages.AdminPages
         private void ClearAll()
         {
             ClearStaffForm();
-            ClearSrForm();
         }
 
         private void ClearStaffForm()
@@ -272,81 +264,5 @@ namespace Slottet.Client.Pages.AdminPages
             passwordInput = string.Empty;
         }
 
-        // ═════════════════════════════════════════
-        //  SÆRLIGT ANSVAR
-        // ═════════════════════════════════════════
-
-        private async Task LoadSr()
-        {
-            try
-            {
-                specialResponsibilities = await httpClient.GetFromJsonAsync<List<SpecialResponsibilityEntryDto>>(
-                    "api/SpecialResponsibility/SpecialResponsibilities"
-                );
-            }
-            catch
-            {
-                specialResponsibilities = new List<SpecialResponsibilityEntryDto>();
-                srLoadFailed = true;
-            }
-        }
-
-        private void SelectSr(SpecialResponsibilityEntryDto item)
-        {
-            selectedSr = item;
-            srDescriptionInput = item.Description;
-        }
-
-        private async Task CreateSr()
-        {
-            if (string.IsNullOrWhiteSpace(srDescriptionInput) || srBusy) return;
-            srBusy = true;
-            try
-            {
-                var newItem = new SpecialResponsibilityEntryDto
-                {
-                    SpecialResponsibilityID = Guid.NewGuid(),
-                    DepartmentID = GetDepartmentSkoven(),
-                    Description = srDescriptionInput
-                };
-                var response = await httpClient.PostAsJsonAsync("api/SpecialResponsibility", newItem);
-                if (response.IsSuccessStatusCode) { await LoadSr(); ClearSrForm(); }
-            }
-            finally { srBusy = false; }
-        }
-
-        private async Task UpdateSr()
-        {
-            if (selectedSr == null || srBusy) return;
-            srBusy = true;
-            try
-            {
-                selectedSr.Description = srDescriptionInput ?? string.Empty;
-
-                var response = await httpClient.PutAsJsonAsync(
-                    $"api/SpecialResponsibility/{selectedSr.SpecialResponsibilityID}", selectedSr);
-                if (response.IsSuccessStatusCode) { await LoadSr(); ClearSrForm(); }
-            }
-            finally { srBusy = false; }
-        }
-
-        private async Task DeleteSr()
-        {
-            if (selectedSr == null || srBusy) return;
-            srBusy = true;
-            try
-            {
-                var response = await httpClient.DeleteAsync(
-                    $"api/SpecialResponsibility/{selectedSr.SpecialResponsibilityID}");
-                if (response.IsSuccessStatusCode) { await LoadSr(); ClearSrForm(); }
-            }
-            finally { srBusy = false; }
-        }
-
-        private void ClearSrForm()
-        {
-            selectedSr = null;
-            srDescriptionInput = string.Empty;
-        }
     }
 }

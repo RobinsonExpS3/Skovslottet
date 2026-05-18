@@ -17,16 +17,25 @@ public class DevAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+        // X-Dev-Role header tillader test-scripts at impersonate andre roller
+        // uden omkompilering. Default = Admin når headeren mangler.
+        // Tilladte værdier: Admin, Employee, Storskaerm.
+        var roleHeader = Request.Headers["X-Dev-Role"].FirstOrDefault();
+        var role = roleHeader switch
+        {
+            "Employee"   => "Employee",
+            "Storskaerm" => "Storskaerm",
+            _            => "Admin"
+        };
+
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, "dev-user"),
             new Claim("StaffID", "00000000-0000-0000-0000-000000000001"),
             new Claim(ClaimTypes.Name, "Dev User"),
-            new Claim(ClaimTypes.Role, "Admin"),
+            new Claim(ClaimTypes.Role, role),
             new Claim("StaffName", "Dev User")
         };
-
-        // Admin, Employee, Storskaerm
 
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);

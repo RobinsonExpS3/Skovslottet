@@ -526,3 +526,21 @@
     font-weight: 700;
     color: var(--color-primary);
 }
+
+/* ── ADMIN-MODE: enkelt-kolonne layout (Medicin over Handledag/Betaling) ── */
+.bkv-card--admin .bkv-grid {
+    grid-template-columns: 1fr;
+}
+
+.bkv-card--admin .bkv-medicin-section,
+.bkv-card--admin .bkv-praktisk-section {
+    grid-column: 1;
+    grid-row: auto;
+}
+
+/* Medicin-tids-pills i admin-mode skal matche "+" knappens højde (40px) */
+.bkv-card--admin .bkv-med-slot {
+    min-height: 40px;
+    box-sizing: border-box;
+    justify-content: center;
+}

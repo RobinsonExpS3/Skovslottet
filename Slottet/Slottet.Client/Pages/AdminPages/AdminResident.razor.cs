@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Slottet.Client.Pages.ShiftBoard;
 using Slottet.Shared;
 
 namespace Slottet.Client.Pages.AdminPages
@@ -14,13 +15,17 @@ namespace Slottet.Client.Pages.AdminPages
         // ── Data ──────────────────────────────────────────────────────────
         protected List<ResidentCardDto> Cards { get; set; } = new();
         protected List<string> AllStaff { get; set; } = new();
+        protected ShiftBoardDTO? Shift { get; set; }
         protected bool IsLoading { get; set; } = true;
         protected string? LoadError { get; set; }
 
         // ── Overlay ───────────────────────────────────────────────────────
         protected ResidentCardDto? SelectedResident { get; set; }
+        protected OverlayPanel ActivePanel { get; set; } = OverlayPanel.None;
         private AdminBoundingRect? _cardRect;
         private bool _pendingFlyIn;
+        private bool _pendingSidebarFlyIn;
+        private string _sidebarPanelId = string.Empty;
         private bool _isNewResident;
 
         // ── Drag & drop ───────────────────────────────────────────────────
@@ -96,6 +101,12 @@ namespace Slottet.Client.Pages.AdminPages
                 _pendingFlyIn = false;
                 await JS.InvokeVoidAsync("overlayHelpers.playFlyIn", "overlay-panel-admin-borger", _cardRect);
             }
+
+            if (_pendingSidebarFlyIn && !string.IsNullOrEmpty(_sidebarPanelId))
+            {
+                _pendingSidebarFlyIn = false;
+                await JS.InvokeVoidAsync("overlayHelpers.playFlyIn", _sidebarPanelId, null);
+            }
         }
 
         // ── Data loading ──────────────────────────────────────────────────
@@ -105,17 +116,19 @@ namespace Slottet.Client.Pages.AdminPages
             LoadError = null;
             try
             {
-                var cardsTask = Http.GetFromJsonAsync<List<ResidentCardDto>>("api/Resident/cards");
-                var staffTask = Http.GetFromJsonAsync<List<EditStaffDTO>>("api/Staff/Staffs");
+                var cardsTask   = Http.GetFromJsonAsync<List<ResidentCardDto>>("api/Resident/cards");
+                var staffTask   = Http.GetFromJsonAsync<List<EditStaffDTO>>("api/Staff/Staffs");
                 var groceryTask = Http.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays");
                 var paymentTask = Http.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods");
+                var shiftTask   = Http.GetFromJsonAsync<ShiftBoardDTO>("api/shiftboard/current");
 
-                await Task.WhenAll(cardsTask, staffTask, groceryTask, paymentTask);
+                await Task.WhenAll(cardsTask, staffTask, groceryTask, paymentTask, shiftTask);
 
                 Cards = cardsTask.Result ?? new();
                 AllStaff = (staffTask.Result ?? new()).Select(s => s.StaffName).ToList();
                 groceryDays = groceryTask.Result ?? new();
                 paymentMethods = paymentTask.Result ?? new();
+                Shift = shiftTask.Result;
             }
             catch (Exception ex)
             {
@@ -157,6 +170,23 @@ namespace Slottet.Client.Pages.AdminPages
         {
             SelectedResident = null;
             _isNewResident   = false;
+            ActivePanel      = OverlayPanel.None;
+        }
+
+        // ── Sidebar overlays (telefoner + saerligt ansvar) ────────────────
+        protected void OpenSidebarPanel(OverlayPanel panel)
+        {
+            SelectedResident      = null;
+            ActivePanel           = panel;
+            _sidebarPanelId       = "overlay-panel-admin-" + panel.ToString().ToLower();
+            _pendingSidebarFlyIn  = true;
+        }
+
+        // Fælles handler — bindes via lambda så den passer på begge EventCallback<List<T>>
+        protected async Task OnSidebarSaved()
+        {
+            CloseOverlay();
+            await LoadDataAsync();
         }
 
         protected async Task OnResidentDeleted()

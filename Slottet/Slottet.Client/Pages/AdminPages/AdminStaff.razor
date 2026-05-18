@@ -94,66 +94,6 @@ else
                 </div>
             </section>
 
-            @* ── HØJRE: Særligt Ansvar ── *@
-            <section class="admin-card sr-card">
-
-                <div class="admin-card-header">
-                    <h2>Særligt Ansvar</h2>
-                </div>
-
-                <div class="sr-editor">
-
-                    @* SR-liste *@
-                    <div class="sr-list-panel">
-                        @if (specialResponsibilities == null)
-                        {
-                            <p class="state-text">Indlæser…</p>
-                        }
-                        else if (srLoadFailed)
-                        {
-                            <p class="state-text state-text--error">Kunne ikke loade data.</p>
-                        }
-                        else
-                        {
-                            <table class="staff-table">
-                                <tbody>
-                                    @foreach (var sr in specialResponsibilities)
-                                    {
-                                        <tr @onclick:stopPropagation @onclick="() => SelectSr(sr)"
-                                        class="staff-row @(selectedSr == sr ? "staff-row--selected" : "")">
-                                            <td class="col-name">@sr.Description</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                    </div>
-
-                    @* SR-formular *@
-                    <div class="sr-form-panel" @onclick:stopPropagation>
-                        <input class="form-field" @bind="srDescriptionInput" @bind:event="oninput" placeholder="Ansvarsområde" />
-                        <div class="form-buttons">
-                            <button class="btn-admin btn-create"
-                            @onclick="CreateSr"
-                            disabled="@(string.IsNullOrWhiteSpace(srDescriptionInput) || selectedSr != null || srBusy)">
-                                Opret
-                            </button>
-                            <button class="btn-admin btn-update"
-                            @onclick="UpdateSr"
-                            disabled="@(selectedSr == null || srBusy)">
-                                Opdater
-                            </button>
-                            <button class="btn-admin btn-delete"
-                            @onclick="DeleteSr"
-                            disabled="@(selectedSr == null || srBusy)">
-                                Slet
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </section>
-
         </div>
     </div>
 }

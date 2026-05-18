@@ -77,33 +77,3 @@
     background-color: var(--color-bg-section);
 }
 
-/* ═══════════════════════
-   SÆRLIGT ANSVAR CARD
-   ═══════════════════════ */
-.sr-card {
-    min-height: 0;
-}
-
-.sr-editor {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.sr-list-panel {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    border-bottom: var(--border-inner);
-}
-
-.sr-form-panel {
-    flex-shrink: 0;
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background-color: var(--color-bg-section);
-}

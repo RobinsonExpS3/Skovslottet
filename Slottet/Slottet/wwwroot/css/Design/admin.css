@@ -22,10 +22,10 @@
 
     height: 100vh;
     box-sizing: border-box;
-    padding: 10px 14px;
+    padding: 8px 12px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     background-color: var(--color-bg-page);
     background-image: url('/images/forest-bg.svg');
     background-size: cover;
@@ -40,7 +40,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 20px;
+    padding: 6px 16px;
     background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary-mid));
     border-radius: var(--radius-header);
     box-shadow: var(--shadow-header);

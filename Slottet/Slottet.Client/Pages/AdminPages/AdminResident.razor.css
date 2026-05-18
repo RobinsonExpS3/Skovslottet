@@ -365,19 +365,65 @@
     border-radius: var(--radius-info);
     box-shadow: var(--shadow-info);
     padding: 10px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    overflow: hidden;
 }
 
 .info-box h3 {
-    margin: 0;
-    font-size: 0.95rem;
+    margin: 0 0 6px 0;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--color-primary-dark);
-    padding-bottom: 6px;
+    padding-bottom: 5px;
     border-bottom: 1px solid var(--color-primary-lighter);
 }
+
+/* ── Sidebar-lister (telefoner / særligt ansvar / afdelingsopgaver) ── */
+.info-box--clickable { cursor: pointer; transition: box-shadow 0.15s, outline 0.15s; }
+.info-box--clickable:hover { box-shadow: var(--shadow-info), 0 0 0 2px var(--color-primary-light); }
+
+.info-box ul { margin: 0; padding: 0; list-style: none; }
+
+/* To-kolonne tabel-layout for Telefonnumre + Særligt ansvar */
+.sidebar-list--two-col {
+    display: table;
+    width: 100%;
+    border-spacing: 0;
+}
+
+.sidebar-list--two-col li {
+    display: table-row;
+}
+
+.sidebar-list--two-col li > span {
+    display: table-cell;
+    padding: 4px 8px;
+}
+
+.sidebar-list--two-col li > span:first-child {
+    width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 16px;
+}
+
+.sidebar-list--two-col li:nth-child(even) > span {
+    background-color: rgba(0, 0, 0, 0.09);
+}
+
+/* Enkelt-kolonne lister (Afdelingens opgaver) */
+.info-box li {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.info-box li:nth-child(even) { background-color: rgba(0, 0, 0, 0.09); }
+
+.sidebar-nummer { font-size: 1rem;   font-weight: 700; color: var(--color-text-dark); }
+.sidebar-navn   { font-size: 0.92rem; color: var(--color-text-label); margin-left: 6px; white-space: nowrap; }
+.sidebar-ansvar { font-size: 0.92rem; color: var(--color-text-muted); }
 
 .create-active-label {
     display: flex;
