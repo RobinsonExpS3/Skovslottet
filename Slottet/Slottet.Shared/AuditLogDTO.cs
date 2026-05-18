@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Slottet.Shared {
-    public class AuditLogDTO {
+    public class AuditLogDto {
         public Guid AuditLogID { get; set; }
         public DateTime PerformedAtTime { get; set; }
 

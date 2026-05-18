@@ -1,6 +1,6 @@
 ﻿namespace Slottet.Shared
 {
-    public class StaffPNDTO
+    public class StaffPNDto
     {
         public Guid StaffID { get; set; }
         public string? StaffName { get; set; }

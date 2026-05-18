@@ -23,7 +23,7 @@ namespace Slottet.Tests.Controllers
             _controller = new ResidentController(_mockService.Object);
         }
 
-        private static EditResidentDTO ValidDto() => new EditResidentDTO
+        private static EditResidentDto ValidDto() => new EditResidentDto
         {
             ResidentID = ValidResidentId,
             ResidentName = "Jane",
@@ -36,7 +36,7 @@ namespace Slottet.Tests.Controllers
         {
             _mockService
                 .Setup(s => s.GetAllResidentsAsync())
-                .ReturnsAsync(new List<EditResidentDTO>());
+                .ReturnsAsync(new List<EditResidentDto>());
 
             var result = await _controller.GetAllResidentsAsync();
 
@@ -47,10 +47,10 @@ namespace Slottet.Tests.Controllers
         [TestMethod]
         public async Task GetAllResidentsAsync_ReturnsCorrectCount()
         {
-            var residents = new List<EditResidentDTO>
+            var residents = new List<EditResidentDto>
             {
-                new EditResidentDTO { ResidentID = Guid.NewGuid(), ResidentName = "Jane" },
-                new EditResidentDTO { ResidentID = Guid.NewGuid(), ResidentName = "John" }
+                new EditResidentDto { ResidentID = Guid.NewGuid(), ResidentName = "Jane" },
+                new EditResidentDto { ResidentID = Guid.NewGuid(), ResidentName = "John" }
             };
 
             _mockService
@@ -60,7 +60,7 @@ namespace Slottet.Tests.Controllers
             var result = await _controller.GetAllResidentsAsync();
 
             var ok = (OkObjectResult)result.Result!;
-            var items = (IEnumerable<EditResidentDTO>)ok.Value!;
+            var items = (IEnumerable<EditResidentDto>)ok.Value!;
 
             Assert.AreEqual(2, items.Count()); 
         }
@@ -75,7 +75,7 @@ namespace Slottet.Tests.Controllers
 
             var result = await _controller.GetResidentByIdAsync(ValidResidentId);
             var ok = (OkObjectResult)result.Result!;
-            var returned = (EditResidentDTO)ok.Value!;
+            var returned = (EditResidentDto)ok.Value!;
 
             Assert.AreEqual(ValidResidentId, returned.ResidentID); 
         }
@@ -86,7 +86,7 @@ namespace Slottet.Tests.Controllers
         {
             var dto = ValidDto();
             _mockService
-                .Setup(s => s.PostResidentAsync(It.IsAny<EditResidentDTO>()))
+                .Setup(s => s.PostResidentAsync(It.IsAny<EditResidentDto>()))
                 .ReturnsAsync(dto);
 
             var result = await _controller.PostResidentAsync(dto);

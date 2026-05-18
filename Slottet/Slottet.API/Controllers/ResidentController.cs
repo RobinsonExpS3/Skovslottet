@@ -22,7 +22,7 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all active residents.</returns>
         [HttpGet("Residents")]
-        public async Task<ActionResult<IEnumerable<EditResidentDTO>>> GetAllResidentsAsync()
+        public async Task<ActionResult<IEnumerable<EditResidentDto>>> GetAllResidentsAsync()
         {
             var residents = await _residentService.GetAllResidentsAsync();
 
@@ -35,7 +35,7 @@ namespace Slottet.API.Controllers
         /// <param name="id">The ID of the resident to retrieve.</param>
         /// <returns>Returns the resident if found, otherwise NotFound.</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<EditResidentDTO>> GetResidentByIdAsync(Guid id)
+        public async Task<ActionResult<EditResidentDto>> GetResidentByIdAsync(Guid id)
         {
             var resident = await _residentService.GetResidentByIdAsync(id);
 
@@ -53,7 +53,7 @@ namespace Slottet.API.Controllers
         /// <param name="dto">DTO object containing resident information.</param>
         /// <returns>Returns the created resident.</returns>
         [HttpPost]
-        public async Task<ActionResult<EditResidentDTO>> PostResidentAsync([FromBody] EditResidentDTO dto)
+        public async Task<ActionResult<EditResidentDto>> PostResidentAsync([FromBody] EditResidentDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty)
             {
@@ -76,7 +76,7 @@ namespace Slottet.API.Controllers
         /// <param name="dto">DTO object containing updated resident information.</param>
         /// <returns>Returns NoContent if the update succeeds, otherwise BadRequest or NotFound.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult> PutResidentAsync(Guid id, [FromBody] EditResidentDTO dto)
+        public async Task<ActionResult> PutResidentAsync(Guid id, [FromBody] EditResidentDto dto)
         {
             if (dto == null || string.IsNullOrWhiteSpace(dto.ResidentName) || dto.GroceryDayID == Guid.Empty)
             {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace Slottet.Shared {
-    public class EditResidentDTO {
+    public class EditResidentDto {
         public Guid ResidentID { get; set; }
         public string ResidentName { get; set; }
 
@@ -12,8 +12,8 @@ namespace Slottet.Shared {
         public List<Guid> PaymentMethodIDs { get; set; } = new();
         public List<TimeOnly> MedicineTimes { get; set; } = new();
 
-        public List<ResidentLookupDTO> GroceryDays { get; set; } = new();
-        public List<ResidentLookupDTO> PaymentMethods { get; set; } = new();
+        public List<ResidentLookupDto> GroceryDays { get; set; } = new();
+        public List<ResidentLookupDto> PaymentMethods { get; set; } = new();
 
         public bool IsActive { get; set; }
     }

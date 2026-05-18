@@ -19,7 +19,7 @@ namespace Slottet.Infrastructure.Services {
         /// Sends a query to the database to retrieve all audit log objects and maps them to DTO objects.
         /// </summary>
         /// <returns>Returns a list of AuditLogDTO objects.</returns>
-        public async Task<IEnumerable<AuditLogDTO>> GetAllAuditLogsAsync() {
+        public async Task<IEnumerable<AuditLogDto>> GetAllAuditLogsAsync() {
             var auditLogs = await _context.AuditLogs
                 .AsNoTracking()
                 .OrderBy(s => s.AuditLogID)
@@ -36,7 +36,7 @@ namespace Slottet.Infrastructure.Services {
         /// <param name="date">The date to filter audit logs by, or null to include all dates.</param>
         /// <param name="shift">The shift name to filter audit logs by, or null to include all shifts.</param>
         /// <returns>Returns a filtered list of AuditLogDTO objects.</returns>
-        public async Task<IEnumerable<AuditLogDTO>> GetAllAuditLogsAsync(DateOnly? date, string? shift) {
+        public async Task<IEnumerable<AuditLogDto>> GetAllAuditLogsAsync(DateOnly? date, string? shift) {
             IQueryable<AuditLog> query = _context.AuditLogs.AsNoTracking()
                 .Where(log => log.PerformedByStaffID != null);
 
@@ -81,8 +81,8 @@ namespace Slottet.Infrastructure.Services {
         /// <remarks>This expression can be used with LINQ providers such as Entity Framework to perform
         /// efficient server-side projection of AuditLog entities to AuditLogDTO objects.</remarks>
         /// <returns>An expression that projects an AuditLog object into an AuditLogDTO instance.</returns>
-        private static Expression<Func<AuditLog, AuditLogDTO>> MapToDtoExpression() {
-            return auditLog => new AuditLogDTO {
+        private static Expression<Func<AuditLog, AuditLogDto>> MapToDtoExpression() {
+            return auditLog => new AuditLogDto {
                 AuditLogID = auditLog.AuditLogID,
                 PerformedAtTime = auditLog.PerformedAtTime ?? auditLog.TimeStamp,
                 Action = auditLog.Action ?? string.Empty,

@@ -108,7 +108,7 @@ namespace Slottet.Infrastructure.Test {
 
             var service = new StaffDTOService(context);
 
-            var dto = new EditStaffDTO {
+            var dto = new EditStaffDto {
                 StaffID = Guid.Empty,
                 StaffName = "Bo Berg",
                 Initials = "BB",
@@ -130,7 +130,7 @@ namespace Slottet.Infrastructure.Test {
 
             var service = new StaffDTOService(context);
 
-            var dto = new EditStaffDTO {
+            var dto = new EditStaffDto {
                 StaffID = Guid.NewGuid(),
                 StaffName = "Bo Berg",
                 Initials = "BB",
@@ -160,7 +160,7 @@ namespace Slottet.Infrastructure.Test {
 
             var service = new StaffDTOService(context);
 
-            var dto = new EditStaffDTO {
+            var dto = new EditStaffDto {
                 StaffID = staff.StaffID,
                 StaffName = "Updated Name",
                 Initials = "UN",
@@ -189,7 +189,7 @@ namespace Slottet.Infrastructure.Test {
 
             var service = new StaffDTOService(context);
 
-            var dto = new EditStaffDTO {
+            var dto = new EditStaffDto {
                 StaffID = Guid.NewGuid(),
                 StaffName = "Missing Name",
                 Initials = "MN",

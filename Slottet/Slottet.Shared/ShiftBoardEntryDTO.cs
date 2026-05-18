@@ -1,6 +1,6 @@
 namespace Slottet.Shared
 {
-    public class ShiftBoardEntryDTO
+    public class ShiftBoardEntryDto
     {
         public Guid ShiftBoardID { get; set; }
         public string ShiftType { get; set; } = string.Empty;

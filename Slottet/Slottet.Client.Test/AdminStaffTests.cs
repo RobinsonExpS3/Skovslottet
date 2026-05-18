@@ -25,11 +25,11 @@ namespace Slottet.Client.Test {
         private void SetupSuccessfulInitialLoad() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
 
-            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDTO> {
+            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDto> {
                 new() { ID = Guid.NewGuid(), Name = "Slottet" }
             });
 
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO> {
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto> {
                 new() {
                     StaffID = Guid.NewGuid(),
                     StaffName = "Anna Hansen",
@@ -46,11 +46,11 @@ namespace Slottet.Client.Test {
         private void SetupSuccessfulInitialLoadWithStaffId(Guid staffId) {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
 
-            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDTO> { 
+            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDto> { 
                 new() { ID = Guid.NewGuid(), Name = "Slottet" } 
             });
 
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO> {
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto> {
                 new() {
                     StaffID = staffId,
                     StaffName = "Anna Hansen",
@@ -104,8 +104,8 @@ namespace Slottet.Client.Test {
         [TestMethod]
         public void AdminStaff_ShowsAccessDeniedMessage_WhenShiftBoardReturnsForbidden() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Forbidden);
-            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDTO>());
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDto>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/SpecialResponsibility/SpecialResponsibilities",
                 new List<SpecialResponsibilityEntryDto>());
 
@@ -119,8 +119,8 @@ namespace Slottet.Client.Test {
         [TestMethod]
         public void AdminStaff_ShowsAccessDeniedMessage_WhenShiftBoardReturnsUnauthorized() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Unauthorized);
-            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDTO>());
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDto>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/SpecialResponsibility/SpecialResponsibilities",
                 new List<SpecialResponsibilityEntryDto>());
 
@@ -137,7 +137,7 @@ namespace Slottet.Client.Test {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
             _handler.AddStatus(HttpMethod.Get, "api/Department", HttpStatusCode.InternalServerError);
 
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/SpecialResponsibility/SpecialResponsibilities",
                 new List<SpecialResponsibilityEntryDto>());
 
@@ -153,7 +153,7 @@ namespace Slottet.Client.Test {
         public void AdminStaff_ShowsStaffLoadError_WhenStaffLoadFails() {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
 
-            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDTO> { 
+            _handler.AddJson(HttpMethod.Get, "api/Department", new List<DepartmentLookupDto> { 
                 new() { ID = Guid.NewGuid(), Name = "Slottet" } 
             });
 

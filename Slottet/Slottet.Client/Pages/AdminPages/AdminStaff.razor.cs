@@ -14,13 +14,13 @@ namespace Slottet.Client.Pages.AdminPages
         private bool isAdminChecked = false;
 
         // ── Staff ─────────────────────────────────────────────────────────
-        private List<EditStaffDTO>? staffMembers;
-        private List<DepartmentLookupDTO> departments = new();
+        private List<EditStaffDto>? staffMembers;
+        private List<DepartmentLookupDto> departments = new();
         private string staffNameInput = string.Empty;
         private string initialsInput = string.Empty;
         private string roleInput = string.Empty;
         private Guid departmentIdInput;
-        private EditStaffDTO? selectedItem;
+        private EditStaffDto? selectedItem;
         private bool isBusy = false;
         private bool loadFailed = false;
 
@@ -70,7 +70,7 @@ namespace Slottet.Client.Pages.AdminPages
 
         private async Task LoadDepartments()
         {
-            var result = await AdminHttp.GetJsonAsync<List<DepartmentLookupDTO>>(httpClient, "api/Department");
+            var result = await AdminHttp.GetJsonAsync<List<DepartmentLookupDto>>(httpClient, "api/Department");
             if (result.Failed)
             {
                 departments = new();
@@ -95,11 +95,11 @@ namespace Slottet.Client.Pages.AdminPages
         {
             try
             {
-                staffMembers = await httpClient.GetFromJsonAsync<List<EditStaffDTO>>("api/Staff/Staffs");
+                staffMembers = await httpClient.GetFromJsonAsync<List<EditStaffDto>>("api/Staff/Staffs");
             }
             catch
             {
-                staffMembers = new List<EditStaffDTO>();
+                staffMembers = new List<EditStaffDto>();
                 loadFailed = true;
             }
         }
@@ -111,7 +111,7 @@ namespace Slottet.Client.Pages.AdminPages
             departments.FirstOrDefault(x =>
                 string.Equals(x.Name, "Skoven", StringComparison.OrdinalIgnoreCase))?.ID ?? Guid.Empty;
 
-        private void SelectItem(EditStaffDTO item)
+        private void SelectItem(EditStaffDto item)
         {
             selectedItem = item;
             staffNameInput = item.StaffName;
@@ -129,7 +129,7 @@ namespace Slottet.Client.Pages.AdminPages
             {
                 var staffid = Guid.NewGuid();
 
-                var newItem = new EditStaffDTO
+                var newItem = new EditStaffDto
                 {
                     StaffID = staffid,
                     StaffName = staffNameInput.Trim(),
@@ -153,7 +153,7 @@ namespace Slottet.Client.Pages.AdminPages
                     isAdminChecked = true;
                 }
 
-                var newUser = new CreateUserForStaffDTO
+                var newUser = new CreateUserForStaffDto
                 {
                     StaffID = staffid,
                     UserName = initialsInput.Trim(),
@@ -211,7 +211,7 @@ namespace Slottet.Client.Pages.AdminPages
                     isAdminChecked = true;
                 }
 
-                var userUpdate = new CreateUserForStaffDTO
+                var userUpdate = new CreateUserForStaffDto
                 {
                     StaffID = selectedItem.StaffID,
                     UserName = initialsInput.Trim(),

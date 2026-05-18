@@ -5,15 +5,15 @@ using Slottet.Shared;
 
 namespace Slottet.Application.Interfaces {
     public interface IResidentDTOService {
-        Task<IEnumerable<EditResidentDTO>> GetAllResidentsAsync();
-        Task<EditResidentDTO?> GetResidentByIdAsync(Guid id);
-        Task<EditResidentDTO?> PostResidentAsync(EditResidentDTO dto);
-        Task<bool> PutResidentAsync(Guid id, EditResidentDTO dto);
+        Task<IEnumerable<EditResidentDto>> GetAllResidentsAsync();
+        Task<EditResidentDto?> GetResidentByIdAsync(Guid id);
+        Task<EditResidentDto?> PostResidentAsync(EditResidentDto dto);
+        Task<bool> PutResidentAsync(Guid id, EditResidentDto dto);
         Task<bool> DeleteResidentAsync(Guid id);
         Task<bool> DeactivateResidentAsync(Guid id, CancellationToken ct = default);
 
-        Task<List<ResidentLookupDTO>> GetResidentGroceryDaysAsync();
-        Task<List<ResidentLookupDTO>> GetResidentPaymentMethodsAsync();
+        Task<List<ResidentLookupDto>> GetResidentGroceryDaysAsync();
+        Task<List<ResidentLookupDto>> GetResidentPaymentMethodsAsync();
         Task<List<ResidentCardDto>> GetResidentCardsAsync(CancellationToken ct = default);
         Task<bool> SwapResidentSortOrderAsync(Guid residentIdA, Guid residentIdB, CancellationToken ct = default);
         Task<bool> UpdateMedicineTimesAsync(Guid residentId, List<TimeOnly> times, CancellationToken ct = default);

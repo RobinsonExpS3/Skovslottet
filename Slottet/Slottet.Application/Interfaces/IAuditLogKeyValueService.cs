@@ -2,6 +2,6 @@ using Slottet.Shared;
 
 namespace Slottet.Application.Interfaces {
     public interface IAuditLogKeyValueService {
-        Task EnrichAuditLogsAsync(IList<AuditLogDTO> auditLogs);
+        Task EnrichAuditLogsAsync(IList<AuditLogDto> auditLogs);
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Slottet.Shared
 {
-    public class DepartmentTaskDTO
+    public class DepartmentTaskDto
     {
         public Guid DepartmentID { get; set; }
         public string? DepartmentTaskName { get; set; }

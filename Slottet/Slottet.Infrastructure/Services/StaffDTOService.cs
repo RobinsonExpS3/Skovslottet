@@ -21,7 +21,7 @@ namespace Slottet.Infrastructure.Services
         /// DTO object.
         /// </summary>
         /// <returns>Returns a list of EditStaffDTO objects.</returns>
-        public async Task<IEnumerable<EditStaffDTO>> GetAllStaffAsync()
+        public async Task<IEnumerable<EditStaffDto>> GetAllStaffAsync()
         {
             return await _context.Staffs
                     .AsNoTracking()
@@ -36,7 +36,7 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="id">The ID of the staff to retrieve.</param>
         /// <returns>Returns an EditStaffDTO object if found, otherwise null.</returns>
-        public async Task<EditStaffDTO?> GetStaffByIdAsync(Guid id)
+        public async Task<EditStaffDto?> GetStaffByIdAsync(Guid id)
         {
             return await _context.Staffs
                     .AsNoTracking()
@@ -55,7 +55,7 @@ namespace Slottet.Infrastructure.Services
         /// <param name="dto">DTO object containing staff information.</param>
         /// <returns>Returns the created EditStaffDTO object.</returns>
         /// <exception cref="ArgumentException">Thrown when the provided DepartmentID does not exist.</exception>
-        public async Task<EditStaffDTO?> PostStaffAsync(EditStaffDTO dto)
+        public async Task<EditStaffDto?> PostStaffAsync(EditStaffDto dto)
         {
             var departmentExists = await _context.Departments
                 .AnyAsync(d => d.DepartmentID == dto.DepartmentID);
@@ -85,7 +85,7 @@ namespace Slottet.Infrastructure.Services
         /// <param name="id">The ID of the staff to update.</param>
         /// <param name="dto">DTO object containing updated staff information.</param>
         /// <returns>Returns true if the update is successful, otherwise false.</returns>
-        public async Task<bool> PutStaffAsync(Guid id, EditStaffDTO dto)
+        public async Task<bool> PutStaffAsync(Guid id, EditStaffDto dto)
         {
             var existingStaff = await _context.Staffs
                 .FirstOrDefaultAsync(s => s.StaffID == id);
@@ -130,9 +130,9 @@ namespace Slottet.Infrastructure.Services
         /// <remarks>This expression can be used with LINQ providers such as Entity Framework to perform
         /// efficient server-side projection of Staff entities to EditStaffDTO objects.</remarks>
         /// <returns>An expression that projects a Staff object into an EditStaffDTO instance.</returns>
-        private static Expression<Func<Staff, EditStaffDTO>> MapToDtoExpression()
+        private static Expression<Func<Staff, EditStaffDto>> MapToDtoExpression()
         {
-            return staff => new EditStaffDTO
+            return staff => new EditStaffDto
             {
                 StaffID = staff.StaffID,
                 StaffName = staff.StaffName,

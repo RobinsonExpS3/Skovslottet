@@ -22,7 +22,7 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all department tasks.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DepartmentTaskDTO>>> GetAllDepartmentTasksAsync()
+        public async Task<ActionResult<IEnumerable<DepartmentTaskDto>>> GetAllDepartmentTasksAsync()
         {
             var departmentTasks = await _departmentTaskService.GetAllDepartmentTasksAsync();
             return Ok(departmentTasks);

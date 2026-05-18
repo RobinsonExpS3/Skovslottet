@@ -22,7 +22,7 @@ namespace Slottet.API.Test
             _controller = new StaffController(_mockService.Object);
         }
 
-        private static EditStaffDTO ValidDto() => new EditStaffDTO
+        private static EditStaffDto ValidDto() => new EditStaffDto
         {
             StaffID = ValidStaffId,
             StaffName = "Anna Andersen",
@@ -39,7 +39,7 @@ namespace Slottet.API.Test
         {
             _mockService
                 .Setup(s => s.GetAllStaffAsync())
-                .ReturnsAsync(new List<EditStaffDTO>());
+                .ReturnsAsync(new List<EditStaffDto>());
 
             var result = await _controller.GetAllStaffAsync();
 
@@ -52,9 +52,9 @@ namespace Slottet.API.Test
         [TestMethod]
         public async Task GetAllStaffAsync_ReturnsAllStaffFromService()
         {
-            var staff = new List<EditStaffDTO>
+            var staff = new List<EditStaffDto>
             {
-                new EditStaffDTO
+                new EditStaffDto
                 {
                     StaffID = Guid.NewGuid(),
                     StaffName = "Anna Andersen",
@@ -62,7 +62,7 @@ namespace Slottet.API.Test
                     Role = "Pædagog",
                     DepartmentID = Guid.NewGuid()
                 },
-                new EditStaffDTO
+                new EditStaffDto
                 {
                     StaffID = Guid.NewGuid(),
                     StaffName = "Bo Berg",
@@ -80,8 +80,8 @@ namespace Slottet.API.Test
 
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
             var ok = (OkObjectResult)result.Result!;
-            Assert.IsInstanceOfType(ok.Value, typeof(IEnumerable<EditStaffDTO>));
-            var items = (IEnumerable<EditStaffDTO>)ok.Value!;
+            Assert.IsInstanceOfType(ok.Value, typeof(IEnumerable<EditStaffDto>));
+            var items = (IEnumerable<EditStaffDto>)ok.Value!;
             Assert.AreEqual(2, items.Count());
         }
 
@@ -115,7 +115,7 @@ namespace Slottet.API.Test
 
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
             var ok = (OkObjectResult)result.Result!;
-            var returned = (EditStaffDTO)ok.Value!;
+            var returned = (EditStaffDto)ok.Value!;
             Assert.AreEqual(ValidStaffId, returned.StaffID);
             Assert.AreEqual("Anna Andersen", returned.StaffName);
             Assert.AreEqual("AA", returned.Initials);
@@ -129,7 +129,7 @@ namespace Slottet.API.Test
         {
             _mockService
                 .Setup(s => s.GetStaffByIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync((EditStaffDTO?)null);
+                .ReturnsAsync((EditStaffDto?)null);
 
             var result = await _controller.GetStaffByIdAsync(Guid.NewGuid());
 
@@ -144,7 +144,7 @@ namespace Slottet.API.Test
         {
             var dto = ValidDto();
             _mockService
-                .Setup(s => s.PostStaffAsync(It.IsAny<EditStaffDTO>()))
+                .Setup(s => s.PostStaffAsync(It.IsAny<EditStaffDto>()))
                 .ReturnsAsync(dto);
 
             var result = await _controller.PostStaffAsync(dto);
@@ -203,8 +203,8 @@ namespace Slottet.API.Test
         {
             var dto = ValidDto();
             _mockService
-                .Setup(s => s.PostStaffAsync(It.IsAny<EditStaffDTO>()))
-                .ReturnsAsync((EditStaffDTO?)null);
+                .Setup(s => s.PostStaffAsync(It.IsAny<EditStaffDto>()))
+                .ReturnsAsync((EditStaffDto?)null);
 
             var result = await _controller.PostStaffAsync(dto);
 
@@ -219,7 +219,7 @@ namespace Slottet.API.Test
         {
             var dto = ValidDto();
             _mockService
-                .Setup(s => s.PutStaffAsync(ValidStaffId, It.IsAny<EditStaffDTO>()))
+                .Setup(s => s.PutStaffAsync(ValidStaffId, It.IsAny<EditStaffDto>()))
                 .ReturnsAsync(true);
 
             var result = await _controller.PutStaffAsync(ValidStaffId, dto);

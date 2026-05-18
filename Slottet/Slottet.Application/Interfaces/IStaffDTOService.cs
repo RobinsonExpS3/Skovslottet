@@ -7,10 +7,10 @@ namespace Slottet.Application.Interfaces
 {
     public interface IStaffDTOService
     {
-        Task<IEnumerable<EditStaffDTO>> GetAllStaffAsync();
-        Task<EditStaffDTO?> GetStaffByIdAsync(Guid id);
-        Task<EditStaffDTO?> PostStaffAsync(EditStaffDTO dto);
-        Task<bool> PutStaffAsync(Guid id, EditStaffDTO dto);
+        Task<IEnumerable<EditStaffDto>> GetAllStaffAsync();
+        Task<EditStaffDto?> GetStaffByIdAsync(Guid id);
+        Task<EditStaffDto?> PostStaffAsync(EditStaffDto dto);
+        Task<bool> PutStaffAsync(Guid id, EditStaffDto dto);
         Task<bool> DeleteStaffAsync(Guid id);
     }
 }

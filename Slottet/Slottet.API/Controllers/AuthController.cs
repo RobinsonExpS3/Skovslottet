@@ -34,7 +34,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CreateUserForStaffDTO>> GetStaffUserAsync(Guid id)
+        public async Task<ActionResult<CreateUserForStaffDto>> GetStaffUserAsync(Guid id)
         {
             var result = await _authService.GetStaffUserAsync(id);
 
@@ -47,7 +47,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpPost("createUserForStaff")]
-        public async Task<ActionResult<CreateUserForStaffDTO>> PostStaffUserAsync([FromBody] CreateUserForStaffDTO dto)
+        public async Task<ActionResult<CreateUserForStaffDto>> PostStaffUserAsync([FromBody] CreateUserForStaffDto dto)
         {
             var result = await _authService.PostStaffUserAsync(dto);
 
@@ -60,7 +60,7 @@ namespace Slottet.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<CreateUserForStaffDTO>> PutStaffUserAsync(Guid id, [FromBody] CreateUserForStaffDTO dto)
+        public async Task<ActionResult<CreateUserForStaffDto>> PutStaffUserAsync(Guid id, [FromBody] CreateUserForStaffDto dto)
         {
             var updated = await _authService.PutStaffUserAsync(id, dto);
 

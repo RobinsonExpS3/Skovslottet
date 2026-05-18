@@ -24,7 +24,7 @@ namespace Slottet.API.Controllers
         /// <param name="shift">The shift name to filter audit logs by, or null to include all shifts.</param>
         /// <returns>Returns the matching audit logs.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AuditLogDTO>>> GetAllAuditLogsAsync([FromQuery] DateOnly? date, [FromQuery] string? shift)
+        public async Task<ActionResult<IEnumerable<AuditLogDto>>> GetAllAuditLogsAsync([FromQuery] DateOnly? date, [FromQuery] string? shift)
         {
             var auditLogs = await _auditLogService.GetAllAuditLogsAsync(date, shift);
 

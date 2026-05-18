@@ -23,7 +23,7 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all staff.</returns>
         [HttpGet("Staffs")]
-        public async Task<ActionResult<IEnumerable<EditStaffDTO>>> GetAllStaffAsync()
+        public async Task<ActionResult<IEnumerable<EditStaffDto>>> GetAllStaffAsync()
         {
             var staffs = await _staffService.GetAllStaffAsync();
 
@@ -36,7 +36,7 @@ namespace Slottet.API.Controllers
         /// <param name="id">The ID of the staff member to retrieve.</param>
         /// <returns>Returns the staff member if found, otherwise NotFound.</returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<EditStaffDTO>> GetStaffByIdAsync(Guid id)
+        public async Task<ActionResult<EditStaffDto>> GetStaffByIdAsync(Guid id)
         {
             var staff = await _staffService.GetStaffByIdAsync(id);
 
@@ -54,7 +54,7 @@ namespace Slottet.API.Controllers
         /// <param name="dto">DTO object containing staff information.</param>
         /// <returns>Returns the created staff member.</returns>
         [HttpPost]
-        public async Task<ActionResult<EditStaffDTO>> PostStaffAsync([FromBody] EditStaffDTO dto)
+        public async Task<ActionResult<EditStaffDto>> PostStaffAsync([FromBody] EditStaffDto dto)
         {
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||
@@ -81,7 +81,7 @@ namespace Slottet.API.Controllers
         /// <param name="dto">DTO object containing updated staff information.</param>
         /// <returns>Returns NoContent if the update succeeds, otherwise BadRequest or NotFound.</returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult<EditStaffDTO>> PutStaffAsync(Guid id, [FromBody] EditStaffDTO dto)
+        public async Task<ActionResult<EditStaffDto>> PutStaffAsync(Guid id, [FromBody] EditStaffDto dto)
         {
             if (dto == null ||
                 string.IsNullOrWhiteSpace(dto.StaffName) ||

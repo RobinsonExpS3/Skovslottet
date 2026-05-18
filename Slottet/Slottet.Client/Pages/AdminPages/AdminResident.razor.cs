@@ -106,7 +106,7 @@ namespace Slottet.Client.Pages.AdminPages
             try
             {
                 var cardsTask = Http.GetFromJsonAsync<List<ResidentCardDto>>("api/Resident/cards");
-                var staffTask = Http.GetFromJsonAsync<List<EditStaffDTO>>("api/Staff/Staffs");
+                var staffTask = Http.GetFromJsonAsync<List<EditStaffDto>>("api/Staff/Staffs");
                 var groceryTask = Http.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/groceryDays");
                 var paymentTask = Http.GetFromJsonAsync<List<ResidentLookupDTO>>("api/Resident/paymentMethods");
 
@@ -221,7 +221,7 @@ namespace Slottet.Client.Pages.AdminPages
                 .FirstOrDefault(g => g.Name == SelectedResident.GroceryDay)?.ID
                 ?? Guid.Empty;
 
-            var dto = new EditResidentDTO
+            var dto = new EditResidentDto
             {
                 ResidentName     = SelectedResident.ResidentName.Trim(),
                 GroceryDayID     = groceryDayId,
@@ -250,7 +250,7 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
-                var dto = new EditResidentDTO
+                var dto = new EditResidentDto
                 {
                     ResidentName = residentNameInput!.Trim(),
                     GroceryDayID = selectedGroceryDayID!.Value,
@@ -270,7 +270,7 @@ namespace Slottet.Client.Pages.AdminPages
             isBusy = true;
             try
             {
-                var dto = new EditResidentDTO
+                var dto = new EditResidentDto
                 {
                     ResidentID = SelectedResident!.ResidentID,
                     ResidentName = residentNameInput ?? string.Empty,

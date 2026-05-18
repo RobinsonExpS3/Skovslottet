@@ -20,7 +20,7 @@ namespace Slottet.Infrastructure.Services
         /// Sends a query to the database to retrieve all active resident objects and maps them to DTO objects.
         /// </summary>
         /// <returns>Returns a list of EditResidentDTO objects.</returns>
-        public async Task<IEnumerable<EditResidentDTO>> GetAllResidentsAsync()
+        public async Task<IEnumerable<EditResidentDto>> GetAllResidentsAsync()
         {
             var residents = await _context.Residents
                 .AsNoTracking()
@@ -46,7 +46,7 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="id">The ID of the resident to retrieve.</param>
         /// <returns>Returns an EditResidentDTO object if found, otherwise null.</returns>
-        public async Task<EditResidentDTO?> GetResidentByIdAsync(Guid id)
+        public async Task<EditResidentDto?> GetResidentByIdAsync(Guid id)
         {
             var residentDto = await _context.Residents
                 .AsNoTracking()
@@ -94,7 +94,7 @@ namespace Slottet.Infrastructure.Services
         /// </summary>
         /// <param name="dto">DTO object containing resident information.</param>
         /// <returns>Returns the created EditResidentDTO object.</returns>
-        public async Task<EditResidentDTO?> PostResidentAsync(EditResidentDTO dto)
+        public async Task<EditResidentDto?> PostResidentAsync(EditResidentDto dto)
         {
             var maxSortOrder = await _context.Residents.AnyAsync()
                 ? await _context.Residents.MaxAsync(r => r.SortOrder)
@@ -126,7 +126,7 @@ namespace Slottet.Infrastructure.Services
         /// <param name="id">The ID of the resident to update.</param>
         /// <param name="dto">DTO object containing updated resident information.</param>
         /// <returns>Returns true if the update is successful, otherwise false.</returns>
-        public async Task<bool> PutResidentAsync(Guid id, EditResidentDTO dto)
+        public async Task<bool> PutResidentAsync(Guid id, EditResidentDto dto)
         {
             var existingResident = await _context.Residents
                 .FirstOrDefaultAsync(r => r.ResidentID == id);
@@ -421,9 +421,9 @@ namespace Slottet.Infrastructure.Services
             };
         }
 
-        private static Expression<Func<Resident, EditResidentDTO>> MapToDtoExpression()
+        private static Expression<Func<Resident, EditResidentDto>> MapToDtoExpression()
         {
-            return resident => new EditResidentDTO
+            return resident => new EditResidentDto
             {
                 ResidentID = resident.ResidentID,
                 ResidentName = resident.ResidentName,

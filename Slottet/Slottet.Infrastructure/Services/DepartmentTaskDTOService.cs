@@ -23,7 +23,7 @@ namespace Slottet.Infrastructure.Services
         /// Sends a query to the database to retrieve all department task objects and maps them to DTO objects.
         /// </summary>
         /// <returns>Returns a list of DepartmentTaskDTO objects.</returns>
-        public async Task<IEnumerable<DepartmentTaskDTO>> GetAllDepartmentTasksAsync()
+        public async Task<IEnumerable<DepartmentTaskDto>> GetAllDepartmentTasksAsync()
         {
             return await _context.DepartmentTasks
                 .AsNoTracking()
@@ -38,9 +38,9 @@ namespace Slottet.Infrastructure.Services
         /// <remarks>This expression can be used with LINQ providers such as Entity Framework to perform
         /// efficient server-side projection of DepartmentTask entities to DepartmentTaskDTO objects.</remarks>
         /// <returns>An expression that projects a DepartmentTask object into a DepartmentTaskDTO instance.</returns>
-        private static Expression<Func<DepartmentTask, DepartmentTaskDTO>> MapToDtoExpression()
+        private static Expression<Func<DepartmentTask, DepartmentTaskDto>> MapToDtoExpression()
         {
-            return departmentTask => new DepartmentTaskDTO
+            return departmentTask => new DepartmentTaskDto
             {
                 DepartmentID = departmentTask.DepartmentID,
                 DepartmentTaskName = departmentTask.DepartmentTaskName

@@ -14,7 +14,7 @@ namespace Slottet.Infrastructure.Services {
 
         // ── Public entry point ────────────────────────────────────────────
 
-        public async Task EnrichAuditLogsAsync(IList<AuditLogDTO> auditLogs) {
+        public async Task EnrichAuditLogsAsync(IList<AuditLogDto> auditLogs) {
             if (auditLogs.Count == 0) return;
 
             var lookups = await BuildLookupsAsync(auditLogs);
@@ -36,7 +36,7 @@ namespace Slottet.Infrastructure.Services {
 
         // ── Batch lookup builder ──────────────────────────────────────────
 
-        private async Task<AuditLookups> BuildLookupsAsync(IList<AuditLogDTO> auditLogs) {
+        private async Task<AuditLookups> BuildLookupsAsync(IList<AuditLogDto> auditLogs) {
             var lookups      = new AuditLookups();
             var guidsByProp  = CollectGuidsByProperty(auditLogs);
 
@@ -192,7 +192,7 @@ namespace Slottet.Infrastructure.Services {
             return lookups;
         }
 
-        private static Dictionary<string, HashSet<Guid>> CollectGuidsByProperty(IList<AuditLogDTO> auditLogs) {
+        private static Dictionary<string, HashSet<Guid>> CollectGuidsByProperty(IList<AuditLogDto> auditLogs) {
             var result = new Dictionary<string, HashSet<Guid>>(StringComparer.OrdinalIgnoreCase);
             foreach (var log in auditLogs) {
                 CollectGuidsFromJson(log.KeyValues, result);
@@ -222,7 +222,7 @@ namespace Slottet.Infrastructure.Services {
 
         // ── Table-specific overrides (synchronous) ────────────────────────
 
-        private static void ApplyTableSpecificOverrides(AuditLogDTO auditLog, IReadOnlyDictionary<string, string?> keyValues, AuditLookups lookups) {
+        private static void ApplyTableSpecificOverrides(AuditLogDto auditLog, IReadOnlyDictionary<string, string?> keyValues, AuditLookups lookups) {
 
             // ── MedicineLogs ──────────────────────────────────────────────────
             if (auditLog.TableName == "MedicineLogs") {

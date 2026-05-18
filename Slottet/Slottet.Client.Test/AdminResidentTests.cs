@@ -47,7 +47,7 @@ namespace Slottet.Client.Test
                 }
             });
 
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/groceryDays", new List<ResidentLookupDTO>
             {
                 new() { ID = Guid.NewGuid(), Name = "Mandag" }
@@ -74,7 +74,7 @@ namespace Slottet.Client.Test
                 }
             });
 
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/groceryDays", new List<ResidentLookupDTO>
             {
                 new() { ID = Guid.NewGuid(), Name = "Mandag" }
@@ -124,7 +124,7 @@ namespace Slottet.Client.Test
         {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.Forbidden);
             _handler.AddJson(HttpMethod.Get, "api/Resident/cards", new List<ResidentCardDto>());
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/groceryDays", new List<ResidentLookupDTO>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/paymentMethods", new List<ResidentLookupDTO>());
 
@@ -141,7 +141,7 @@ namespace Slottet.Client.Test
         {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.InternalServerError);
             _handler.AddJson(HttpMethod.Get, "api/Resident/cards", new List<ResidentCardDto>());
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/groceryDays", new List<ResidentLookupDTO>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/paymentMethods", new List<ResidentLookupDTO>());
 
@@ -158,7 +158,7 @@ namespace Slottet.Client.Test
         {
             _handler.AddStatus(HttpMethod.Get, "api/shiftboard/current", HttpStatusCode.OK);
             _handler.AddStatus(HttpMethod.Get, "api/Resident/cards", HttpStatusCode.InternalServerError);
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/groceryDays", new List<ResidentLookupDTO>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/paymentMethods", new List<ResidentLookupDTO>());
 
@@ -224,7 +224,7 @@ namespace Slottet.Client.Test
                     PNEntries        = new List<PNEntryDto>()
                 }
             });
-            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDTO>());
+            _handler.AddJson(HttpMethod.Get, "api/Staff/Staffs", new List<EditStaffDto>());
             _handler.AddJson(HttpMethod.Get, "api/Resident/groceryDays", new List<ResidentLookupDTO>
             {
                 new() { ID = groceryDayId, Name = "Mandag" }

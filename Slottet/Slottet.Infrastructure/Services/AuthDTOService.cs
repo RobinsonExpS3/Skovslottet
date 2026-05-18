@@ -33,7 +33,7 @@ namespace Slottet.Infrastructure.Services
             return result.Succeeded;
         }
 
-        public async Task<CreateUserForStaffDTO?> GetStaffUserAsync(Guid userId)
+        public async Task<CreateUserForStaffDto?> GetStaffUserAsync(Guid userId)
         {
             var user = await FindByUserIdOrStaffIdAsync(userId);
 
@@ -45,7 +45,7 @@ namespace Slottet.Infrastructure.Services
             return await MapToDtoAsync(user);
         }
 
-        public async Task<CreateUserForStaffDTO?> PostStaffUserAsync(CreateUserForStaffDTO dto)
+        public async Task<CreateUserForStaffDto?> PostStaffUserAsync(CreateUserForStaffDto dto)
         {
             var authRole = NormalizeRole(dto.AuthRole);
 
@@ -86,7 +86,7 @@ namespace Slottet.Infrastructure.Services
             return await MapToDtoAsync(user);
         }
 
-        public async Task<bool> PutStaffUserAsync(Guid id, CreateUserForStaffDTO dto)
+        public async Task<bool> PutStaffUserAsync(Guid id, CreateUserForStaffDto dto)
         {
             var user = await FindByUserIdOrStaffIdAsync(id);
 
@@ -158,11 +158,11 @@ namespace Slottet.Infrastructure.Services
             return user ?? await _userManager.Users.FirstOrDefaultAsync(u => u.StaffID == id);
         }
 
-        private async Task<CreateUserForStaffDTO> MapToDtoAsync(ApplicationUser user)
+        private async Task<CreateUserForStaffDto> MapToDtoAsync(ApplicationUser user)
         {
             var roles = await _userManager.GetRolesAsync(user);
 
-            return new CreateUserForStaffDTO
+            return new CreateUserForStaffDto
             {
                 StaffID = user.StaffID ?? Guid.Empty,
                 UserName = user.UserName,

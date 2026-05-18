@@ -1,6 +1,6 @@
 namespace Slottet.Shared
 {
-    public class PhoneDTO
+    public class PhoneDto
     {
         public Guid PhoneID { get; set; }
         public string PhoneNumber { get; set; } = string.Empty;

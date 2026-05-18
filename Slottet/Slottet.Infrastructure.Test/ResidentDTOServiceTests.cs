@@ -144,7 +144,7 @@ namespace Slottet.Infrastructure.Test
 
             var service = new ResidentDTOService(context);
 
-            var dto = new EditResidentDTO
+            var dto = new EditResidentDto
             {
                 ResidentID = Guid.Empty,
                 ResidentName = "Bo Berg",
@@ -175,7 +175,7 @@ namespace Slottet.Infrastructure.Test
 
             var service = new ResidentDTOService(context);
 
-            var dto = new EditResidentDTO
+            var dto = new EditResidentDto
             {
                 ResidentID = resident.ResidentID,
                 ResidentName = "Updated Name",
@@ -203,7 +203,7 @@ namespace Slottet.Infrastructure.Test
 
             var service = new ResidentDTOService(context);
 
-            var dto = new EditResidentDTO
+            var dto = new EditResidentDto
             {
                 ResidentID = Guid.NewGuid(),
                 ResidentName = "Missing Name",

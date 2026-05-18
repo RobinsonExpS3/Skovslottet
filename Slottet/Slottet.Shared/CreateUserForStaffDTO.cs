@@ -1,6 +1,6 @@
 ﻿namespace Slottet.Shared
 {
-    public class CreateUserForStaffDTO
+    public class CreateUserForStaffDto
     {
         public Guid StaffID { get; set; }
         public string? UserName { get; set; } = string.Empty;

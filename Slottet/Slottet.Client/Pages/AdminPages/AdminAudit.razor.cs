@@ -12,7 +12,7 @@ namespace Slottet.Client.Pages.AdminPages
         [Inject]
         private HttpClient httpClient { get; set; } = default!;
 
-        protected List<AuditLogDTO> AuditRows { get; set; } = new();
+        protected List<AuditLogDto> AuditRows { get; set; } = new();
         private List<AuditDisplayRow> _allDisplayRows = new();
         protected IReadOnlyList<AuditGroup> FilteredGroups { get; private set; } = new List<AuditGroup>();
         protected List<ResidentCardDto> ResidentCards { get; set; } = new();
@@ -89,7 +89,7 @@ namespace Slottet.Client.Pages.AdminPages
                 }
 
                 var url = $"api/AuditLog?{string.Join("&", query)}";
-                var result = await AdminHttp.GetJsonAsync<List<AuditLogDTO>>(httpClient, url);
+                var result = await AdminHttp.GetJsonAsync<List<AuditLogDto>>(httpClient, url);
                 if (result.Failed)
                 {
                     ErrorMessage = result.ErrorMessage;
@@ -207,7 +207,7 @@ namespace Slottet.Client.Pages.AdminPages
             await LoadAuditLogsAsync();
         }
 
-        private static IEnumerable<AuditDisplayRow> CreateAuditDisplayRows(AuditLogDTO row)
+        private static IEnumerable<AuditDisplayRow> CreateAuditDisplayRows(AuditLogDto row)
         {
             var keyValues = GetAuditValues(row.KeyValues);
             var oldValues = GetAuditValues(row.OldValuesJson);

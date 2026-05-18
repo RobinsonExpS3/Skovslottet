@@ -27,7 +27,7 @@ namespace Slottet.Test.Controllers
 
         // --------------------------- Helper Data -----------------------------------------
 
-        private static EditResidentDTO validDto() => new EditResidentDTO
+        private static EditResidentDto validDto() => new EditResidentDto
         {
             ResidentID = ValidResidentId,
             ResidentName = "John",
@@ -46,7 +46,7 @@ namespace Slottet.Test.Controllers
             //Arrange
             _mockService
                 .Setup(s => s.GetAllResidentsAsync())
-                .ReturnsAsync(new List<EditResidentDTO>());
+                .ReturnsAsync(new List<EditResidentDto>());
 
             //Act
             var result = await _controller.GetAllResidentsAsync();
@@ -59,10 +59,10 @@ namespace Slottet.Test.Controllers
         public async Task GetAllResidentsAsync_ReturnAllResidentsFromService()
         {
             //Arrange
-            var resident = new List<EditResidentDTO>
+            var resident = new List<EditResidentDto>
             {
-                new EditResidentDTO { ResidentID = Guid.NewGuid(), ResidentName = "John", GroceryDayID = Guid.NewGuid() },
-                new EditResidentDTO { ResidentID = Guid.NewGuid(), ResidentName = "Jane", GroceryDayID = Guid.NewGuid() }
+                new EditResidentDto { ResidentID = Guid.NewGuid(), ResidentName = "John", GroceryDayID = Guid.NewGuid() },
+                new EditResidentDto { ResidentID = Guid.NewGuid(), ResidentName = "Jane", GroceryDayID = Guid.NewGuid() }
             };
 
             _mockService
@@ -75,8 +75,8 @@ namespace Slottet.Test.Controllers
             //Assert 
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
             var ok = (OkObjectResult)result.Result;
-            Assert.IsInstanceOfType(ok.Value, typeof(IEnumerable<EditResidentDTO>));
-            var items = (IEnumerable<EditResidentDTO>)ok.Value!;
+            Assert.IsInstanceOfType(ok.Value, typeof(IEnumerable<EditResidentDto>));
+            var items = (IEnumerable<EditResidentDto>)ok.Value!;
             Assert.AreEqual(2, items.Count());
 
         }
@@ -116,7 +116,7 @@ namespace Slottet.Test.Controllers
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
             var ok = (OkObjectResult)result.Result!;
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
-            var returned = (EditResidentDTO)ok.Value!;
+            var returned = (EditResidentDto)ok.Value!;
             Assert.AreEqual(ValidResidentId, returned.ResidentID);
 
 
@@ -129,7 +129,7 @@ namespace Slottet.Test.Controllers
             //Arrange
             _mockService
                 .Setup(s => s.GetResidentByIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync((EditResidentDTO?)null);
+                .ReturnsAsync((EditResidentDto?)null);
 
             //Act
             var result = await _controller.GetResidentByIdAsync(Guid.NewGuid());
@@ -148,7 +148,7 @@ namespace Slottet.Test.Controllers
             //Arrange
             var dto = validDto();
             _mockService
-                .Setup(s => s.PostResidentAsync(It.IsAny<EditResidentDTO>()))
+                .Setup(s => s.PostResidentAsync(It.IsAny<EditResidentDto>()))
                 .ReturnsAsync(dto);
 
             //Act
@@ -177,8 +177,8 @@ namespace Slottet.Test.Controllers
             var dto = validDto();
             
             _mockService
-                .Setup(s => s.PostResidentAsync(It.IsAny<EditResidentDTO>()))
-                .ReturnsAsync((EditResidentDTO?)null);
+                .Setup(s => s.PostResidentAsync(It.IsAny<EditResidentDto>()))
+                .ReturnsAsync((EditResidentDto?)null);
             
             //Act
             var result = await _controller.PostResidentAsync(dto);
@@ -196,7 +196,7 @@ namespace Slottet.Test.Controllers
         {
             var dto = validDto();
             _mockService
-                .Setup(s => s.PutResidentAsync(ValidResidentId, It.IsAny<EditResidentDTO>()))
+                .Setup(s => s.PutResidentAsync(ValidResidentId, It.IsAny<EditResidentDto>()))
                 .ReturnsAsync(true);
 
             var result = await _controller.PutResidentAsync(ValidResidentId, dto);

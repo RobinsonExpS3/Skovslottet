@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Slottet.Shared
 {
-    public class SwapPhoneDTO
+    public class SwapPhoneDto
     {
         public Guid PhoneID { get; set; }
         public Guid ShiftBoardID { get; set; }

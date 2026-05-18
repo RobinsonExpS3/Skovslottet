@@ -2,11 +2,11 @@
 
 namespace Slottet.Application.Interfaces
 {
-    public interface IAuthDTOService
+    public interface IAuthDtoService
     {
-        Task<CreateUserForStaffDTO?> GetStaffUserAsync(Guid userId);
-        Task<CreateUserForStaffDTO?> PostStaffUserAsync(CreateUserForStaffDTO dto);
-        Task<bool> PutStaffUserAsync(Guid id, CreateUserForStaffDTO dto);
+        Task<CreateUserForStaffDto?> GetStaffUserAsync(Guid userId);
+        Task<CreateUserForStaffDto?> PostStaffUserAsync(CreateUserForStaffDto dto);
+        Task<bool> PutStaffUserAsync(Guid id, CreateUserForStaffDto dto);
         Task<bool> DeleteStaffUserAsync(Guid id);
     }
 }

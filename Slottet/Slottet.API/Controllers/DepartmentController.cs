@@ -23,12 +23,12 @@ namespace Slottet.API.Controllers
         /// </summary>
         /// <returns>Returns all departments ordered by department name.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DepartmentLookupDTO>>> GetAllDepartmentsAsync()
+        public async Task<ActionResult<IEnumerable<DepartmentLookupDto>>> GetAllDepartmentsAsync()
         {
             var departments = await _context.Departments
                 .AsNoTracking()
                 .OrderBy(d => d.DepartmentName)
-                .Select(d => new DepartmentLookupDTO
+                .Select(d => new DepartmentLookupDto
                 {
                     ID = d.DepartmentID,
                     Name = d.DepartmentName
