@@ -4,9 +4,11 @@ using Slottet.API.Controllers;
 using Slottet.Application.Interfaces;
 using Slottet.Shared;
 
-namespace Slottet.API.Test {
+namespace Slottet.API.Test 
+{
     [TestClass]
-    public class PhoneControllerTests {
+    public class PhoneControllerTests 
+    {
         private Mock<IPhoneDTOService> _mockService = null!;
         private PhoneController _controller = null!;
 
@@ -14,12 +16,14 @@ namespace Slottet.API.Test {
         private static readonly Guid ValidDepartmentId = Guid.NewGuid();
 
         [TestInitialize]
-        public void Setup() {
+        public void Setup() 
+        {
             _mockService = new Mock<IPhoneDTOService>();
             _controller = new PhoneController(_mockService.Object);
         }
 
-        private static PhoneDTO ValidDto() => new PhoneDTO {
+        private static PhoneDto ValidDto() => new PhoneDto 
+        {
             PhoneID = ValidPhoneId,
             PhoneNumber = "12345678",
             DepartmentID = ValidDepartmentId
@@ -29,10 +33,11 @@ namespace Slottet.API.Test {
         /// Ensures the controller returns 200 OK when the service successfully retrieves a list of phones.
         /// </summary>
         [TestMethod]
-        public async Task GetAllPhonesAsync_Returns200OK() {
+        public async Task GetAllPhonesAsync_Returns200OK() 
+        {
             _mockService
                 .Setup(p => p.GetAllPhonesAsync())
-                .ReturnsAsync(new List<PhoneDTO>());
+                .ReturnsAsync(new List<PhoneDto>());
 
             var result = await _controller.GetAllPhonesAsync();
 
@@ -43,14 +48,18 @@ namespace Slottet.API.Test {
         /// Ensures the controller returns all phones provided by the service.
         /// </summary>
         [TestMethod]
-        public async Task GetAllPhonesAsync_ReturnsAllPhonesFromService() {
-            var phones = new List<PhoneDTO> {
-                new PhoneDTO {
+        public async Task GetAllPhonesAsync_ReturnsAllPhonesFromService() 
+        {
+            var phones = new List<PhoneDto> 
+            {
+                new PhoneDto 
+                {
                     PhoneID = Guid.NewGuid(),
                     PhoneNumber = "23456789",
                     DepartmentID = Guid.NewGuid()
                 },
-                new PhoneDTO {
+                new PhoneDto 
+                {
                     PhoneID = Guid.NewGuid(),
                     PhoneNumber = "34567890",
                     DepartmentID = Guid.NewGuid()
@@ -65,8 +74,8 @@ namespace Slottet.API.Test {
 
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
             var ok = (OkObjectResult)result.Result!;
-            Assert.IsInstanceOfType(ok.Value, typeof(IEnumerable<PhoneDTO>));
-            var items = (IEnumerable<PhoneDTO>)ok.Value!;
+            Assert.IsInstanceOfType(ok.Value, typeof(IEnumerable<PhoneDto>));
+            var items = (IEnumerable<PhoneDto>)ok.Value!;
             Assert.AreEqual(2, items.Count());
         }
 
@@ -74,7 +83,8 @@ namespace Slottet.API.Test {
         /// Ensures 200 OK is returned when the requested phone exists.
         /// </summary>
         [TestMethod]
-        public async Task GetPhoneByIdAsync_Returns200OK_WhenFound() {
+        public async Task GetPhoneByIdAsync_Returns200OK_WhenFound() 
+        {
             _mockService
                 .Setup(p => p.GetPhoneByIdAsync(ValidPhoneId))
                 .ReturnsAsync(ValidDto());
@@ -88,7 +98,8 @@ namespace Slottet.API.Test {
         /// Ensures the correct phone data is returned when the phone exists.
         /// </summary>
         [TestMethod]
-        public async Task GetPhoneByIdAsync_ReturnsCorrectPhone_WhenFound() {
+        public async Task GetPhoneByIdAsync_ReturnsCorrectPhone_WhenFound() 
+        {
             var dto = ValidDto();
             _mockService
                 .Setup(p => p.GetPhoneByIdAsync(ValidPhoneId))
@@ -98,7 +109,7 @@ namespace Slottet.API.Test {
 
             Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult));
             var ok = (OkObjectResult)result.Result!;
-            var returned = (PhoneDTO)ok.Value!;
+            var returned = (PhoneDto)ok.Value!;
             Assert.AreEqual(ValidPhoneId, returned.PhoneID);
             Assert.AreEqual("12345678", returned.PhoneNumber);
             Assert.AreEqual(ValidDepartmentId, returned.DepartmentID);
@@ -108,10 +119,11 @@ namespace Slottet.API.Test {
         /// Ensures 404 NotFound is returned when the requested phone does not exist.
         /// </summary>
         [TestMethod]
-        public async Task GetPhoneByIdAsync_Returns404NotFound_WhenMissing() {
+        public async Task GetPhoneByIdAsync_Returns404NotFound_WhenMissing() 
+        {
             _mockService
                 .Setup(p => p.GetPhoneByIdAsync(It.IsAny<Guid>()))
-                .ReturnsAsync((PhoneDTO?)null);
+                .ReturnsAsync((PhoneDto?)null);
 
             var result = await _controller.GetPhoneByIdAsync(Guid.NewGuid());
 
@@ -122,10 +134,11 @@ namespace Slottet.API.Test {
         /// Ensures a successful creation returns 201 Created with correct route information.
         /// </summary>
         [TestMethod]
-        public async Task PostPhoneAsync_Returns201Created_WhenServiceSucceeds() {
+        public async Task PostPhoneAsync_Returns201Created_WhenServiceSucceeds() 
+        {
             var dto = ValidDto();
             _mockService
-                .Setup(p => p.PostPhoneAsync(It.IsAny<PhoneDTO>()))
+                .Setup(p => p.PostPhoneAsync(It.IsAny<PhoneDto>()))
                 .ReturnsAsync(dto);
 
             var result = await _controller.PostPhoneAsync(dto);
@@ -138,10 +151,11 @@ namespace Slottet.API.Test {
         }
 
         /// <summary>
-        /// Ensures 400 BadRequest is returned when the input DTO is null.
+        /// Ensures 400 BadRequest is returned when the input Dto is null.
         /// </summary>
         [TestMethod]
-        public async Task PostPhoneAsync_Returns400BadRequest_WhenDtoIsNull() {
+        public async Task PostPhoneAsync_Returns400BadRequest_WhenDtoIsNull() 
+        {
             var result = await _controller.PostPhoneAsync(null!);
 
             Assert.IsInstanceOfType(result.Result, typeof(BadRequestResult));
@@ -151,7 +165,8 @@ namespace Slottet.API.Test {
         /// Ensures validation fails when required fields are empty, resulting in 400 BadRequest.
         /// </summary>
         [TestMethod]
-        public async Task PostPhoneAsync_Returns400BadRequest_WhenRequiredFieldsAreMissing() {
+        public async Task PostPhoneAsync_Returns400BadRequest_WhenRequiredFieldsAreMissing() 
+        {
             var invalidDto = ValidDto();
             invalidDto.PhoneNumber = "";
 
@@ -164,7 +179,8 @@ namespace Slottet.API.Test {
         /// Ensures validation fails when DepartmentID is missing, resulting in 400 BadRequest.
         /// </summary>
         [TestMethod]
-        public async Task PostPhoneAsync_Returns400BadRequest_WhenDepartmentIsMissing() {
+        public async Task PostPhoneAsync_Returns400BadRequest_WhenDepartmentIsMissing() 
+        {
             var invalidDto = ValidDto();
             invalidDto.DepartmentID = Guid.Empty;
 
@@ -177,11 +193,12 @@ namespace Slottet.API.Test {
         /// Ensures 400 BadRequest is returned when the service fails to create a phone.
         /// </summary>
         [TestMethod]
-        public async Task PostPhoneAsync_Returns400BadRequest_WhenServiceReturnsNull() {
+        public async Task PostPhoneAsync_Returns400BadRequest_WhenServiceReturnsNull() 
+        {
             var dto = ValidDto();
             _mockService
-                .Setup(s => s.PostPhoneAsync(It.IsAny<PhoneDTO>()))
-                .ReturnsAsync((PhoneDTO?)null);
+                .Setup(s => s.PostPhoneAsync(It.IsAny<PhoneDto>()))
+                .ReturnsAsync((PhoneDto?)null);
 
             var result = await _controller.PostPhoneAsync(dto);
 
@@ -192,10 +209,11 @@ namespace Slottet.API.Test {
         /// Ensures 204 NoContent is returned when an update operation succeeds.
         /// </summary>
         [TestMethod]
-        public async Task PutPhoneAsync_Returns204NoContent_WhenUpdateSucceeds() {
+        public async Task PutPhoneAsync_Returns204NoContent_WhenUpdateSucceeds() 
+        {
             var dto = ValidDto();
             _mockService
-                .Setup(p => p.PutPhoneAsync(ValidPhoneId, It.IsAny<PhoneDTO>()))
+                .Setup(p => p.PutPhoneAsync(ValidPhoneId, It.IsAny<PhoneDto>()))
                 .ReturnsAsync(true);
 
             var result = await _controller.PutPhoneAsync(ValidPhoneId, dto);
@@ -204,10 +222,11 @@ namespace Slottet.API.Test {
         }
 
         /// <summary>
-        /// Ensures 400 BadRequest is returned when the input DTO is null during update.
+        /// Ensures 400 BadRequest is returned when the input Dto is null during update.
         /// </summary>
         [TestMethod]
-        public async Task PutPhoneAsync_Returns400BadRequest_WhenDtoIsNull() {
+        public async Task PutPhoneAsync_Returns400BadRequest_WhenDtoIsNull() 
+        {
             var result = await _controller.PutPhoneAsync(ValidPhoneId, null!);
 
             Assert.IsInstanceOfType(result, typeof(BadRequestResult));
@@ -217,7 +236,8 @@ namespace Slottet.API.Test {
         /// Ensures validation fails when required fields are missing during update.
         /// </summary>
         [TestMethod]
-        public async Task PutPhoneAsync_Returns400BadRequest_WhenRequiredFieldsAreMissing() {
+        public async Task PutPhoneAsync_Returns400BadRequest_WhenRequiredFieldsAreMissing() 
+        {
             var invalidDto = ValidDto();
             invalidDto.PhoneNumber = "";
 
@@ -230,7 +250,8 @@ namespace Slottet.API.Test {
         /// Ensures 404 NotFound is returned when attempting to update a non-existent phone.
         /// </summary>
         [TestMethod]
-        public async Task PutPhoneAsync_Returns404NotFound_WhenPhoneMissing() {
+        public async Task PutPhoneAsync_Returns404NotFound_WhenPhoneMissing() 
+        {
             var dto = ValidDto();
             var missingId = Guid.NewGuid();
             dto.PhoneID = missingId;
@@ -248,7 +269,8 @@ namespace Slottet.API.Test {
         /// Ensures 204 NoContent is returned when a delete operation succeeds.
         /// </summary>
         [TestMethod]
-        public async Task DeletePhoneAsync_Returns204NoContent_WhenDeleteSucceeds() {
+        public async Task DeletePhoneAsync_Returns204NoContent_WhenDeleteSucceeds() 
+        {
             _mockService
                 .Setup(s => s.DeletePhoneAsync(ValidPhoneId))
                 .ReturnsAsync(true);
@@ -262,7 +284,8 @@ namespace Slottet.API.Test {
         /// Ensures 404 NotFound is returned when attempting to delete a non-existent phone.
         /// </summary>
         [TestMethod]
-        public async Task DeletePhoneAsync_Returns404NotFound_WhenPhoneMissing() {
+        public async Task DeletePhoneAsync_Returns404NotFound_WhenPhoneMissing() 
+        {
             _mockService
                 .Setup(s => s.DeletePhoneAsync(It.IsAny<Guid>()))
                 .ReturnsAsync(false);
