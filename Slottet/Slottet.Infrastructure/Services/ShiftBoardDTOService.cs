@@ -346,6 +346,8 @@ namespace Slottet.Infrastructure.Services
             if (dto.PhoneID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
                 return false;
 
+            _auditScope.ShiftBoardID = dto.ShiftBoardID;
+
             var existing = await _context.StaffPhones
                 .Where(sp => sp.PhoneID == dto.PhoneID && sp.ShiftBoardID == dto.ShiftBoardID)
                 .ToListAsync(ct);
@@ -376,6 +378,8 @@ namespace Slottet.Infrastructure.Services
         {
             if (dto.SpecialResponsibilityID == Guid.Empty || dto.ShiftBoardID == Guid.Empty)
                 return false;
+
+            _auditScope.ShiftBoardID = dto.ShiftBoardID;
 
             var existing = await _context.SpecialResponsibilityStaffs
                 .Where(srs => srs.SpecialResponsibilityID == dto.SpecialResponsibilityID
@@ -545,6 +549,8 @@ namespace Slottet.Infrastructure.Services
         {
             // Guard: we need at least a valid ResidentID to do anything useful
             if (dto.ResidentID == Guid.Empty || dto.ShiftBoardID == Guid.Empty) return false;
+
+            _auditScope.ShiftBoardID = dto.ShiftBoardID;
 
             // ── 1. Find ShiftBoard (required for all operations below) ──
             var shiftBoard = await _context.ShiftBoards
